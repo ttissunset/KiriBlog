@@ -276,7 +276,8 @@ const performSearch = () => {
     activeTag.value = ''
     // 更新URL查询参数
     updateRouteQuery()
-    console.log('执行搜索:', searchQuery.value.trim())
+    // 强制重新计算过滤后的文章
+    return filteredArticles.value
   }
 }
 

@@ -22,16 +22,21 @@
 
           <nav class="main-nav">
             <ul>
-              <li><router-link to="/">首页</router-link></li>
-              <li><router-link to="/gallery">相册</router-link></li>
-              <li><router-link to="/blog">文章</router-link></li>
+              <li><router-link to="/">{{ $t('nav.home') }}</router-link></li>
+              <li><router-link to="/gallery">{{ $t('nav.gallery') }}</router-link></li>
+              <li><router-link to="/blog">{{ $t('nav.blog') }}</router-link></li>
               <li>
-                <router-link to="/journal">随记</router-link>
+                <router-link to="/journal">{{ $t('nav.journal') }}</router-link>
               </li>
-              <li><router-link to="/comments">留言</router-link></li>
-              <li><router-link to="/archive">归档</router-link></li>
+              <li><router-link to="/comments">{{ $t('nav.comments') }}</router-link></li>
+              <li><router-link to="/archive">{{ $t('nav.archive') }}</router-link></li>
             </ul>
           </nav>
+
+          <div class="language-switcher">
+            <button @click="switchLanguage('zh')" :class="{ active: currentLocale === 'zh' }">中</button>
+            <button @click="switchLanguage('en')" :class="{ active: currentLocale === 'en' }">EN</button>
+          </div>
         </div>
       </div>
     </header>
@@ -62,11 +67,14 @@
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
+import { useI18n } from 'vue-i18n';
 
 const router = useRouter();
 const route = useRoute();
 const searchQuery = ref("");
 const searchInput = ref(null);
+const { locale } = useI18n();
+const currentLocale = ref(locale.value);
 
 // 检查当前是否在随笔页面
 const isJournalPage = computed(() => {
@@ -97,7 +105,20 @@ const focusSearch = (e) => {
   }
 };
 
+// 切换语言
+const switchLanguage = (lang) => {
+  locale.value = lang;
+  currentLocale.value = lang;
+  localStorage.setItem('locale', lang);
+};
+
+// 初始化语言
 onMounted(() => {
+  const savedLocale = localStorage.getItem('locale');
+  if (savedLocale) {
+    locale.value = savedLocale;
+    currentLocale.value = savedLocale;
+  }
   // 添加全局键盘事件监听器
   window.addEventListener("keydown", focusSearch);
 });
@@ -347,5 +368,32 @@ onUnmounted(() => {
 .new-entry-btn:hover {
   background-color: var(--link-hover);
   transform: translateY(-1px);
+}
+
+.language-switcher {
+  display: flex;
+  margin-left: 20px;
+}
+
+.language-switcher button {
+  background: none;
+  border: none;
+  color: var(--text-color);
+  opacity: 0.7;
+  font-size: 0.9rem;
+  padding: 3px 8px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.3s;
+}
+
+.language-switcher button.active {
+  background-color: var(--button-hover);
+  opacity: 1;
+}
+
+.language-switcher button:hover {
+  opacity: 1;
+  background-color: var(--button-hover);
 }
 </style>

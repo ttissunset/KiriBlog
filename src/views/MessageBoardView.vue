@@ -1,40 +1,6 @@
 <template>
   <MainLayout>
     <div class="message-board">
-      <!-- 留言板头部 -->
-      <div class="message-board-header">
-        <div class="header-content">
-          <font-awesome-icon :icon="['fas', 'comments']" class="header-icon" />
-          <div class="header-text">
-            <h1>留言板</h1>
-            <p>欢迎在此留下您的想法、建议或问题，与我交流互动</p>
-          </div>
-        </div>
-        <div class="header-stats">
-          <div class="stat-item">
-            <font-awesome-icon :icon="['fas', 'comment']" class="stat-icon" />
-            <div class="stat-info">
-              <div class="stat-value">{{ messages.length }}</div>
-              <div class="stat-label">条留言</div>
-            </div>
-          </div>
-          <div class="stat-item">
-            <font-awesome-icon :icon="['fas', 'reply']" class="stat-icon" />
-            <div class="stat-info">
-              <div class="stat-value">{{ getReplyCount() }}</div>
-              <div class="stat-label">条回复</div>
-            </div>
-          </div>
-          <div class="stat-item">
-            <font-awesome-icon :icon="['fas', 'clock']" class="stat-icon" />
-            <div class="stat-info">
-              <div class="stat-value">{{ getLastActiveTime() }}</div>
-              <div class="stat-label">最近活动</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <div class="message-container">
         <!-- 左侧留言表单 -->
         <div class="message-form-section">
@@ -406,78 +372,7 @@ const getAvatarInitials = (name) => {
   display: flex;
   flex-direction: column;
   gap: 30px;
-}
-
-/* 留言板头部 */
-.message-board-header {
-  background-color: var(--card-bg);
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  padding: 40px 30px;
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
-  position: relative;
-  overflow: hidden;
-}
-
-.header-content {
-  display: flex;
-  align-items: center;
-  gap: 25px;
-}
-
-.header-icon {
-  font-size: 2.8rem;
-  color: var(--link-color);
-  padding: 20px;
-  background-color: rgba(var(--link-color-rgb, 50, 115, 220), 0.1);
-  border-radius: 50%;
-}
-
-.header-text h1 {
-  margin: 0 0 10px 0;
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: var(--text-color);
-}
-
-.header-text p {
-  margin: 0;
-  font-size: 1.1rem;
-  color: var(--text-color);
-  opacity: 0.8;
-}
-
-/* 统计信息样式 */
-.header-stats {
-  display: flex;
-  gap: 40px;
-  padding-top: 20px;
-  border-top: 1px solid var(--border-color);
-}
-
-.stat-item {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.stat-icon {
-  font-size: 1.5rem;
-  color: var(--link-color);
-}
-
-.stat-value {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--text-color);
-}
-
-.stat-label {
-  font-size: 0.9rem;
-  color: var(--text-color);
-  opacity: 0.7;
+  margin-top: 20px;
 }
 
 /* 留言内容区域 */
@@ -745,16 +640,6 @@ label {
 }
 
 @media (max-width: 600px) {
-  .header-content {
-    flex-direction: column;
-    text-align: center;
-  }
-  
-  .header-stats {
-    flex-direction: column;
-    gap: 15px;
-  }
-  
   .form-row {
     grid-template-columns: 1fr;
   }

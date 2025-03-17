@@ -3,8 +3,8 @@
     <div class="archive-page">
       <!-- 页面头部 -->
       <div class="archive-header">
-        <h1 class="archive-title">回忆与归档</h1>
-        <p class="archive-subtitle">岁月绵长，山高路远，葱茏回首，我们也曾在这里留下过足迹。</p>
+        <h1 class="archive-title">{{ $t('archive.title') }}</h1>
+        <p class="archive-subtitle">{{ $t('archive.subtitle') }}</p>
       </div>
 
       <!-- 归档内容 -->
@@ -125,7 +125,7 @@ import MainLayout from '../layouts/Header.vue';
 
 <style scoped>
 .archive-page {
-  max-width: 800px;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 20px 0;
 }

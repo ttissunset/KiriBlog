@@ -3,6 +3,7 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 import './assets/main.css'
+import i18n from './i18n' // 引入i18n配置
 
 // 引入FontAwesome
 import { library } from '@fortawesome/fontawesome-svg-core'
@@ -18,6 +19,7 @@ const app = createApp(App)
 
 app.use(createPinia())
 app.use(router)
+app.use(i18n) // 使用i18n
 
 // 注册FontAwesome组件
 app.component('font-awesome-icon', FontAwesomeIcon)

@@ -138,13 +138,14 @@ const formatCameraTime = (dateString) => {
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   z-index: 1001;
+  line-height: 1;
 }
 
 .close-btn:hover {
   background-color: rgba(255, 255, 255, 0.3);
-  transform: rotate(90deg);
+  transform: rotate(90deg) scale(1.1);
 }
 
 .viewer-main {

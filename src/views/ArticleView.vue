@@ -6,22 +6,88 @@
           <h1 class="article-title">{{ article.title }}</h1>
           <div class="article-meta">
             <span class="meta-item author">
-              <router-link :to="'/'" class="author-link">{{ article.author || 'grtsiny43' }}</router-link>
+              <svg
+                class="meta-icon"
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              <router-link :to="'/'" class="author-link">{{
+                article.author || "grtsiny43"
+              }}</router-link>
             </span>
             <span class="meta-item date">
+              <svg
+                class="meta-icon"
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
               {{ formatDate(article.createdAt) }}
-              <span class="update-date" v-if="article.updatedAt">(更新于 {{ formatUpdatedDate(article.updatedAt) }})</span>
+              <span class="update-date" v-if="article.updatedAt"
+                >(更新于 {{ formatUpdatedDate(article.updatedAt) }})</span
+              >
             </span>
             <span class="meta-item views">
+              <svg
+                class="meta-icon"
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
               {{ article.views }} views
             </span>
             <span class="meta-item reading-time">
+              <svg
+                class="meta-icon"
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
               预计阅读时长 {{ calculateReadingTime(article.content) }} 分钟
             </span>
           </div>
         </header>
 
-        <div class="ai-summary">
+        <div class="ai-summary" :class="{ expanded: isSummaryExpanded }">
           <div class="summary-header">
             <span class="summary-icon">✨</span>
             <span class="summary-title">AI Summary</span>
@@ -30,37 +96,38 @@
           <div class="summary-content">
             <p>时光如镜映代码，云舟载梦启航程。</p>
             <p>星火轻盈燃运维，容器万千纳轻舟。</p>
+            <div v-if="isSummaryExpanded" class="summary-full-content">
+              <p>
+                云计算是一种通过互联网提供计算服务的模式，它允许用户在不拥有实际物理设备的情况下，通过网络按需访问计算资源。
+              </p>
+              <p>
+                容器技术如Docker简化了应用程序部署流程，使应用能够运行在任何支持容器的环境中，无需考虑底层系统配置差异。
+              </p>
+              <p>
+                本文将探讨Docker容器技术的核心概念、实际应用场景及部署最佳实践，帮助开发者充分利用容器化技术优势。
+              </p>
+            </div>
           </div>
           <div class="summary-more">
-            <span>开发 ≠ 搬运。不学习底层原理你永远不知道...</span>
-            <button class="show-more-btn">
-              <span class="arrow-icon">▼</span>
-              Show More
+            <span v-if="!isSummaryExpanded"
+              >开发 ≠ 搬运。不学习底层原理你永远不知道...</span
+            >
+            <button class="show-more-btn" @click="toggleSummary" style="margin-left: auto;">
+              <span class="arrow-icon" :class="{ up: isSummaryExpanded }">{{
+                isSummaryExpanded ? "▲" : "▼"
+              }}</span>
+              {{ isSummaryExpanded ? "Show Less" : "Show More" }}
             </button>
           </div>
         </div>
 
-        <div class="article-sidebar">
-          <div class="sidebar-sections">
-            <div class="sidebar-section">
-              <h3>0 %</h3>
-            </div>
-            <div class="sidebar-section">
-              <h3>部署教程 (快速简单)</h3>
-            </div>
-            <div class="sidebar-section">
-              <h3>完整步骤</h3>
-            </div>
-          </div>
-        </div>
-
-        <div class="markdown-content" v-html="renderedContent"></div>
+        <div class="markdown-body" v-html="renderedContent"></div>
 
         <div class="article-footer">
           <div class="article-tags">
-            <router-link 
-              v-for="tag in article.tags" 
-              :key="tag" 
+            <router-link
+              v-for="tag in article.tags"
+              :key="tag"
               :to="{ name: 'blog', query: { tag } }"
               class="tag"
             >
@@ -87,13 +154,17 @@
       <div class="article-navigation">
         <div v-if="prevArticle" class="prev-article">
           <span>上一篇</span>
-          <router-link :to="{ name: 'article', params: { id: prevArticle.id } }">
+          <router-link
+            :to="{ name: 'article', params: { id: prevArticle.id } }"
+          >
             {{ prevArticle.title }}
           </router-link>
         </div>
         <div v-if="nextArticle" class="next-article">
           <span>下一篇</span>
-          <router-link :to="{ name: 'article', params: { id: nextArticle.id } }">
+          <router-link
+            :to="{ name: 'article', params: { id: nextArticle.id } }"
+          >
             {{ nextArticle.title }}
           </router-link>
         </div>
@@ -102,8 +173,14 @@
       <div class="related-articles">
         <h3>相关文章</h3>
         <div class="related-list">
-          <div v-for="relatedArticle in relatedArticles" :key="relatedArticle.id" class="related-item">
-            <router-link :to="{ name: 'article', params: { id: relatedArticle.id } }">
+          <div
+            v-for="relatedArticle in relatedArticles"
+            :key="relatedArticle.id"
+            class="related-item"
+          >
+            <router-link
+              :to="{ name: 'article', params: { id: relatedArticle.id } }"
+            >
               {{ relatedArticle.title }}
             </router-link>
             <div class="related-meta">
@@ -116,19 +193,23 @@
 
       <section class="comments-section">
         <h3>评论区 ({{ article.comments.length }})</h3>
-        
+
         <div v-if="article.comments.length > 0" class="comments-list">
-          <div v-for="comment in article.comments" :key="comment.id" class="comment-item">
+          <div
+            v-for="comment in article.comments"
+            :key="comment.id"
+            class="comment-item"
+          >
             <div class="comment-meta">
               <span class="comment-author">{{ comment.author }}</span>
-              <span class="comment-date">{{ formatDate(comment.createdAt) }}</span>
+              <span class="comment-date">{{
+                formatDate(comment.createdAt)
+              }}</span>
             </div>
             <div class="comment-content">{{ comment.content }}</div>
           </div>
         </div>
-        <div v-else class="no-comments">
-          暂无评论
-        </div>
+        <div v-else class="no-comments">暂无评论</div>
 
         <div class="comment-form">
           <h4>发表评论</h4>
@@ -149,8 +230,8 @@
               rows="4"
             ></textarea>
           </div>
-          <button 
-            @click="submitComment" 
+          <button
+            @click="submitComment"
             class="submit-btn"
             :disabled="!newComment.content.trim()"
           >
@@ -168,148 +249,223 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { format } from 'date-fns'
-import { useBlogStore } from '../stores/blogStore'
-import MainLayout from '../layouts/Header.vue'
+import { ref, computed, onMounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { format } from "date-fns";
+import { useBlogStore } from "../stores/blogStore";
+import MainLayout from "../layouts/Header.vue";
+import { marked } from 'marked';
+import hljs from 'highlight.js';
+import 'highlight.js/styles/github.css';
 
-const route = useRoute()
-const router = useRouter()
-const blogStore = useBlogStore()
+// 配置marked选项，设置代码高亮和其他Markdown渲染选项
+marked.setOptions({
+  highlight: function(code, lang) {
+    // 如果指定了语言且highlight.js支持该语言，则使用该语言进行高亮，否则使用纯文本
+    const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+    return hljs.highlight(code, { language }).value;
+  },
+  langPrefix: 'hljs language-', // 添加到代码块class的前缀
+  gfm: true,                    // 启用GitHub风格的Markdown
+  breaks: true                  // 将换行符转换为<br>
+});
 
-// 获取文章ID
-const articleId = computed(() => Number(route.params.id))
+const route = useRoute();
+const router = useRouter();
+const blogStore = useBlogStore();
 
-// 获取文章详情
-const article = computed(() => blogStore.getArticleById(articleId.value))
+// AI Summary 展开/收起状态控制
+const isSummaryExpanded = ref(false);
 
-// 相关文章
-const relatedArticles = computed(() => 
-  article.value 
-    ? blogStore.getRelatedArticles(articleId.value)
-    : []
-)
+// 切换摘要展开/收起状态
+const toggleSummary = () => {
+  isSummaryExpanded.value = !isSummaryExpanded.value;
+};
 
-// Markdown渲染
+// 从路由参数获取文章ID
+const articleId = computed(() => Number(route.params.id));
+
+// 根据ID获取文章详情
+const article = computed(() => blogStore.getArticleById(articleId.value));
+
+// 获取与当前文章相关的文章列表
+const relatedArticles = computed(() =>
+  article.value ? blogStore.getRelatedArticles(articleId.value) : []
+);
+
+// 使用marked处理Markdown内容为HTML
 const renderedContent = computed(() => {
-  if (!article.value) return ''
-  
-  // 处理代码块，使用更美观的代码高亮样式
-  let content = article.value.content
-    .replace(/```([a-z]*)\n([\s\S]*?)\n```/gm, (match, language, code) => {
-      return `<div class="code-block-wrapper">
-        <div class="code-block-header">
-          <span class="code-language">${language || 'code'}</span>
-          <button class="copy-button">复制</button>
-        </div>
-        <pre class="code-block"><code class="language-${language}">${escapeHtml(code)}</code></pre>
-      </div>`
-    })
-    // 处理行内代码
-    .replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>')
-    // 处理标题
-    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
-    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-    .replace(/^#### (.+)$/gm, '<h4>$1</h4>')
-    .replace(/^##### (.+)$/gm, '<h5>$1</h5>')
-    .replace(/^###### (.+)$/gm, '<h6>$1</h6>')
-    // 处理粗体和斜体
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    // 处理链接和图片
-    .replace(/!\[(.+?)\]\((.+?)\)/g, '<img alt="$1" src="$2" class="article-image">')
-    .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" class="article-link">$1</a>')
-    // 处理段落
-    .replace(/\n\n/g, '</p><p>')
-  
-  // 确保内容被包裹在段落中
-  if (!content.startsWith('<h1>') && !content.startsWith('<h2>') && 
-      !content.startsWith('<h3>') && !content.startsWith('<p>')) {
-    content = '<p>' + content
-  }
-  if (!content.endsWith('</p>')) {
-    content = content + '</p>'
-  }
-  
-  return content
-})
+  if (!article.value) return "";
+  return marked(article.value.content);
+});
 
-// 转义HTML特殊字符
-function escapeHtml(unsafe) {
-  return unsafe
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
-
-// 上一篇和下一篇文章
+// 获取上一篇文章（如果存在）
 const prevArticle = computed(() => {
-  if (!article.value) return null
-  const allArticles = blogStore.articles
-  const currentIndex = allArticles.findIndex(a => a.id === articleId.value)
-  return currentIndex > 0 ? allArticles[currentIndex - 1] : null
-})
+  if (!article.value) return null;
+  const allArticles = blogStore.articles;
+  const currentIndex = allArticles.findIndex((a) => a.id === articleId.value);
+  return currentIndex > 0 ? allArticles[currentIndex - 1] : null;
+});
 
+// 获取下一篇文章（如果存在）
 const nextArticle = computed(() => {
-  if (!article.value) return null
-  const allArticles = blogStore.articles
-  const currentIndex = allArticles.findIndex(a => a.id === articleId.value)
-  return currentIndex < allArticles.length - 1 ? allArticles[currentIndex + 1] : null
-})
+  if (!article.value) return null;
+  const allArticles = blogStore.articles;
+  const currentIndex = allArticles.findIndex((a) => a.id === articleId.value);
+  return currentIndex < allArticles.length - 1
+    ? allArticles[currentIndex + 1]
+    : null;
+});
 
-// 评论表单
+// 评论表单数据
 const newComment = ref({
-  author: '',
-  content: ''
-})
+  author: "",
+  content: "",
+});
 
-// 提交评论
+// 提交评论到博客存储
 const submitComment = () => {
-  if (!newComment.value.content.trim()) return
-  
+  if (!newComment.value.content.trim()) return;
+
   blogStore.addComment(
     articleId.value,
     newComment.value.author.trim(),
     newComment.value.content.trim()
-  )
-  
-  // 重置表单
+  );
+
+  // 重置表单数据
   newComment.value = {
-    author: '',
-    content: ''
-  }
-  
-  alert('评论已提交，等待管理员审核')
-}
+    author: "",
+    content: "",
+  };
 
-// 格式化日期
+  alert("评论已提交，等待管理员审核");
+};
+
+// 格式化日期为月/日/年格式
 const formatDate = (dateString) => {
-  return format(new Date(dateString), 'MM/dd/yyyy')
-}
+  return format(new Date(dateString), "MM/dd/yyyy");
+};
 
-// 格式化更新日期
+// 格式化更新日期为月/日/年格式
 const formatUpdatedDate = (dateString) => {
-  return format(new Date(dateString), 'MM/dd/yyyy')
-}
+  return format(new Date(dateString), "MM/dd/yyyy");
+};
 
-// 计算阅读时间
+// 估算文章阅读时间（基于单词数量）
 const calculateReadingTime = (content) => {
-  const wordsPerMinute = 300;
+  const wordsPerMinute = 300; // 假设平均阅读速度为每分钟300个单词
   const words = content.trim().split(/\s+/).length;
   return Math.ceil(words / wordsPerMinute);
-}
+};
 
-// 增加文章阅读量
+// 组件挂载时增加文章阅读计数
 onMounted(() => {
   if (article.value) {
-    blogStore.incrementArticleViews(articleId.value)
+    blogStore.incrementArticleViews(articleId.value);
   }
-})
+});
 </script>
+
+<style>
+/* GitHub-like Markdown Styles */
+.markdown-body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial,
+    sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #24292e;
+  word-wrap: break-word;
+}
+
+.markdown-body img {
+  max-width: 100%;
+  box-sizing: border-box;
+  background-color: #fff;
+}
+
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+  margin-top: 24px;
+  margin-bottom: 16px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.markdown-body h1 {
+  font-size: 2em;
+  border-bottom: 1px solid #eaecef;
+  padding-bottom: 0.3em;
+}
+
+.markdown-body h2 {
+  font-size: 1.5em;
+  border-bottom: 1px solid #eaecef;
+  padding-bottom: 0.3em;
+}
+
+.markdown-body h3 {
+  font-size: 1.25em;
+}
+
+.markdown-body h4 {
+  font-size: 1em;
+}
+
+.markdown-body blockquote {
+  padding: 0 1em;
+  color: #6a737d;
+  border-left: 0.25em solid #dfe2e5;
+  margin: 0 0 16px 0;
+}
+
+.markdown-body code {
+  padding: 0.2em 0.4em;
+  margin: 0;
+  font-size: 85%;
+  background-color: rgba(27, 31, 35, 0.05);
+  border-radius: 3px;
+  font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+.markdown-body pre {
+  word-wrap: normal;
+  padding: 16px;
+  overflow: auto;
+  font-size: 85%;
+  line-height: 1.45;
+  background-color: #f6f8fa;
+  border-radius: 3px;
+  margin-bottom: 16px;
+}
+
+.markdown-body pre code {
+  padding: 0;
+  margin: 0;
+  background-color: transparent;
+  border: 0;
+  word-break: normal;
+  white-space: pre;
+}
+
+.markdown-body a {
+  color: #0366d6;
+  text-decoration: none;
+}
+
+.markdown-body a:hover {
+  text-decoration: underline;
+}
+
+.markdown-body p {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+</style>
 
 <style scoped>
 .article-page {
@@ -331,6 +487,7 @@ onMounted(() => {
 
 .article-header {
   margin-bottom: 30px;
+  text-align: center;
 }
 
 .article-title {
@@ -348,6 +505,7 @@ onMounted(() => {
   font-size: 0.95rem;
   margin-bottom: 25px;
   align-items: center;
+  justify-content: center;
 }
 
 .meta-item {
@@ -355,8 +513,13 @@ onMounted(() => {
   align-items: center;
 }
 
+.meta-icon {
+  margin-right: 5px;
+  color: #666;
+}
+
 .meta-item::after {
-  content: '·';
+  content: "·";
   margin-left: 15px;
   color: #ccc;
 }
@@ -381,10 +544,16 @@ onMounted(() => {
 }
 
 .ai-summary {
-  background-color: #f7f7f9;
+  background-color: #f0e6ff; /* 浅紫色背景 */
   border-radius: 8px;
   padding: 20px;
   margin-bottom: 30px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.ai-summary.expanded {
+  background-color: #e6d9ff; /* 扩展时略深一点的紫色 */
 }
 
 .summary-header {
@@ -420,6 +589,24 @@ onMounted(() => {
   margin-bottom: 8px;
 }
 
+.summary-full-content {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px dashed rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .summary-more {
   display: flex;
   align-items: center;
@@ -433,7 +620,7 @@ onMounted(() => {
   align-items: center;
   background: none;
   border: none;
-  color: #3273dc;
+  color: #6d41d1; /* 紫色按钮 */
   cursor: pointer;
   font-size: 0.85rem;
   padding: 0;
@@ -442,40 +629,40 @@ onMounted(() => {
 .arrow-icon {
   font-size: 0.6rem;
   margin-right: 4px;
+  transition: transform 0.3s ease;
 }
 
-.markdown-content {
-  line-height: 1.8;
-  color: #333;
-  font-size: 1.05rem;
+.arrow-icon.up {
+  transform: rotate(180deg);
 }
 
-.markdown-content h1,
-.markdown-content h2,
-.markdown-content h3,
-.markdown-content h4,
-.markdown-content h5,
-.markdown-content h6 {
-  margin-top: 1.8em;
-  margin-bottom: 1em;
-  font-weight: 600;
+.article-sidebar {
+  position: sticky;
+  top: 90px;
+  float: left;
+  margin-right: 20px;
+  margin-left: -100px;
+  width: 80px;
 }
 
-.markdown-content h2 {
-  font-size: 1.6rem;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 10px;
+.sidebar-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.markdown-content h3 {
-  font-size: 1.4rem;
+.sidebar-section {
+  text-align: center;
+  padding: 8px 0;
 }
 
-.markdown-content p {
-  margin-bottom: 1.5em;
+.sidebar-section h3 {
+  font-size: 0.8rem;
+  color: #666;
+  font-weight: 500;
+  margin: 0;
 }
 
-/* 代码块样式 */
 .code-block-wrapper {
   margin: 1.5em 0;
   border-radius: 8px;
@@ -521,14 +708,6 @@ onMounted(() => {
   line-height: 1.5;
 }
 
-code.language-javascript, 
-code.language-js {
-  color: #333;
-  font-family: Consolas, Monaco, 'Andale Mono', monospace;
-  font-size: 0.9em;
-  tab-size: 2;
-}
-
 .inline-code {
   background-color: #f5f5f5;
   padding: 0.2em 0.4em;
@@ -536,54 +715,6 @@ code.language-js {
   font-family: monospace;
   font-size: 0.9em;
   color: #e83e8c;
-}
-
-/* 文章图片样式 */
-.article-image {
-  max-width: 100%;
-  height: auto;
-  margin: 1.5em 0;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* 文章链接样式 */
-.article-link {
-  color: #3273dc;
-  text-decoration: none;
-  border-bottom: 1px solid rgba(50, 115, 220, 0.2);
-  transition: border-color 0.2s;
-}
-
-.article-link:hover {
-  border-color: rgba(50, 115, 220, 0.8);
-}
-
-.article-sidebar {
-  position: sticky;
-  top: 90px;
-  float: left;
-  margin-right: 20px;
-  margin-left: -100px;
-  width: 80px;
-}
-
-.sidebar-sections {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.sidebar-section {
-  text-align: center;
-  padding: 8px 0;
-}
-
-.sidebar-section h3 {
-  font-size: 0.8rem;
-  color: #666;
-  font-weight: 500;
-  margin: 0;
 }
 
 .article-footer {
@@ -833,23 +964,24 @@ code.language-js {
   .article-content {
     padding: 20px;
   }
-  
+
   .article-title {
     font-size: 1.8rem;
   }
-  
+
   .article-meta {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
+    justify-content: flex-start;
   }
-  
+
   .meta-item::after {
     display: none;
   }
-  
+
   .article-sidebar {
     display: none;
   }
 }
-</style> 
+</style>

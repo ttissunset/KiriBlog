@@ -267,7 +267,23 @@ marked.setOptions({
   },
   langPrefix: 'hljs language-', // 添加到代码块class的前缀
   gfm: true,                    // 启用GitHub风格的Markdown
-  breaks: true                  // 将换行符转换为<br>
+  breaks: true,                 // 将换行符转换为<br>
+  renderer: {
+    code(code, language) {
+      language = language || 'plaintext';
+      const languageDisplay = language.charAt(0).toUpperCase() + language.slice(1);
+      
+      return `
+        <div class="code-block-wrapper">
+          <div class="code-block-header">
+            <span class="code-language">${languageDisplay}</span>
+            <button class="copy-button" onclick="copyCode(this)">复制</button>
+          </div>
+          <pre class="code-block"><code class="hljs language-${language}">${hljs.highlight(code, {language}).value}</code></pre>
+        </div>
+      `;
+    }
+  }
 });
 
 const route = useRoute();
@@ -359,11 +375,31 @@ const calculateReadingTime = (content) => {
   return Math.ceil(words / wordsPerMinute);
 };
 
-// 组件挂载时增加文章阅读计数
+// 在组件挂载时添加复制代码功能
 onMounted(() => {
   if (article.value) {
     blogStore.incrementArticleViews(articleId.value);
   }
+  
+  // 添加复制代码的全局函数
+  window.copyCode = (button) => {
+    const pre = button.parentElement.nextElementSibling;
+    const code = pre.querySelector('code').innerText;
+    
+    navigator.clipboard.writeText(code).then(() => {
+      const originalText = button.innerText;
+      button.innerText = '已复制!';
+      button.classList.add('copied');
+      
+      setTimeout(() => {
+        button.innerText = originalText;
+        button.classList.remove('copied');
+      }, 2000);
+    }).catch(err => {
+      console.error('复制失败:', err);
+      alert('复制失败，请手动复制');
+    });
+  };
 });
 </script>
 
@@ -475,26 +511,29 @@ onMounted(() => {
   max-width: 1200px;
   margin: 0 auto;
   position: relative;
+  padding: 30px 20px;
 }
 
 .article-content {
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  padding: 40px;
+  padding: 0;
   position: relative;
+  background-color: transparent;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .article-header {
-  margin-bottom: 30px;
+  margin-bottom: 40px;
   text-align: center;
+  padding-bottom: 30px;
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.1);
 }
 
 .article-title {
   font-size: 2.5rem;
   margin-bottom: 20px;
   line-height: 1.3;
-  color: #333;
+  color: var(--text-color);
 }
 
 .article-meta {
@@ -503,7 +542,7 @@ onMounted(() => {
   gap: 15px;
   color: #666;
   font-size: 0.95rem;
-  margin-bottom: 25px;
+  margin-bottom: 0;
   align-items: center;
   justify-content: center;
 }
@@ -544,12 +583,9 @@ onMounted(() => {
 }
 
 .ai-summary {
-  background-color: #f0e6ff; /* 浅紫色背景 */
-  border-radius: 8px;
-  padding: 20px;
-  margin-bottom: 30px;
-  transition: all 0.3s ease;
-  position: relative;
+  margin: 30px 0 40px 0;
+  border-radius: 12px;
+  padding: 25px;
 }
 
 .ai-summary.expanded {
@@ -682,22 +718,33 @@ onMounted(() => {
 
 .code-language {
   font-size: 0.85rem;
-  font-weight: 600;
+  font-weight: 500;
   color: #555;
+  padding: 2px 6px;
+  background-color: #f0f0f0;
+  border-radius: 3px;
 }
 
 .copy-button {
   background: none;
-  border: none;
-  font-size: 0.8rem;
-  color: #3273dc;
-  cursor: pointer;
-  padding: 2px 8px;
+  border: 1px solid #ccc;
   border-radius: 4px;
+  font-size: 0.8rem;
+  color: #666;
+  padding: 2px 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .copy-button:hover {
-  background-color: rgba(50, 115, 220, 0.1);
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.copy-button.copied {
+  background-color: #e6f7e6;
+  color: #28a745;
+  border-color: #28a745;
 }
 
 .code-block {
@@ -780,9 +827,10 @@ onMounted(() => {
 .article-navigation {
   display: flex;
   justify-content: space-between;
-  padding: 20px 0;
-  border-top: 1px solid #eee;
-  border-bottom: 1px solid #eee;
+  padding: 20px 0 30px 0;
+  margin: 40px 0;
+  border-top: 1px dashed rgba(0, 0, 0, 0.1);
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.1);
 }
 
 .prev-article,
@@ -812,25 +860,34 @@ onMounted(() => {
 
 .related-articles {
   margin-top: 40px;
+  padding-top: 30px;
+  border-top: 1px dashed rgba(0, 0, 0, 0.1);
 }
 
 .related-articles h3 {
-  font-size: 1.2rem;
-  margin-bottom: 15px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #eee;
+  font-size: 1.4rem;
+  margin-bottom: 20px;
+  padding-bottom: 0;
+  border-bottom: none;
+  color: var(--text-color);
 }
 
 .related-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
 }
 
 .related-item {
-  background-color: #f9f9f9;
-  padding: 12px 15px;
-  border-radius: 5px;
+  background-color: rgba(0, 0, 0, 0.02);
+  padding: 15px;
+  border-radius: 8px;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.related-item:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+  transform: translateY(-2px);
 }
 
 .related-item a {
@@ -852,24 +909,26 @@ onMounted(() => {
 }
 
 .comments-section {
-  margin-top: 50px;
+  margin-top: 40px;
+  padding-top: 30px;
+  border-top: 1px dashed rgba(0, 0, 0, 0.1);
 }
 
 .comments-section h3 {
-  font-size: 1.3rem;
-  margin-bottom: 20px;
+  font-size: 1.4rem;
+  margin-bottom: 25px;
+  color: var(--text-color);
 }
 
 .comments-list {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  margin-bottom: 30px;
+  gap: 15px;
 }
 
 .comment-item {
-  background-color: #f9f9f9;
-  padding: 15px;
+  background-color: rgba(0, 0, 0, 0.02);
+  padding: 20px;
   border-radius: 8px;
 }
 
@@ -893,22 +952,23 @@ onMounted(() => {
 }
 
 .no-comments {
-  background-color: #f9f9f9;
-  padding: 20px;
+  background-color: rgba(0, 0, 0, 0.02);
+  padding: 25px;
   border-radius: 8px;
   text-align: center;
   color: #666;
-  margin-bottom: 30px;
 }
 
 .comment-form {
-  background-color: #f9f9f9;
-  padding: 20px;
+  margin-top: 30px;
+  padding: 25px;
   border-radius: 8px;
+  background-color: rgba(0, 0, 0, 0.02);
 }
 
 .comment-form h4 {
   margin-bottom: 15px;
+  color: var(--text-color);
 }
 
 .comment-note {
@@ -923,26 +983,29 @@ onMounted(() => {
 
 .form-control {
   width: 100%;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  padding: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+  background-color: white;
   font-family: inherit;
   font-size: 1rem;
+  transition: border-color 0.2s ease;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--link-color);
 }
 
 .submit-btn {
-  background-color: #3273dc;
+  background-color: var(--link-color);
   color: white;
   border: none;
-  border-radius: 4px;
-  padding: 10px 20px;
+  border-radius: 6px;
+  padding: 12px 24px;
   font-size: 1rem;
   cursor: pointer;
   transition: background-color 0.2s;
-}
-
-.submit-btn:hover {
-  background-color: #2366d1;
 }
 
 .submit-btn:disabled {

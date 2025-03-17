@@ -37,6 +37,12 @@ const router = createRouter({
       meta: { title: '随记' }
     },
     {
+      path: '/journal/edit',
+      name: 'journal-edit',
+      component: () => import('../views/JournalEditView.vue'),
+      meta: { title: '写随笔' }
+    },
+    {
       path: '/gallery',
       name: 'gallery',
       component: () => import('../views/CategoryView.vue'),

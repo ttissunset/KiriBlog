@@ -110,7 +110,10 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths } from 'date-fns'
+import { useRouter } from 'vue-router'
 import MainLayout from '../layouts/Header.vue'
+
+const router = useRouter()
 
 // 当前日期状态
 const currentDate = ref(new Date())
@@ -312,7 +315,7 @@ const formatJournalContent = (content) => {
 
 // 创建新随记（占位函数）
 const createNewJournal = () => {
-  console.log('创建新随记')
+  router.push('/journal/edit')
 }
 
 // 组件挂载时
@@ -336,9 +339,8 @@ onMounted(() => {
 
 /* 左侧日历部分 */
 .calendar-section {
-  background-color: var(--card-bg);
+  background-color: rgba(0, 0, 0, 0.01);
   border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -350,7 +352,7 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   padding: 15px;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .current-date {
@@ -546,11 +548,10 @@ onMounted(() => {
 
 /* 右侧随记内容 */
 .journal-content-section {
-  background-color: var(--card-bg);
   border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
   overflow: hidden;
   padding: 30px;
+  background-color: rgba(0, 0, 0, 0.01);
 }
 
 .journal-header {
@@ -562,7 +563,7 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   padding-bottom: 10px;
-  border-bottom: 2px solid var(--link-color);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .journal-title {

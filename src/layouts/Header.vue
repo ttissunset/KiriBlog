@@ -25,8 +25,10 @@
               <li><router-link to="/">首页</router-link></li>
               <li><router-link to="/gallery">相册</router-link></li>
               <li><router-link to="/blog">文章</router-link></li>
-              <li><router-link to="/journal">记录</router-link></li>
-              <li><router-link to="/comments">思考</router-link></li>
+              <li>
+                <router-link to="/journal">随记</router-link>
+              </li>
+              <li><router-link to="/comments">留言</router-link></li>
               <li><router-link to="/archive">归档</router-link></li>
             </ul>
           </nav>
@@ -58,12 +60,23 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from "vue";
-import { useRouter } from "vue-router";
+import { ref, onMounted, onUnmounted, computed } from "vue";
+import { useRouter, useRoute } from "vue-router";
 
 const router = useRouter();
+const route = useRoute();
 const searchQuery = ref("");
 const searchInput = ref(null);
+
+// 检查当前是否在随笔页面
+const isJournalPage = computed(() => {
+  return route.path === "/journal";
+});
+
+// 跳转到写随笔页面
+const newJournal = () => {
+  router.push("/journal/edit");
+};
 
 // 处理搜索
 const handleSearch = () => {
@@ -223,7 +236,9 @@ onUnmounted(() => {
 }
 
 .main-nav li {
-  margin-left: 15px;
+  position: relative;
+  display: flex;
+  align-items: center;
 }
 
 .main-nav a {
@@ -312,5 +327,25 @@ onUnmounted(() => {
     flex-wrap: nowrap;
     padding-bottom: 5px;
   }
+}
+
+/* 添加新随笔按钮样式 */
+.new-entry-btn {
+  background-color: var(--link-color);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  margin-left: 8px;
+  transition: all 0.2s ease;
+  vertical-align: middle;
+  display: inline-block;
+}
+
+.new-entry-btn:hover {
+  background-color: var(--link-hover);
+  transform: translateY(-1px);
 }
 </style>

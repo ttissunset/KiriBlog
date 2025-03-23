@@ -5,6 +5,135 @@ export const useBlogStore = defineStore('blog', () => {
   // 文章列表
   const articles = ref([
     {
+      id: 10,
+      title: '2024年前端开发趋势展望',
+      summary: '探讨2024年前端技术的发展方向，包括AI辅助开发、WebAssembly的普及和Web组件标准化...',
+      content: `# 2024年前端开发趋势展望
+      
+2024年前端开发领域正在经历快速变革，多项技术趋势值得关注。
+
+## AI辅助开发工具的普及
+
+人工智能正在深刻改变前端开发流程：
+- GitHub Copilot等代码补全工具提高编码效率
+- AI生成UI组件减少重复工作
+- 智能调试工具帮助定位问题
+
+## WebAssembly的广泛应用
+
+WebAssembly正在扩展Web应用的可能性：
+- 高性能计算任务在浏览器中实现
+- 复杂应用如CAD、视频编辑在Web端运行
+- 与JavaScript的无缝集成
+
+## Web组件的标准化
+
+组件化开发正在走向标准：
+- Custom Elements的广泛支持
+- Shadow DOM提供更好的封装
+- HTML Templates简化组件定义
+
+## 边缘计算与前端
+
+边缘计算为前端带来新机遇：
+- 通过边缘渲染减少延迟
+- 分布式内容交付提升全球用户体验
+- 服务器组件与边缘计算的结合
+
+## Rust生态在前端工具链的崛起
+
+Rust正在改变前端工具开发：
+- 构建工具性能显著提升
+- 更可靠的依赖管理
+- 更快的热重载和开发体验
+      `,
+      createdAt: '2024-02-05T08:30:25.000Z',
+      updatedAt: '2024-02-06T15:45:12.000Z',
+      category: '前端趋势',
+      tags: ['前端', '技术趋势', '2024'],
+      views: 426,
+      comments: [
+        {
+          id: 13,
+          author: '技术探索者',
+          content: '很期待WebAssembly在2024年的发展！',
+          createdAt: '2024-02-05T12:30:45.000Z',
+          approved: true
+        }
+      ]
+    },
+    {
+      id: 11,
+      title: 'React Server Components实战',
+      summary: '深入解析React Server Components的工作原理和最佳实践，探讨如何结合客户端组件打造高性能应用...',
+      content: `# React Server Components实战指南
+      
+React Server Components(RSC)是React生态中的重要创新，本文将详细介绍其实战应用。
+
+## 基本概念
+
+Server Components允许开发者创建仅在服务器上渲染的组件：
+\`\`\`jsx
+// 服务器组件示例
+export default async function ProductDetails({ id }) {
+  const product = await getProduct(id);
+  return <div>{product.name}</div>;
+}
+\`\`\`
+
+## 与客户端组件协作
+
+服务器组件和客户端组件可以相互嵌套使用：
+\`\`\`jsx
+// 客户端组件 ("use client")
+'use client';
+import { useState } from 'react';
+
+export default function AddToCart({ productId }) {
+  const [added, setAdded] = useState(false);
+  return (
+    <button onClick={() => setAdded(true)}>
+      {added ? '已添加' : '添加到购物车'}
+    </button>
+  );
+}
+\`\`\`
+
+## 数据获取策略
+
+服务器组件中的数据获取变得简单直接：
+\`\`\`jsx
+export default async function Dashboard() {
+  const [user, orders, recommendations] = await Promise.all([
+    getUser(),
+    getOrders(),
+    getRecommendations()
+  ]);
+  
+  return (
+    <div>
+      <UserProfile user={user} />
+      <RecentOrders orders={orders} />
+      <Recommendations items={recommendations} />
+    </div>
+  );
+}
+\`\`\`
+
+## 性能优化最佳实践
+
+- 将大型依赖移至服务器组件
+- 适当拆分客户端和服务器组件
+- 使用流式渲染提升用户体验
+      `,
+      createdAt: '2024-01-15T10:25:32.000Z',
+      updatedAt: '2024-01-16T09:17:18.000Z',
+      category: 'React',
+      tags: ['React', 'Server Components', '前端'],
+      views: 358,
+      comments: []
+    },
+    {
       id: 1,
       title: '如何开始Vue 3项目开发',
       summary: 'Vue 3提供了许多新特性，本文将介绍如何快速上手Vue 3项目开发...',
@@ -850,48 +979,89 @@ self.onmessage = e => {
     }
   ])
 
-  // 获取文章详情
-  const getArticleById = (id) => {
-    return articles.value.find(article => article.id === Number(id))
-  }
+  // 获取所有文章，按创建时间降序排序
+  const getAllArticles = computed(() => {
+    return [...articles.value].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  });
 
-  // 获取相关文章（同类别或标签）
-  const getRelatedArticles = (articleId) => {
-    const currentArticle = getArticleById(articleId)
-    if (!currentArticle) return []
+  // 根据ID获取文章
+  const getArticleById = (id) => {
+    return articles.value.find(article => article.id === id);
+  };
+
+  // 根据筛选条件过滤文章
+  const getFilteredArticles = (category, tag, searchTerm) => {
+    let result = [...articles.value];
     
-    return articles.value
+    if (category) {
+      result = result.filter(article => article.category === category);
+    }
+    
+    if (tag) {
+      result = result.filter(article => article.tags.includes(tag));
+    }
+    
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      result = result.filter(article => 
+        article.title.toLowerCase().includes(term) || 
+        article.summary.toLowerCase().includes(term) || 
+        article.content.toLowerCase().includes(term)
+      );
+    }
+    
+    // 按照时间降序排序
+    return result.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  };
+
+  // 获取热门文章
+  const getPopularArticles = () => {
+    return [...articles.value]
+      .sort((a, b) => b.views - a.views)
+      .slice(0, 5);
+  };
+
+  // 获取按分类分组的文章
+  const getArticlesByCategory = (categoryName) => {
+    const result = articles.value.filter(article => article.category === categoryName);
+    // 按照时间降序排序
+    return result.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  };
+
+  // 获取按标签分组的文章
+  const getArticlesByTag = (tagName) => {
+    const result = articles.value.filter(article => article.tags.includes(tagName));
+    // 按照时间降序排序
+    return result.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  };
+
+  // 获取相关文章
+  const getRelatedArticles = (articleId) => {
+    const currentArticle = getArticleById(articleId);
+    if (!currentArticle) return [];
+    
+    const result = articles.value
       .filter(article => 
         article.id !== articleId && 
         (article.category === currentArticle.category || 
          article.tags.some(tag => currentArticle.tags.includes(tag)))
       )
-      .slice(0, 3)
-  }
-
-  // 根据分类筛选文章
-  const getArticlesByCategory = (categoryName) => {
-    return articles.value.filter(article => article.category === categoryName)
-  }
-
-  // 根据标签筛选文章
-  const getArticlesByTag = (tagName) => {
-    return articles.value.filter(article => article.tags.includes(tagName))
-  }
-
-  // 搜索文章
-  const searchArticles = (keyword) => {
-    if (!keyword) return []
-    console.log('Searching for:', keyword);
-    const lowerKeyword = keyword.toLowerCase()
-    const results = articles.value.filter(article => 
-      article.title.toLowerCase().includes(lowerKeyword) || 
-      article.content.toLowerCase().includes(lowerKeyword) ||
-      article.summary.toLowerCase().includes(lowerKeyword)
-    );
-    console.log('Search results:', results.length);
-    return results;
-  }
+      .sort((a, b) => {
+        // 计算相关度分数
+        const aScore = calculateRelevanceScore(a, currentArticle);
+        const bScore = calculateRelevanceScore(b, currentArticle);
+        
+        // 如果相关度相同，按照时间排序
+        if (aScore === bScore) {
+          return new Date(b.createdAt) - new Date(a.createdAt);
+        }
+        
+        return bScore - aScore;
+      })
+      .slice(0, 3);
+      
+    return result;
+  };
 
   // 按年月归档文章
   const archivedArticles = computed(() => {
@@ -911,6 +1081,27 @@ self.onmessage = e => {
       }
       
       archive[year][month].push(article)
+    })
+    
+    // 按年从新到旧排序
+    const sortedYears = Object.keys(archive).sort((a, b) => b - a)
+    
+    // 对每年中的月份从新到旧排序
+    sortedYears.forEach(year => {
+      const sortedMonths = Object.keys(archive[year]).sort((a, b) => b - a)
+      
+      // 对每个月中的文章按发布日期从新到旧排序
+      sortedMonths.forEach(month => {
+        archive[year][month].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+      })
+      
+      // 重新构建该年的月份数据
+      const sortedMonthsData = {}
+      sortedMonths.forEach(month => {
+        sortedMonthsData[month] = archive[year][month]
+      })
+      
+      archive[year] = sortedMonthsData
     })
     
     return archive
@@ -960,11 +1151,13 @@ self.onmessage = e => {
     statistics, 
     pendingComments,
     archivedArticles,
+    getAllArticles,
     getArticleById, 
     getRelatedArticles,
     getArticlesByCategory,
     getArticlesByTag,
-    searchArticles,
+    getFilteredArticles,
+    getPopularArticles,
     addComment,
     approveComment,
     incrementArticleViews

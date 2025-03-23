@@ -5,93 +5,29 @@
         <header class="article-header">
           <h1 class="article-title">{{ article.title }}</h1>
           <div class="article-meta">
-            <span class="meta-item author">
-              <svg
-                class="meta-icon"
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+            <div class="meta-item">
+              <span class="meta-icon">📅</span>
+              <span class="meta-text">{{ formatDateTime(article.createdAt) }}</span>
+            </div>
+            <div class="meta-item category">
+              <span class="meta-icon">📂</span>
+              <router-link 
+                :to="{ name: 'blog', query: { category: article.category } }"
+                class="category-link"
               >
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
-              </svg>
-              <router-link :to="'/'" class="author-link">{{
-                article.author || "grtsiny43"
-              }}</router-link>
-            </span>
-            <span class="meta-item date">
-              <svg
-                class="meta-icon"
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                <line x1="16" y1="2" x2="16" y2="6"></line>
-                <line x1="8" y1="2" x2="8" y2="6"></line>
-                <line x1="3" y1="10" x2="21" y2="10"></line>
-              </svg>
-              {{ formatDate(article.createdAt) }}
-              <span class="update-date" v-if="article.updatedAt"
-                >(更新于 {{ formatUpdatedDate(article.updatedAt) }})</span
-              >
-            </span>
-            <span class="meta-item views">
-              <svg
-                class="meta-icon"
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                <circle cx="12" cy="12" r="3"></circle>
-              </svg>
-              {{ article.views }} views
-            </span>
-            <span class="meta-item reading-time">
-              <svg
-                class="meta-icon"
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <circle cx="12" cy="12" r="10"></circle>
-                <polyline points="12 6 12 12 16 14"></polyline>
-              </svg>
-              预计阅读时长 {{ calculateReadingTime(article.content) }} 分钟
-            </span>
+                {{ article.category }}
+              </router-link>
+            </div>
           </div>
         </header>
+
+        <div class="article-summary">{{ article.summary }}</div>
 
         <div class="ai-summary" :class="{ expanded: isSummaryExpanded }">
           <div class="summary-header">
             <span class="summary-icon">✨</span>
-            <span class="summary-title">AI Summary</span>
-            <span class="summary-powered">Powered By DeepSeek-中文</span>
+            <span class="summary-title">{{ $t('article.aiSummary') }}</span>
+            <span class="summary-powered">{{ $t('article.poweredBy') }}</span>
           </div>
           <div class="summary-content">
             <p>时光如镜映代码，云舟载梦启航程。</p>
@@ -116,7 +52,7 @@
               <span class="arrow-icon" :class="{ up: isSummaryExpanded }">{{
                 isSummaryExpanded ? "▲" : "▼"
               }}</span>
-              {{ isSummaryExpanded ? "Show Less" : "Show More" }}
+              {{ isSummaryExpanded ? $t('article.showLess') : $t('article.showMore') }}
             </button>
           </div>
         </div>
@@ -125,125 +61,59 @@
 
         <div class="article-footer">
           <div class="article-tags">
-            <router-link
-              v-for="tag in article.tags"
+            <span class="tags-label">标签:</span>
+            <router-link 
+              v-for="tag in article.tags" 
               :key="tag"
               :to="{ name: 'blog', query: { tag } }"
-              class="tag"
+              class="article-tag"
             >
-              {{ tag }}
+              #{{ tag }}
             </router-link>
           </div>
-
-          <div class="article-actions">
-            <button class="like-button">
-              <span class="like-icon">♥</span>
-              <span>{{ article.likes || 4 }}</span>
-            </button>
-            <button class="comment-button">
-              <span class="comment-icon">💬</span>
-              <span>{{ article.comments.length || 4 }}</span>
-            </button>
-            <button class="share-button">
-              <span class="share-icon">🔗</span>
-            </button>
+          
+          <div class="article-views">
+            <span class="views-icon">👁️</span>
+            <span class="views-count">{{ article.views }} 次阅读</span>
           </div>
         </div>
       </article>
 
       <div class="article-navigation">
-        <div v-if="prevArticle" class="prev-article">
-          <span>上一篇</span>
-          <router-link
-            :to="{ name: 'article', params: { id: prevArticle.id } }"
-          >
+        <div class="prev-article" v-if="prevArticle">
+          <span>{{ $t('article.prevArticle') }}</span>
+          <router-link :to="{ name: 'article', params: { id: prevArticle.id } }">
             {{ prevArticle.title }}
           </router-link>
         </div>
-        <div v-if="nextArticle" class="next-article">
-          <span>下一篇</span>
-          <router-link
-            :to="{ name: 'article', params: { id: nextArticle.id } }"
-          >
+        <div class="next-article" v-if="nextArticle">
+          <span>{{ $t('article.nextArticle') }}</span>
+          <router-link :to="{ name: 'article', params: { id: nextArticle.id } }">
             {{ nextArticle.title }}
           </router-link>
         </div>
       </div>
 
-      <div class="related-articles">
-        <h3>相关文章</h3>
+      <div class="related-articles" v-if="relatedArticles.length > 0">
+        <h3>{{ $t('article.relatedArticles') }}</h3>
         <div class="related-list">
-          <div
-            v-for="relatedArticle in relatedArticles"
-            :key="relatedArticle.id"
-            class="related-item"
-          >
-            <router-link
-              :to="{ name: 'article', params: { id: relatedArticle.id } }"
-            >
+          <div v-for="relatedArticle in relatedArticles" :key="relatedArticle.id" class="related-item">
+            <router-link :to="{ name: 'article', params: { id: relatedArticle.id } }">
               {{ relatedArticle.title }}
             </router-link>
             <div class="related-meta">
-              <span>{{ formatDate(relatedArticle.createdAt) }}</span>
-              <span>{{ relatedArticle.views }} 次阅读</span>
+              <span>{{ formatDateTime(relatedArticle.createdAt) }}</span>
+              <span>{{ relatedArticle.views }} {{ $t('article.views') }}</span>
             </div>
           </div>
         </div>
       </div>
 
-      <section class="comments-section">
-        <h3>评论区 ({{ article.comments.length }})</h3>
-
-        <div v-if="article.comments.length > 0" class="comments-list">
-          <div
-            v-for="comment in article.comments"
-            :key="comment.id"
-            class="comment-item"
-          >
-            <div class="comment-meta">
-              <span class="comment-author">{{ comment.author }}</span>
-              <span class="comment-date">{{
-                formatDate(comment.createdAt)
-              }}</span>
-            </div>
-            <div class="comment-content">{{ comment.content }}</div>
-          </div>
-        </div>
-        <div v-else class="no-comments">暂无评论</div>
-
-        <div class="comment-form">
-          <h4>发表评论</h4>
-          <p class="comment-note">评论需要管理员审核后才会显示</p>
-          <div class="form-group">
-            <input
-              type="text"
-              v-model="newComment.author"
-              placeholder="您的昵称 (可选)"
-              class="form-control"
-            />
-          </div>
-          <div class="form-group">
-            <textarea
-              v-model="newComment.content"
-              placeholder="评论内容"
-              class="form-control"
-              rows="4"
-            ></textarea>
-          </div>
-          <button
-            @click="submitComment"
-            class="submit-btn"
-            :disabled="!newComment.content.trim()"
-          >
-            提交评论
-          </button>
-        </div>
-      </section>
     </div>
     <div v-else class="article-not-found">
-      <h2>文章未找到</h2>
-      <p>您访问的文章可能已被删除或移动到其他位置。</p>
-      <router-link to="/" class="back-link">返回首页</router-link>
+      <h1>{{ $t('article.notFound') }}</h1>
+      <p>{{ $t('article.notFoundDesc') }}</p>
+      <router-link to="/" class="back-link">{{ $t('article.backToHome') }}</router-link>
     </div>
   </MainLayout>
 </template>
@@ -254,37 +124,137 @@ import { useRoute, useRouter } from "vue-router";
 import { format } from "date-fns";
 import { useBlogStore } from "../stores/blogStore";
 import MainLayout from "../layouts/Header.vue";
-import { marked } from 'marked';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/github.css';
+import DOMPurify from 'dompurify';
 
-// 配置marked选项，设置代码高亮和其他Markdown渲染选项
-marked.setOptions({
-  highlight: function(code, lang) {
-    // 如果指定了语言且highlight.js支持该语言，则使用该语言进行高亮，否则使用纯文本
-    const language = hljs.getLanguage(lang) ? lang : 'plaintext';
-    return hljs.highlight(code, { language }).value;
-  },
-  langPrefix: 'hljs language-', // 添加到代码块class的前缀
-  gfm: true,                    // 启用GitHub风格的Markdown
-  breaks: true,                 // 将换行符转换为<br>
-  renderer: {
-    code(code, language) {
-      language = language || 'plaintext';
-      const languageDisplay = language.charAt(0).toUpperCase() + language.slice(1);
+// 自定义安全渲染Markdown的函数
+const renderMarkdown = (markdown) => {
+  if (!markdown || typeof markdown !== 'string') {
+    return '<p>没有内容可显示</p>';
+  }
+  
+  try {
+    // 处理代码块 (必须先处理，避免内部内容被其他规则匹配)
+    let html = markdown.replace(/```([a-z]*)\n([\s\S]+?)```/g, (match, language, code) => {
+      const langClass = language ? `language-${language}` : '';
+      const highlightedCode = language && hljs.getLanguage(language)
+        ? hljs.highlight(code.trim(), { language }).value
+        : hljs.highlightAuto(code.trim()).value;
+        
+      // 为代码添加行号
+      const codeLines = highlightedCode.split('\n');
+      let codeWithLineNumbers = '';
+      
+      // 生成带行号的代码，确保行号与代码在同一行
+      codeLines.forEach((line, index) => {
+        const lineNumber = index + 1;
+        codeWithLineNumbers += `<tr><td class="line-number">${lineNumber}</td><td class="line-content"><span class="hljs ${langClass}">${line || ' '}</span></td></tr>`;
+      });
+      
+      // 根据语言生成合适的文件名示例
+      let filename = '';
+      if (language === 'js' || language === 'javascript') {
+        filename = 'example.js';
+      } else if (language === 'ts' || language === 'typescript') {
+        filename = 'app/users/page.tsx';
+      } else if (language === 'html') {
+        filename = 'index.html';
+      } else if (language === 'css') {
+        filename = 'styles.css';
+      } else if (language === 'vue') {
+        filename = 'Component.vue';
+      } else {
+        filename = language ? `file.${language}` : 'code';
+      }
       
       return `
         <div class="code-block-wrapper">
           <div class="code-block-header">
-            <span class="code-language">${languageDisplay}</span>
-            <button class="copy-button" onclick="copyCode(this)">复制</button>
+            <div class="file-path">
+              <svg class="file-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+              </svg>
+              <span>${filename}</span>
+            </div>
+            <div class="copy-button" onclick="copyCode(this)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+            </div>
           </div>
-          <pre class="code-block"><code class="hljs language-${language}">${hljs.highlight(code, {language}).value}</code></pre>
+          <div class="code-content">
+            <table class="code-table">
+              <tbody>${codeWithLineNumbers}</tbody>
+            </table>
+          </div>
         </div>
       `;
+    });
+    
+    // 处理标题 (h1 - h6)
+    html = html.replace(/^(#{1,6})\s+(.+)$/gm, (match, hashes, content) => {
+      const level = hashes.length;
+      const id = content.toLowerCase().replace(/[^\w]+/g, '-');
+      return `<h${level} id="${id}">${content}</h${level}>`;
+    });
+    
+    // 处理粗体
+    html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    
+    // 处理斜体
+    html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+    
+    // 处理链接 [text](url)
+    html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, text, url) => {
+      return `<a href="${url}" target="_blank">${text}</a>`;
+    });
+    
+    // 处理图片 ![alt](url)
+    html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, url) => {
+      return `<img src="${url}" alt="${alt}" class="markdown-image">`;
+    });
+    
+    // 处理行内代码
+    html = html.replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>');
+    
+    // 处理分割线
+    html = html.replace(/^---$/gm, '<hr class="markdown-hr">');
+    
+    // 处理引用块
+    html = html.replace(/^>\s(.+)$/gm, '<blockquote>$1</blockquote>');
+    
+    // 处理无序列表 (先标记项目，后包装列表)
+    const ulMatch = html.match(/^[\*\-]\s(.+)$/gm);
+    if (ulMatch) {
+      const items = ulMatch.map(item => `<li>${item.replace(/^[\*\-]\s/, '')}</li>`).join('');
+      html = html.replace(/^[\*\-]\s(.+)$/gm, '<!-- list-item -->');
+      html = html.replace(/<!-- list-item -->([\s\S]*?)(?=(^[^<])|$)/gm, '<ul>$1</ul>');
     }
+    
+    // 处理有序列表
+    const olMatch = html.match(/^\d+\.\s(.+)$/gm);
+    if (olMatch) {
+      const items = olMatch.map(item => `<li>${item.replace(/^\d+\.\s/, '')}</li>`).join('');
+      html = html.replace(/^\d+\.\s(.+)$/gm, '<!-- list-item -->');
+      html = html.replace(/<!-- list-item -->([\s\S]*?)(?=(^[^<])|$)/gm, '<ol>$1</ol>');
+    }
+    
+    // 处理段落 (对非标签开头的行添加段落标签)
+    html = html.replace(/^(?!<[a-z]).+$/gm, '<p>$&</p>');
+    
+    // 替换换行符为实际的换行
+    html = html.replace(/\n/g, '');
+    
+    // 使用DOMPurify清理HTML，防止XSS攻击
+    return DOMPurify.sanitize(html);
+  } catch (error) {
+    console.error('Markdown渲染错误:', error);
+    return '<p>内容渲染出错，请刷新页面重试。</p>';
   }
-});
+};
 
 const route = useRoute();
 const router = useRouter();
@@ -309,10 +279,10 @@ const relatedArticles = computed(() =>
   article.value ? blogStore.getRelatedArticles(articleId.value) : []
 );
 
-// 使用marked处理Markdown内容为HTML
+// 使用自定义函数处理Markdown内容为HTML
 const renderedContent = computed(() => {
-  if (!article.value) return "";
-  return marked(article.value.content);
+  if (!article.value || !article.value.content) return "";
+  return renderMarkdown(article.value.content);
 });
 
 // 获取上一篇文章（如果存在）
@@ -333,39 +303,14 @@ const nextArticle = computed(() => {
     : null;
 });
 
-// 评论表单数据
-const newComment = ref({
-  author: "",
-  content: "",
-});
-
-// 提交评论到博客存储
-const submitComment = () => {
-  if (!newComment.value.content.trim()) return;
-
-  blogStore.addComment(
-    articleId.value,
-    newComment.value.author.trim(),
-    newComment.value.content.trim()
-  );
-
-  // 重置表单数据
-  newComment.value = {
-    author: "",
-    content: "",
-  };
-
-  alert("评论已提交，等待管理员审核");
+// 格式化日期为精确到秒的格式
+const formatDateTime = (dateString) => {
+  return format(new Date(dateString), "yyyy/MM/dd HH:mm:ss");
 };
 
-// 格式化日期为月/日/年格式
-const formatDate = (dateString) => {
-  return format(new Date(dateString), "MM/dd/yyyy");
-};
-
-// 格式化更新日期为月/日/年格式
+// 格式化更新日期为精确到秒的格式
 const formatUpdatedDate = (dateString) => {
-  return format(new Date(dateString), "MM/dd/yyyy");
+  return format(new Date(dateString), "yyyy/MM/dd HH:mm:ss");
 };
 
 // 估算文章阅读时间（基于单词数量）
@@ -383,16 +328,27 @@ onMounted(() => {
   
   // 添加复制代码的全局函数
   window.copyCode = (button) => {
-    const pre = button.parentElement.nextElementSibling;
-    const code = pre.querySelector('code').innerText;
+    // 找到代码内容
+    const codeWrapper = button.closest('.code-block-wrapper');
+    const lineContents = codeWrapper.querySelectorAll('.line-content');
     
-    navigator.clipboard.writeText(code).then(() => {
-      const originalText = button.innerText;
-      button.innerText = '已复制!';
+    // 从各行内容中提取纯文本
+    const codeText = Array.from(lineContents)
+      .map(line => line.textContent)
+      .join('\n');
+    
+    // 复制到剪贴板
+    navigator.clipboard.writeText(codeText).then(() => {
+      const originalIcon = button.innerHTML;
+      button.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#28a745" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+      `;
       button.classList.add('copied');
       
       setTimeout(() => {
-        button.innerText = originalText;
+        button.innerHTML = originalIcon;
         button.classList.remove('copied');
       }, 2000);
     }).catch(err => {
@@ -540,56 +496,53 @@ onMounted(() => {
   display: flex;
   flex-wrap: wrap;
   gap: 15px;
-  color: #666;
-  font-size: 0.95rem;
-  margin-bottom: 0;
-  align-items: center;
-  justify-content: center;
+  margin-bottom: 20px;
+  color: var(--text-color-light);
 }
 
 .meta-item {
   display: flex;
   align-items: center;
+  font-size: 0.9rem;
 }
 
 .meta-icon {
   margin-right: 5px;
-  color: #666;
 }
 
-.meta-item::after {
-  content: "·";
-  margin-left: 15px;
-  color: #ccc;
+.meta-text {
+  color: var(--text-color-light);
 }
 
-.meta-item:last-child::after {
-  display: none;
-}
-
-.author-link {
-  color: #333;
+.category-link {
+  color: var(--link-color);
   text-decoration: none;
-  font-weight: 500;
+  transition: color 0.2s;
 }
 
-.author-link:hover {
-  text-decoration: underline;
+.category-link:hover {
+  color: var(--link-hover);
 }
 
-.update-date {
-  margin-left: 5px;
-  color: #999;
+.article-summary {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: var(--text-color);
+  opacity: 0.85;
+  margin-bottom: 25px;
+  padding-bottom: 25px;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .ai-summary {
   margin: 30px 0 40px 0;
   border-radius: 12px;
   padding: 25px;
+  background-color: rgba(230, 217, 255, 0.4); /* 默认浅紫色背景 */
 }
 
 .ai-summary.expanded {
-  background-color: #e6d9ff; /* 扩展时略深一点的紫色 */
+  background-color: rgba(230, 217, 255, 0.7); /* 扩展时略深一点的紫色 */
 }
 
 .summary-header {
@@ -703,125 +656,146 @@ onMounted(() => {
   margin: 1.5em 0;
   border-radius: 8px;
   overflow: hidden;
-  background-color: #f8f8f8;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  font-family: 'Menlo', 'Monaco', 'Consolas', 'Courier New', monospace;
 }
 
 .code-block-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 15px;
-  background-color: #e8e8e8;
-  border-bottom: 1px solid #ddd;
+  padding: 6px 12px;
+  background-color: #f5f5f5;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.code-language {
+.file-path {
+  display: flex;
+  align-items: center;
   font-size: 0.85rem;
-  font-weight: 500;
-  color: #555;
-  padding: 2px 6px;
-  background-color: #f0f0f0;
-  border-radius: 3px;
+  color: #444;
+}
+
+.file-icon {
+  margin-right: 6px;
+  color: #666;
 }
 
 .copy-button {
-  background: none;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: #666;
-  padding: 2px 8px;
+  opacity: 0.7;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: opacity 0.2s ease;
 }
 
 .copy-button:hover {
-  background-color: #f0f0f0;
-  color: #333;
+  opacity: 1;
 }
 
 .copy-button.copied {
-  background-color: #e6f7e6;
   color: #28a745;
-  border-color: #28a745;
 }
 
-.code-block {
-  margin: 0;
-  padding: 15px;
+.code-content {
+  position: relative;
   overflow-x: auto;
-  background-color: #f8f8f8;
-  line-height: 1.5;
+  background-color: #ffffff;
+}
+
+.code-table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  width: 100%;
+  font-size: 13px;
+  font-family: 'Menlo', 'Monaco', 'Consolas', 'Courier New', monospace;
+}
+
+.code-table tr {
+  line-height: 1.3;
+}
+
+.line-number {
+  user-select: none;
+  text-align: right;
+  color: #aaa;
+  padding: 1px 8px;
+  width: 1%;
+  min-width: 40px;
+  border-right: 1px solid #eee;
+  white-space: nowrap;
+}
+
+.line-content {
+  padding: 1px 8px;
+  white-space: pre;
+  width: 99%;
 }
 
 .inline-code {
-  background-color: #f5f5f5;
+  background-color: rgba(27, 31, 35, 0.05);
   padding: 0.2em 0.4em;
   border-radius: 3px;
-  font-family: monospace;
-  font-size: 0.9em;
+  font-family: 'Menlo', 'Monaco', 'Consolas', 'Courier New', monospace;
+  font-size: 0.85em;
   color: #e83e8c;
 }
 
 .article-footer {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-top: 40px;
   padding-top: 20px;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--border-color);
 }
 
 .article-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-}
-
-.tag {
-  display: inline-block;
-  padding: 4px 10px;
-  background-color: var(--button-bg);
-  border-radius: 15px;
-  font-size: 0.7rem;
-  color: var(--text-color);
-  text-decoration: none;
-  transition: all 0.15s ease;
-  border: 1px solid var(--border-color);
-  font-weight: 500;
-}
-
-.tag:hover {
-  background-color: var(--button-hover);
-  transform: translateY(-1px);
-}
-
-.article-actions {
-  display: flex;
-  gap: 10px;
-}
-
-.like-button,
-.comment-button,
-.share-button {
-  display: flex;
+  gap: 8px;
   align-items: center;
-  gap: 5px;
-  padding: 5px 10px;
-  border: 1px solid #ddd;
+}
+
+.tags-label {
+  font-size: 0.9rem;
+  color: var(--text-color-light);
+  margin-right: 5px;
+}
+
+.article-tag {
+  display: inline-block;
+  padding: 3px 10px;
+  background-color: rgba(var(--link-color-rgb), 0.1);
+  color: var(--link-color);
   border-radius: 20px;
-  background: none;
-  color: #666;
-  font-size: 0.85rem;
-  cursor: pointer;
+  font-size: 0.9rem;
+  text-decoration: none;
   transition: all 0.2s;
 }
 
-.like-button:hover,
-.comment-button:hover,
-.share-button:hover {
-  background-color: #f5f5f5;
-  color: #333;
+.article-tag:hover {
+  background-color: rgba(var(--link-color-rgb), 0.2);
+  transform: translateY(-1px);
+}
+
+.article-views {
+  display: flex;
+  align-items: center;
+  color: var(--text-color-light);
+  font-size: 0.9rem;
+}
+
+.views-icon {
+  margin-right: 5px;
+}
+
+.views-count {
+  font-weight: 500;
 }
 
 .article-navigation {
@@ -909,108 +883,12 @@ onMounted(() => {
 }
 
 .comments-section {
-  margin-top: 40px;
-  padding-top: 30px;
-  border-top: 1px dashed rgba(0, 0, 0, 0.1);
+  display: none; /* 隐藏评论部分 */
 }
 
-.comments-section h3 {
-  font-size: 1.4rem;
-  margin-bottom: 25px;
-  color: var(--text-color);
-}
-
-.comments-list {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.comment-item {
-  background-color: rgba(0, 0, 0, 0.02);
-  padding: 20px;
-  border-radius: 8px;
-}
-
-.comment-meta {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
-
-.comment-author {
-  font-weight: 500;
-}
-
-.comment-date {
-  color: #666;
-  font-size: 0.85rem;
-}
-
-.comment-content {
-  line-height: 1.6;
-}
-
-.no-comments {
-  background-color: rgba(0, 0, 0, 0.02);
-  padding: 25px;
-  border-radius: 8px;
-  text-align: center;
-  color: #666;
-}
-
-.comment-form {
-  margin-top: 30px;
-  padding: 25px;
-  border-radius: 8px;
-  background-color: rgba(0, 0, 0, 0.02);
-}
-
-.comment-form h4 {
-  margin-bottom: 15px;
-  color: var(--text-color);
-}
-
-.comment-note {
-  color: #666;
-  font-size: 0.9rem;
-  margin-bottom: 15px;
-}
-
-.form-group {
-  margin-bottom: 15px;
-}
-
-.form-control {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 6px;
-  background-color: white;
-  font-family: inherit;
-  font-size: 1rem;
-  transition: border-color 0.2s ease;
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: var(--link-color);
-}
-
-.submit-btn {
-  background-color: var(--link-color);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 12px 24px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.submit-btn:disabled {
-  background-color: #cccccc;
-  cursor: not-allowed;
+.next-article {
+  margin-left: auto;
+  text-align: right;
 }
 
 .article-not-found {
@@ -1046,5 +924,41 @@ onMounted(() => {
   .article-sidebar {
     display: none;
   }
+}
+
+/* 代码高亮样式 */
+:deep(.hljs-keyword),
+:deep(.hljs-reserved),
+:deep(.hljs-type) {
+  color: #d73a49; /* 红色 - 如 export, default, const, async, function */
+}
+
+:deep(.hljs-string) {
+  color: #22863a; /* 绿色 - 字符串 */
+}
+
+:deep(.hljs-built_in),
+:deep(.hljs-tag),
+:deep(.hljs-tag .hljs-name) {
+  color: #0366d6; /* 蓝色 - 标签名和内置函数如 map */
+}
+
+:deep(.hljs-attr),
+:deep(.hljs-property),
+:deep(.hljs-variable) {
+  color: #6f42c1; /* 紫色 - 属性名如 key, id */
+}
+
+:deep(.hljs-title),
+:deep(.hljs-title.function_) {
+  color: #6f42c1; /* 紫色 - 函数名 */
+}
+
+:deep(.hljs-params) {
+  color: #24292e; /* 黑色 - 参数 */
+}
+
+:deep(.hljs-operator) {
+  color: #d73a49; /* 红色 - 操作符 */
 }
 </style>

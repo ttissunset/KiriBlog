@@ -7,7 +7,6 @@ const messages = {
       gallery: "相册",
       blog: "文章",
       journal: "随记",
-      comments: "留言",
       archive: "归档"
     },
     home: {
@@ -28,6 +27,41 @@ const messages = {
     common: {
       readMore: "阅读更多",
       noData: "暂无数据"
+    },
+    article: {
+      author: "作者",
+      views: "浏览量",
+      readingTime: "预计阅读时长",
+      minutes: "分钟",
+      updateAt: "更新于",
+      aiSummary: "AI 摘要",
+      poweredBy: "由 DeepSeek-中文提供支持",
+      showMore: "显示更多",
+      showLess: "显示较少",
+      prevArticle: "上一篇",
+      nextArticle: "下一篇",
+      relatedArticles: "相关文章",
+      comments: "评论区",
+      noComments: "暂无评论",
+      postComment: "发表评论",
+      commentNote: "评论需要管理员审核后才会显示",
+      nickname: "您的昵称 (可选)",
+      commentContent: "评论内容",
+      submit: "提交评论",
+      notFound: "文章未找到",
+      notFoundDesc: "您访问的文章可能已被删除或移动到其他位置。",
+      backToHome: "返回首页"
+    },
+    gallery: {
+      cameraInfo: "相机信息",
+      cameraModel: "相机型号",
+      lens: "镜头",
+      aperture: "光圈",
+      shutterSpeed: "快门速度",
+      focalLength: "焦距",
+      photoTime: "拍摄时间",
+      photoDesc: "照片描述",
+      location: "拍摄地点"
     }
   },
   en: {
@@ -36,7 +70,6 @@ const messages = {
       gallery: "Gallery",
       blog: "Blog",
       journal: "Journal",
-      comments: "Comments",
       archive: "Archive"
     },
     home: {
@@ -57,6 +90,41 @@ const messages = {
     common: {
       readMore: "Read More",
       noData: "No Data"
+    },
+    article: {
+      author: "Author",
+      views: "Views",
+      readingTime: "Est. reading time",
+      minutes: "minutes",
+      updateAt: "Updated on",
+      aiSummary: "AI Summary",
+      poweredBy: "Powered By DeepSeek-中文",
+      showMore: "Show More",
+      showLess: "Show Less",
+      prevArticle: "Previous",
+      nextArticle: "Next",
+      relatedArticles: "Related Articles",
+      comments: "Comments",
+      noComments: "No comments yet",
+      postComment: "Post a Comment",
+      commentNote: "Comments will be displayed after admin approval",
+      nickname: "Your nickname (optional)",
+      commentContent: "Comment content",
+      submit: "Submit",
+      notFound: "Article Not Found",
+      notFoundDesc: "The article you're looking for may have been deleted or moved to another location.",
+      backToHome: "Back to Home"
+    },
+    gallery: {
+      cameraInfo: "Camera Info",
+      cameraModel: "Camera Model",
+      lens: "Lens",
+      aperture: "Aperture",
+      shutterSpeed: "Shutter Speed",
+      focalLength: "Focal Length",
+      photoTime: "Photo Time",
+      photoDesc: "Photo Description",
+      location: "Location"
     }
   }
 }

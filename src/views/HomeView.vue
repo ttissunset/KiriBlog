@@ -11,20 +11,6 @@
             <h1 class="profile-name">Kiri</h1>
             <p class="username">苯氨基丙酸</p>
             <div class="bio">自由独立试新茶，沉醉半生</div>
-
-            <!-- 关注信息 -->
-            <div class="follow-section">
-              <div class="followers">
-                <span class="count">3</span> followers
-              </div>
-              <div class="dot">·</div>
-              <div class="following">
-                <span class="count">0</span> following
-              </div>
-            </div>
-
-            <!-- 关注按钮 -->
-            <button class="follow-button">Follow</button>
           </div>
         </div>
 
@@ -151,14 +137,20 @@
                 <div class="stats-container">
                   <div class="stats-data">
                     <div class="stat-item">
-                      <font-awesome-icon :icon="['fas', 'star']" class="stat-icon" />
+                      <font-awesome-icon
+                        :icon="['fas', 'star']"
+                        class="stat-icon"
+                      />
                       <div class="stat-details">
                         <div class="stat-value">1024</div>
                         <div class="stat-label">Total Stars</div>
                       </div>
                     </div>
                     <div class="stat-item">
-                      <font-awesome-icon :icon="['fas', 'code-branch']" class="stat-icon" />
+                      <font-awesome-icon
+                        :icon="['fas', 'code-branch']"
+                        class="stat-icon"
+                      />
                       <div class="stat-details">
                         <div class="stat-value">512</div>
                         <div class="stat-label">Commits (2023)</div>
@@ -179,7 +171,7 @@
                 </p>
                 <p class="from-text">
                   <span class="wave-emoji">👋</span> From
-                  <a href="#" class="author-link">ZaiHua</a>
+                  <a href="#" class="author-link">Kiri</a>
                 </p>
               </div>
             </div>
@@ -1145,13 +1137,13 @@ function getCellClass(week, day) {
   .contribution-heatmap-section {
     margin-top: 20px;
   }
-  
+
   .heatmap-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
   }
-  
+
   .heatmap-buttons {
     overflow-x: auto;
     width: 100%;
@@ -1159,11 +1151,11 @@ function getCellClass(week, day) {
     justify-content: flex-start;
     gap: 5px;
   }
-  
+
   .heatmap-container {
     padding-bottom: 0;
   }
-  
+
   .heatmap-legend {
     justify-content: flex-start;
     margin-left: 30px;
@@ -1175,16 +1167,16 @@ function getCellClass(week, day) {
   .heatmap-months span {
     font-size: 10px;
   }
-  
+
   .heatmap-days {
     font-size: 10px;
   }
-  
+
   .heatmap-cell {
     width: 8px;
     height: 8px;
   }
-  
+
   .legend-cell {
     width: 8px;
     height: 8px;

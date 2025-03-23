@@ -44,36 +44,20 @@
                   
                   <div class="article-cards">
                     <div v-for="article in monthData" :key="article.id" class="article-card">
-                      <div class="card-date">{{ formatDate(article.createdAt, 'MM-dd') }}</div>
+                      <div class="card-date">{{ formatDateTime(article.createdAt) }}</div>
                       <router-link :to="{ name: 'article', params: { id: article.id } }" class="card-title">
                         {{ article.title }}
                       </router-link>
                       
-                      <div class="card-meta">
-                        <div class="meta-left">
-                          <span class="meta-category" @click.stop="filterByCategory(article.category)">
-                            {{ article.category }}
-                          </span>
-                        </div>
-                        <div class="meta-right">
-                          <span class="meta-views">
+                      <p class="card-summary">{{ article.summary }}</p>
+
+                      <div class="card-footer">
+                        <div class="card-stats">
+                          <span class="view-count">
                             <span class="view-icon">👁️</span>
                             {{ article.views }}
                           </span>
                         </div>
-                      </div>
-                      
-                      <p class="card-summary">{{ article.summary }}</p>
-
-                      <div class="card-tags">
-                        <span 
-                          v-for="tag in article.tags" 
-                          :key="tag" 
-                          class="card-tag"
-                          @click.stop="filterByTag(tag)"
-                        >
-                          #{{ tag }}
-                        </span>
                       </div>
                     </div>
                   </div>
@@ -97,7 +81,7 @@
                   class="article-card"
                 >
                   <div class="card-header">
-                    <span class="card-date">{{ formatDate(article.createdAt, 'yyyy-MM-dd') }}</span>
+                    <span class="card-date">{{ formatDateTime(article.createdAt) }}</span>
                     <span 
                       class="card-category"
                       @click="filterByCategory(article.category)"
@@ -113,17 +97,6 @@
                   <p class="card-summary">{{ article.summary }}</p>
                   
                   <div class="card-footer">
-                    <div class="card-tags">
-                      <span 
-                        v-for="tag in article.tags" 
-                        :key="tag" 
-                        class="card-tag"
-                        @click="filterByTag(tag)"
-                      >
-                        #{{ tag }}
-                      </span>
-                    </div>
-                    
                     <div class="card-stats">
                       <span class="view-count">
                         <span class="view-icon">👁️</span>
@@ -149,19 +122,6 @@
 
         <!-- 右侧：侧边栏 -->
         <div class="blog-sidebar">
-          <!-- 搜索框 -->
-          <div class="sidebar-search">
-            <input 
-              type="text" 
-              placeholder="搜索文章..." 
-              v-model="searchQuery"
-              @keyup.enter="performSearch"
-            />
-            <button class="search-btn" @click="performSearch">
-              <span class="search-icon">🔍</span>
-            </button>
-          </div>
-          
           <!-- 分类部分 -->
           <div class="sidebar-section">
             <h3 class="section-title">
@@ -199,7 +159,7 @@
                 </router-link>
                 <div class="post-meta">
                   <span class="post-views">{{ article.views }} 次阅读</span>
-                  <span class="post-date">{{ formatDate(article.createdAt, 'MM-dd') }}</span>
+                  <span class="post-date">{{ formatDateTime(article.createdAt) }}</span>
                 </div>
               </div>
             </div>
@@ -246,26 +206,14 @@ onMounted(() => {
 
 // 筛选文章
 const filteredArticles = computed(() => {
-  if (activeCategory.value) {
-    return blogStore.getArticlesByCategory(activeCategory.value)
-  }
-  
-  if (activeTag.value) {
-    return blogStore.getArticlesByTag(activeTag.value)
-  }
-  
-  if (searchQuery.value.trim()) {
-    return blogStore.searchArticles(searchQuery.value.trim())
-  }
-  
-  return articles
+  // 始终按最新时间排序，确保最新的文章在最前面
+  return blogStore.getFilteredArticles(activeCategory.value, activeTag.value, searchQuery.value)
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 })
 
-// 热门文章（按阅读次数排序）
+// 热门文章
 const popularArticles = computed(() => {
-  return [...articles]
-    .sort((a, b) => b.views - a.views)
-    .slice(0, 5)
+  return blogStore.getPopularArticles().slice(0, 5);
 })
 
 // 执行搜索
@@ -336,6 +284,11 @@ const updateRouteQuery = () => {
 // 格式化日期
 const formatDate = (dateString, formatString) => {
   return format(new Date(dateString), formatString)
+}
+
+// 精确到秒的日期格式化函数
+const formatDateTime = (dateString) => {
+  return format(new Date(dateString), "yyyy/MM/dd HH:mm:ss")
 }
 
 // 监听滚动效果
@@ -655,7 +608,7 @@ onUnmounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: auto;
+  margin-top: 10px;
 }
 
 .card-meta {
@@ -701,35 +654,43 @@ onUnmounted(() => {
   font-size: 0.85rem;
 }
 
-.card-tags, .card-stats {
-  display: flex;
-  align-items: center;
-}
-
 .card-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
 }
 
 .card-tag {
-  font-size: 0.7rem;
-  color: var(--text-color);
-  opacity: 0.8;
-  cursor: pointer;
-  transition: all 0.15s ease;
+  font-size: 0.75rem;
+  color: #666;
+  background-color: rgba(0, 0, 0, 0.04);
   padding: 2px 8px;
-  background-color: var(--button-bg);
-  border-radius: 15px;
-  margin-right: 6px;
-  display: inline-block;
-  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
 }
 
 .card-tag:hover {
-  opacity: 1;
-  background-color: var(--button-hover);
-  transform: translateY(-1px);
+  background-color: rgba(0, 0, 0, 0.08);
+  color: #333;
+}
+
+.card-stats {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.view-count {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.view-icon {
+  opacity: 0.7;
 }
 
 /* 无文章状态 */

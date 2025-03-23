@@ -1,32 +1,6 @@
 <template>
   <MainLayout>
     <div class="blog-page">
-      <!-- 博客页面头部 -->
-      <div class="blog-header">
-        <div class="header-content">
-          <div class="blog-header-decoration"></div>
-          <div class="header-main">
-            <h1 class="blog-title">探索世界</h1>
-            <p class="blog-description">记录思考，分享知识，连接灵感的桥梁</p>
-            
-            <!-- 当前激活的筛选器 -->
-            <div class="active-filters" v-if="activeCategory || activeTag">
-              <span class="filter-label">筛选:</span>
-              <div v-if="activeCategory" class="active-filter">
-                <span class="filter-icon">📂</span>
-                <span>{{ activeCategory }}</span>
-                <button @click="clearFilters('category')" class="clear-filter" title="清除筛选">×</button>
-              </div>
-              <div v-if="activeTag" class="active-filter">
-                <span class="filter-icon">#</span>
-                <span>{{ activeTag }}</span>
-                <button @click="clearFilters('tag')" class="clear-filter" title="清除筛选">×</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <!-- 主要内容区 -->
       <div class="blog-container">
         <!-- 左侧：文章列表 -->
@@ -34,44 +8,86 @@
           <!-- 时间线浏览模式 -->
           <template v-if="filteredArticles.length > 0 && !activeCategory && !activeTag">
             <div class="timeline-view">
-              <div v-for="(yearData, year) in archivedArticles" :key="year" class="year-block">
-                <div class="year-marker">
-                  <span class="year-number">{{ year }}</span>
-                </div>
-                
-                <div v-for="(monthData, month) in yearData" :key="`${year}-${month}`" class="month-block">
-                  <div class="month-marker">{{ month }}月</div>
+              <!-- 文章年份归档区域 -->
+              <template v-if="archivedArticles">
+                <div 
+                  v-for="year in Object.keys(archivedArticles).sort((a, b) => b - a)" 
+                  :key="year" 
+                  class="year-block"
+                >
+                  <div class="year-marker">
+                    <span class="year-number">{{ year }}</span>
+                  </div>
                   
-                  <div class="article-cards">
-                    <div v-for="article in monthData" :key="article.id" class="article-card">
-                      <div class="card-date">{{ formatDateTime(article.createdAt) }}</div>
-                      <router-link :to="{ name: 'article', params: { id: article.id } }" class="card-title">
-                        {{ article.title }}
-                      </router-link>
-                      
-                      <p class="card-summary">{{ article.summary }}</p>
+                  <!-- 文章月份归档区域 -->
+                  <div 
+                    v-for="month in Object.keys(archivedArticles[year] || {}).sort((a, b) => b - a)" 
+                    :key="`${year}-${month}`" 
+                    class="month-block"
+                  >
+                    <div class="month-marker">{{ month }}{{ $t('blog.month') }}</div>
+                    
+                    <div class="article-cards">
+                      <div v-for="article in archivedArticles[year][month]" :key="article.id" class="article-card">
+                        <div class="card-date">{{ formatDateTime(article.createdAt) }}</div>
+                        <router-link :to="{ name: 'article', params: { id: article.id } }" class="card-title">
+                          {{ article.title }}
+                        </router-link>
+                        
+                        <p class="card-summary">{{ article.summary }}</p>
 
-                      <div class="card-footer">
-                        <div class="card-stats">
-                          <span class="view-count">
-                            <span class="view-icon">👁️</span>
-                            {{ article.views }}
-                          </span>
+                        <div class="card-footer">
+                          <div class="card-tags">
+                            <router-link 
+                              v-for="tag in article.tags" 
+                              :key="tag"
+                              :to="{ name: 'blog', query: { tag } }"
+                              class="card-tag"
+                            >
+                              #{{ tag }}
+                            </router-link>
+                          </div>
+                          <div class="card-stats">
+                            <span class="view-count">
+                              <span class="view-icon">👁️</span>
+                              {{ article.views }}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              </template>
             </div>
           </template>
           
           <!-- 筛选模式下的文章列表 -->
           <template v-else-if="filteredArticles.length > 0">
             <div class="filtered-view">
-              <div class="filter-header">
-                <h2 v-if="activeCategory">分类: {{ activeCategory }}</h2>
-                <h2 v-else-if="activeTag">标签: {{ activeTag }}</h2>
+              <div class="filter-header" v-if="activeCategory || activeTag">
+                <h2 class="filter-title">
+                  <span v-if="activeCategory">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    {{ $t('blog.category') }}: {{ activeCategory }}
+                  </span>
+                  <span v-else-if="activeTag">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                      <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                    </svg>
+                    {{ $t('common.tags') }}: {{ activeTag }}
+                  </span>
+                </h2>
+                <button class="reset-filter" @click="resetFilter">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                  {{ $t('blog.resetFilter') }}
+                </button>
               </div>
               
               <div class="article-grid">
@@ -80,16 +96,7 @@
                   :key="article.id" 
                   class="article-card"
                 >
-                  <div class="card-header">
-                    <span class="card-date">{{ formatDateTime(article.createdAt) }}</span>
-                    <span 
-                      class="card-category"
-                      @click="filterByCategory(article.category)"
-                    >
-                      {{ article.category }}
-                    </span>
-                  </div>
-                  
+                  <div class="card-date">{{ formatDateTime(article.createdAt) }}</div>
                   <router-link :to="{ name: 'article', params: { id: article.id } }" class="card-title">
                     {{ article.title }}
                   </router-link>
@@ -97,10 +104,23 @@
                   <p class="card-summary">{{ article.summary }}</p>
                   
                   <div class="card-footer">
+                    <div class="card-tags">
+                      <router-link 
+                        v-for="tag in article.tags" 
+                        :key="tag"
+                        :to="{ name: 'blog', query: { tag } }"
+                        class="card-tag"
+                      >
+                        #{{ tag }}
+                      </router-link>
+                    </div>
                     <div class="card-stats">
                       <span class="view-count">
-                        <span class="view-icon">👁️</span>
-                        {{ article.views }}
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                          <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                        {{ article.views }} {{ $t('common.viewCount') }}
                       </span>
                     </div>
                   </div>
@@ -112,10 +132,18 @@
           <!-- 无文章时显示 -->
           <div v-else class="no-articles">
             <div class="empty-state">
-              <div class="empty-icon">📝</div>
-              <h3>没有找到符合条件的文章</h3>
-              <p>请尝试使用不同的筛选条件</p>
-              <button @click="clearFilters()" class="clear-all-btn">清除所有筛选</button>
+              <div class="empty-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M14 3v4a1 1 0 0 0 1 1h4"></path>
+                  <path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z"></path>
+                  <line x1="9" y1="9" x2="10" y2="9"></line>
+                  <line x1="9" y1="13" x2="15" y2="13"></line>
+                  <line x1="9" y1="17" x2="15" y2="17"></line>
+                </svg>
+              </div>
+              <h3>{{ $t('blog.noArticles') }}</h3>
+              <p>{{ $t('blog.tryDifferent') }}</p>
+              <button @click="clearFilters()" class="clear-all-btn">{{ $t('blog.clearFilters') }}</button>
             </div>
           </div>
         </div>
@@ -125,8 +153,12 @@
           <!-- 分类部分 -->
           <div class="sidebar-section">
             <h3 class="section-title">
-              <span class="section-icon">📂</span>
-              分类
+              <span class="section-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                </svg>
+              </span>
+              {{ $t('blog.category') }}
             </h3>
             <div class="categories-list">
               <div 
@@ -145,8 +177,12 @@
           <!-- 热门文章部分 -->
           <div class="sidebar-section">
             <h3 class="section-title">
-              <span class="section-icon">🔥</span>
-              热门文章
+              <span class="section-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 2c1.1 0 2 1.7 2 3.8 0 .5 0 1.1-.2 1.7l-.7 1.8c.3 0 .7-.1 1.1-.1 1.2 0 2.4.5 3.3 1.4.6.5 1 1.2 1.3 2 .7-.3 1.3-.4 1.8-.4 2.3 0 3.4 2.7 3.4 5.1 0 2.2-1.3 4.1-2.5 5.4-1.2 1.2-2.8 2.2-4.3 2.3H9.7c-1.5-.2-3-1.1-4.2-2.3C4.3 21.7 3 19.8 3 17.6c0-2.4 1.1-5.1 3.4-5.1.6 0 1.2.2 1.9.5.3-.9.8-1.6 1.4-2.2.9-.9 2.1-1.4 3.3-1.4.5 0 .9 0 1.2.1L13.4 8c.5-.7.6-1.4.6-2 0-2.3-.9-4-2-4z"></path>
+                </svg>
+              </span>
+              {{ $t('blog.popularPosts') }}
             </h3>
             <div class="popular-posts">
               <div 
@@ -158,7 +194,7 @@
                   {{ article.title }}
                 </router-link>
                 <div class="post-meta">
-                  <span class="post-views">{{ article.views }} 次阅读</span>
+                  <span class="post-views">{{ article.views }} {{ $t('common.viewCount') }}</span>
                   <span class="post-date">{{ formatDateTime(article.createdAt) }}</span>
                 </div>
               </div>
@@ -313,74 +349,6 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   gap: 30px;
-}
-
-/* 页面标题部分 */
-.blog-header {
-  position: relative;
-  border-radius: 16px;
-  overflow: hidden;
-  background-color: var(--card-bg);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  margin-bottom: 30px;
-}
-
-.header-content {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 40px 20px;
-  text-align: center;
-  overflow: hidden;
-}
-
-.blog-header-decoration {
-  position: absolute;
-  top: -140px;
-  left: -140px;
-  width: 280px;
-  height: 280px;
-  background: linear-gradient(135deg, var(--link-color) 0%, rgba(50, 115, 220, 0.2) 100%);
-  border-radius: 50%;
-  opacity: 0.15;
-}
-
-.header-content::after {
-  content: '';
-  position: absolute;
-  bottom: -100px;
-  right: -100px;
-  width: 200px;
-  height: 200px;
-  background: linear-gradient(225deg, var(--link-color) 0%, rgba(50, 115, 220, 0.2) 100%);
-  border-radius: 50%;
-  opacity: 0.1;
-}
-
-.header-main {
-  position: relative;
-  z-index: 2;
-  max-width: 700px;
-}
-
-.blog-title {
-  font-size: 2.8rem;
-  font-weight: 800;
-  margin-bottom: 12px;
-  color: var(--text-color);
-  letter-spacing: -0.5px;
-  background: linear-gradient(90deg, var(--text-color) 0%, var(--link-color) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.blog-description {
-  font-size: 1.1rem;
-  color: var(--text-color);
-  opacity: 0.8;
-  margin: 0 auto 5px;
-  font-weight: 300;
 }
 
 /* 筛选器标签 */
@@ -547,34 +515,11 @@ onUnmounted(() => {
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
 }
 
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-}
-
 .card-date {
   font-size: 0.85rem;
   color: var(--text-color);
   opacity: 0.6;
-}
-
-.card-category {
-  display: inline-block;
-  padding: 2px 6px;
-  background-color: var(--button-bg);
-  color: var(--link-color);
-  border-radius: 10px;
-  font-size: 0.7rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.card-category:hover {
-  background-color: var(--link-color);
-  color: white;
+  margin-bottom: 12px;
 }
 
 .card-title {
@@ -594,64 +539,19 @@ onUnmounted(() => {
 
 .card-summary {
   font-size: 0.95rem;
-  color: var(--text-color);
-  opacity: 0.8;
-  line-height: 1.6;
+  color: var(--text-color-light);
   margin-bottom: 15px;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  line-height: 1.5;
+  flex-grow: 1;
 }
 
 .card-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 10px;
-}
-
-.card-meta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.meta-left, .meta-right {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.meta-category {
-  display: inline-block;
-  padding: 2px 6px;
-  background-color: var(--button-bg);
-  color: var(--link-color);
-  border-radius: 10px;
-  font-size: 0.7rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.meta-category:hover {
-  background-color: var(--link-color);
-  color: white;
-}
-
-.meta-views, .view-count {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.85rem;
-  color: var(--text-color);
-  opacity: 0.7;
-}
-
-.view-icon {
-  font-size: 0.85rem;
+  margin-top: auto;
+  padding-top: 15px;
+  border-top: 1px solid var(--border-color);
 }
 
 .card-tags {
@@ -661,36 +561,32 @@ onUnmounted(() => {
 }
 
 .card-tag {
-  font-size: 0.75rem;
-  color: #666;
-  background-color: rgba(0, 0, 0, 0.04);
-  padding: 2px 8px;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: background-color 0.2s;
+  font-size: 0.8rem;
+  color: var(--link-color);
+  text-decoration: none;
+  transition: color 0.2s;
 }
 
 .card-tag:hover {
-  background-color: rgba(0, 0, 0, 0.08);
-  color: #333;
+  color: var(--link-hover);
+  text-decoration: underline;
 }
 
 .card-stats {
   display: flex;
   align-items: center;
-  gap: 15px;
 }
 
 .view-count {
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: 0.8rem;
-  color: #666;
+  font-size: 0.85rem;
+  color: var(--text-color-light);
 }
 
 .view-icon {
-  opacity: 0.7;
+  font-size: 0.9rem;
 }
 
 /* 无文章状态 */

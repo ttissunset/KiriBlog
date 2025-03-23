@@ -1,16 +1,37 @@
 <template>
   <MainLayout>
     <div v-if="article" class="article-page">
+      <div class="back-to-blog">
+        <router-link to="/blog" class="back-button">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 12H5"></path>
+            <path d="M12 19l-7-7 7-7"></path>
+          </svg>
+          <span>{{ $t('common.backToList') }}</span>
+        </router-link>
+      </div>
+      
       <article class="article-content">
         <header class="article-header">
           <h1 class="article-title">{{ article.title }}</h1>
           <div class="article-meta">
             <div class="meta-item">
-              <span class="meta-icon">📅</span>
+              <span class="meta-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+              </span>
               <span class="meta-text">{{ formatDateTime(article.createdAt) }}</span>
             </div>
             <div class="meta-item category">
-              <span class="meta-icon">📂</span>
+              <span class="meta-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                </svg>
+              </span>
               <router-link 
                 :to="{ name: 'blog', query: { category: article.category } }"
                 class="category-link"
@@ -25,7 +46,11 @@
 
         <div class="ai-summary" :class="{ expanded: isSummaryExpanded }">
           <div class="summary-header">
-            <span class="summary-icon">✨</span>
+            <span class="summary-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+              </svg>
+            </span>
             <span class="summary-title">{{ $t('article.aiSummary') }}</span>
             <span class="summary-powered">{{ $t('article.poweredBy') }}</span>
           </div>
@@ -49,9 +74,11 @@
               >开发 ≠ 搬运。不学习底层原理你永远不知道...</span
             >
             <button class="show-more-btn" @click="toggleSummary" style="margin-left: auto;">
-              <span class="arrow-icon" :class="{ up: isSummaryExpanded }">{{
-                isSummaryExpanded ? "▲" : "▼"
-              }}</span>
+              <span class="arrow-icon" :class="{ up: isSummaryExpanded }">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+              </span>
               {{ isSummaryExpanded ? $t('article.showLess') : $t('article.showMore') }}
             </button>
           </div>
@@ -61,7 +88,7 @@
 
         <div class="article-footer">
           <div class="article-tags">
-            <span class="tags-label">标签:</span>
+            <span class="tags-label">{{ $t('common.tags') }}</span>
             <router-link 
               v-for="tag in article.tags" 
               :key="tag"
@@ -73,8 +100,13 @@
           </div>
           
           <div class="article-views">
-            <span class="views-icon">👁️</span>
-            <span class="views-count">{{ article.views }} 次阅读</span>
+            <span class="views-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </span>
+            <span class="views-count">{{ article.views }} {{ $t('common.viewCount') }}</span>
           </div>
         </div>
       </article>
@@ -103,7 +135,7 @@
             </router-link>
             <div class="related-meta">
               <span>{{ formatDateTime(relatedArticle.createdAt) }}</span>
-              <span>{{ relatedArticle.views }} {{ $t('article.views') }}</span>
+              <span>{{ relatedArticle.views }} {{ $t('common.viewCount') }}</span>
             </div>
           </div>
         </div>
@@ -960,5 +992,49 @@ onMounted(() => {
 
 :deep(.hljs-operator) {
   color: #d73a49; /* 红色 - 操作符 */
+}
+
+/* 修改返回按钮样式 */
+.back-to-blog {
+  margin-bottom: 20px;
+}
+
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 0;
+  background-color: transparent;
+  color: var(--text-color);
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.back-button:hover {
+  color: var(--link-color);
+  transform: translateX(-3px);
+}
+
+.back-button svg {
+  margin-right: 8px;
+  transition: transform 0.2s ease;
+}
+
+.back-button:hover svg {
+  transform: translateX(-3px);
+}
+
+@media (max-width: 768px) {
+  .back-button {
+    padding: 6px 0;
+    font-size: 0.9rem;
+  }
+  
+  .back-button svg {
+    width: 18px;
+    height: 18px;
+    margin-right: 6px;
+  }
 }
 </style>

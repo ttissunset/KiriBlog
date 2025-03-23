@@ -10,42 +10,49 @@
     
     <div class="gallery-content">
       <div class="gallery-header">
-        <h1 class="gallery-title">相册</h1>
-        <p class="gallery-subtitle">每一个精彩的瞬间，都值得被记录</p>
+        <h1 class="gallery-title">{{ $t('gallery.title') }}</h1>
+        <p class="gallery-subtitle">{{ $t('gallery.subtitle') }}</p>
       </div>
       
       <!-- 加载状态指示器 -->
-      <div v-if="isLoading" class="loading-container">
+      <div v-if="isLoading && !hasItems" class="loading-container">
         <div class="loading-spinner"></div>
-        <p>加载图片中...</p>
+        <p>{{ $t('gallery.loadingImages') }}</p>
       </div>
       
-      <div v-for="(group, index) in groupedImages" :key="index" class="gallery-date-group">
-        <div class="date-label">
-          <div class="date-icon"></div>
-          <span>{{ group.date }}</span>
-        </div>
-        <div class="gallery-waterfall">
-          <div v-for="(image, imageIndex) in group.images" :key="imageIndex" class="gallery-item">
-            <div class="gallery-image-wrapper" @click="viewImage(image)">
-              <div v-if="!image.loaded" class="image-placeholder"></div>
-              <img 
-                :src="image.url" 
-                :alt="image.description" 
-                class="gallery-image" 
-                loading="lazy" 
-                @load="imageLoaded(image)"
-                :class="{ 'is-loaded': image.loaded }"
-              />
+      <!-- 相册内容，不使用虚拟滚动 -->
+      <div class="gallery-container-wrapper">
+        <div 
+          v-for="group in groupedImages" 
+          :key="group.date" 
+          class="gallery-date-group"
+        >
+          <div class="date-label">
+            <div class="date-icon"></div>
+            <span>{{ group.date }}</span>
+          </div>
+          <div class="gallery-waterfall">
+            <div v-for="(image, imageIndex) in group.images" :key="imageIndex" class="gallery-item">
+              <div class="gallery-image-wrapper" @click="viewImage(image)">
+                <div v-if="!image.loaded" class="image-placeholder"></div>
+                <img 
+                  :src="image.url" 
+                  :alt="image.description" 
+                  class="gallery-image" 
+                  loading="lazy" 
+                  @load="imageLoaded(image)"
+                  :class="{ 'is-loaded': image.loaded }"
+                />
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       <!-- 无限滚动加载触发器 -->
-      <div v-if="hasMoreImages" class="load-more" ref="loadMoreTrigger">
+      <div v-if="hasMoreImages && hasItems" class="load-more" ref="loadMoreTrigger">
         <div class="loading-spinner"></div>
-        <p>加载更多照片...</p>
+        <p>{{ $t('gallery.loadMore') }}</p>
       </div>
     </div>
     
@@ -59,53 +66,37 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue';
+import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue';
 import ImageViewer from './ImageViewer.vue';
 
-// 图库图片数据 - 在实际应用中应从API获取
+// 导入图片资源
+import img1 from '../assets/1.jpg';
+import img2 from '../assets/2.jpg';
+import img3 from '../assets/3.jpg';
+import img4 from '../assets/4.jpg';
+import img5 from '../assets/5.jpg';
+import img6 from '../assets/6.jpg';
+import img7 from '../assets/00_01.jpg';
+import img8 from '../assets/00_02.png';
+import img9 from '../assets/00_03.png';
+import img10 from '../assets/00_04.png';
+import img11 from '../assets/00_05.png';
+import img12 from '../assets/00_06.png';
+
+// 图库图片数据
 const allImages = [
-  {
-    url: '/src/assets/1.jpg',
-    description: '樱花树',
-    source: 'Local',
-    date: '2025/3/2',
-    loaded: false
-  },
-  {
-    url: '/src/assets/2.jpg',
-    description: '日本城市风光',
-    source: 'Local',
-    date: '2025/3/2',
-    loaded: false
-  },
-  {
-    url: '/src/assets/3.jpg',
-    description: '春日庭院',
-    source: 'Local',
-    date: '2025/2/26',
-    loaded: false
-  },
-  {
-    url: '/src/assets/4.jpg',
-    description: '夏日海滩',
-    source: 'Local',
-    date: '2025/2/15',
-    loaded: false
-  },
-  {
-    url: '/src/assets/5.jpg',
-    description: '秋日公园',
-    source: 'Local',
-    date: '2025/2/15',
-    loaded: false
-  },
-  {
-    url: '/src/assets/6.jpg',
-    description: '冬日雪景',
-    source: 'Local',
-    date: '2025/2/15',
-    loaded: false
-  }
+  { id: 1, url: img1, date: '2024-03-15', title: '樱花盛开的季节' },
+  { id: 2, url: img2, date: '2024-03-10', title: '城市的夜景' },
+  { id: 3, url: img3, date: '2024-02-28', title: '海边的日落' },
+  { id: 4, url: img4, date: '2024-02-20', title: '雪山风光' },
+  { id: 5, url: img5, date: '2024-02-15', title: '古镇的小巷' },
+  { id: 6, url: img6, date: '2024-02-10', title: '森林中的小径' },
+  { id: 7, url: img7, date: '2024-01-25', title: '繁星点点的夜空' },
+  { id: 8, url: img8, date: '2024-01-20', title: '雾气缭绕的山谷' },
+  { id: 9, url: img9, date: '2024-01-15', title: '湖边的木屋' },
+  { id: 10, url: img10, date: '2024-01-10', title: '秋天的公园' },
+  { id: 11, url: img11, date: '2023-12-30', title: '冬日里的温暖阳光' },
+  { id: 12, url: img12, date: '2023-12-25', title: '圣诞节的装饰' },
 ];
 
 // 加载状态
@@ -115,6 +106,7 @@ const currentPage = ref(1);
 const hasMoreImages = computed(() => {
   return galleryImages.value.length < allImages.length;
 });
+const hasItems = computed(() => galleryImages.value.length > 0);
 
 // 分页加载的图片
 const galleryImages = ref([]);
@@ -156,7 +148,8 @@ const loadMoreImages = () => {
     // 模拟网络请求延迟
     setTimeout(() => {
       for (let i = startIndex; i < endIndex; i++) {
-        galleryImages.value.push({...allImages[i]});
+        const newImage = {...allImages[i], loaded: false};
+        galleryImages.value.push(newImage);
       }
       
       currentPage.value++;
@@ -213,18 +206,24 @@ const closeViewer = () => {
   document.body.style.overflow = ''; // 恢复滚动
 };
 
+// 监听窗口大小变化，更新布局
+const handleResize = () => {
+  // 只响应窗口大小变化，不做虚拟滚动的相关处理
+};
+
 // 监听滚动事件，更新进度
 onMounted(() => {
   window.addEventListener('scroll', updateScrollProgress);
-  updateScrollProgress(); // 初始化进度
+  window.addEventListener('resize', handleResize);
   
-  // 初始加载图片
+  // 初始加载第一批图片
   loadMoreImages();
 });
 
 // 移除滚动事件监听，防止内存泄漏
 onUnmounted(() => {
   window.removeEventListener('scroll', updateScrollProgress);
+  window.removeEventListener('resize', handleResize);
   
   if (observer) {
     observer.disconnect();
@@ -277,9 +276,14 @@ onUnmounted(() => {
 
 .gallery-content {
   flex: 1;
-  max-width: 800px;
-  margin: 0 auto;
+  max-width: 900px;
+  margin: 0 auto 0 0;
   padding: 20px 0;
+  width: 100%;
+}
+
+.gallery-container-wrapper {
+  width: 100%;
 }
 
 .gallery-header {
@@ -365,7 +369,7 @@ onUnmounted(() => {
   background-color: #f5f5f5;
   width: 100%;
   height: 0;
-  padding-bottom: 65%; /* 更宽的比例 */
+  padding-bottom: 75%; /* 长方形比例 */
 }
 
 .gallery-image-wrapper:hover {
@@ -482,16 +486,16 @@ onUnmounted(() => {
   
   .gallery-content {
     max-width: 100%;
-    padding: 10px 5px 10px 0; /* 减少右侧内边距，将内容往左侧挪 */
-    margin-left: 0; /* 移除左侧边距 */
+    padding: 10px 10px 10px 10px;
+    margin: 0 0 0 0;
   }
   
   .gallery-waterfall {
-    column-count: 1;
+    column-count: 2;
   }
   
   .gallery-image-wrapper {
-    padding-bottom: 90%; /* 放大图片高度比例 */
+    padding-bottom: 70%; /* 缩小图片高度比例 */
   }
   
   .gallery-header {
@@ -500,7 +504,7 @@ onUnmounted(() => {
   }
   
   .gallery-title {
-    font-size: 2.2rem;
+    font-size: 1.8rem;
   }
   
   .date-label {
@@ -511,9 +515,9 @@ onUnmounted(() => {
 /* 平板布局优化 */
 @media (min-width: 769px) and (max-width: 1024px) {
   .gallery-content {
-    max-width: 100%;
-    padding: 15px 15px 15px 0; /* 减少右侧内边距 */
-    margin-left: 0; /* 移除左侧边距 */
+    max-width: 90%;
+    padding: 15px 15px 15px 10px;
+    margin: 0;
   }
   
   .gallery-waterfall {
@@ -541,11 +545,11 @@ onUnmounted(() => {
 /* 优化小屏幕样式 */
 @media (max-width: 480px) {
   .gallery-content {
-    padding: 10px 5px 10px 0; /* 更小的内边距 */
+    padding: 10px;
   }
   
   .gallery-title {
-    font-size: 1.8rem;
+    font-size: 1.6rem;
   }
   
   .gallery-subtitle {
@@ -561,7 +565,7 @@ onUnmounted(() => {
   }
   
   .gallery-image-wrapper {
-    padding-bottom: 95%; /* 小屏幕上更大的图片 */
+    padding-bottom: 65%; /* 更小屏幕上进一步缩小图片 */
   }
 }
 </style> 

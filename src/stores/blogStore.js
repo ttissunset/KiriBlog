@@ -1040,6 +1040,26 @@ self.onmessage = e => {
     const currentArticle = getArticleById(articleId);
     if (!currentArticle) return [];
     
+    // 计算两篇文章的相关度评分
+    const calculateRelevanceScore = (article, currentArticle) => {
+      let score = 0;
+      
+      // 如果分类相同，加分
+      if (article.category === currentArticle.category) {
+        score += 3;
+      }
+      
+      // 根据共同标签数量加分
+      const commonTags = article.tags.filter(tag => 
+        currentArticle.tags.includes(tag)
+      );
+      score += commonTags.length * 2;
+      
+      // 可以根据其他因素继续计算相关度，例如标题相似度、内容关键词等
+      
+      return score;
+    };
+    
     const result = articles.value
       .filter(article => 
         article.id !== articleId && 
@@ -1065,8 +1085,10 @@ self.onmessage = e => {
 
   // 按年月归档文章
   const archivedArticles = computed(() => {
+    // 创建存放文章的临时对象
     const archive = {}
     
+    // 将所有文章按年月分组
     articles.value.forEach(article => {
       const date = new Date(article.createdAt)
       const year = date.getFullYear()
@@ -1083,28 +1105,28 @@ self.onmessage = e => {
       archive[year][month].push(article)
     })
     
-    // 按年从新到旧排序
+    // 创建结果对象，用于存储排序后的数据
+    const result = {}
+    
+    // 按年从新到旧排序 (2025年在前，2024年在后)
     const sortedYears = Object.keys(archive).sort((a, b) => b - a)
     
-    // 对每年中的月份从新到旧排序
+    // 为每个年份创建条目
     sortedYears.forEach(year => {
+      result[year] = {}
+      
+      // 按月从新到旧排序 (12月在前，1月在后)
       const sortedMonths = Object.keys(archive[year]).sort((a, b) => b - a)
       
-      // 对每个月中的文章按发布日期从新到旧排序
+      // 为每个月份创建条目
       sortedMonths.forEach(month => {
+        // 对每个月中的文章按时间从新到旧排序
         archive[year][month].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        result[year][month] = archive[year][month]
       })
-      
-      // 重新构建该年的月份数据
-      const sortedMonthsData = {}
-      sortedMonths.forEach(month => {
-        sortedMonthsData[month] = archive[year][month]
-      })
-      
-      archive[year] = sortedMonthsData
     })
     
-    return archive
+    return result
   })
 
   // 添加评论

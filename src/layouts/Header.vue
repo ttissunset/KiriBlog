@@ -7,62 +7,65 @@
             <router-link to="/">山茶</router-link>
           </div>
 
-          <!-- 搜索图标 (移动端) -->
-          <div class="search-icon-mobile" @click="toggleSearchBox">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-          </div>
+          <div class="right-section">
+            <!-- 搜索框 -->
+            <div class="search-container" :class="{ 'search-active': isSearchActive }">
+              <div class="search-toggle" @click="toggleSearch" v-show="!isSearchActive">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+              </div>
+              <div class="search-input-wrapper" :class="{ 'show': isSearchActive, 'desktop-search': true }">
+                <input 
+                  type="text" 
+                  class="search-input" 
+                  :placeholder="$t('header.searchPlaceholder')" 
+                  v-model="searchQuery"
+                  @keyup.enter="handleSearch"
+                  ref="searchInput"
+                />
+                <button class="search-button" @click="handleSearch">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                  </svg>
+                </button>
+                <button v-if="isSearchActive" class="close-search-button" @click="toggleSearch">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
+              </div>
+            </div>
 
-          <!-- 搜索框 -->
-          <div class="search-box" :class="{ 'is-active': isSearchActive }">
-            <div class="search-input-wrapper">
-              <input
-                type="text"
-                v-model="searchQuery"
-                class="search-input"
-                :placeholder="$t('header.searchPlaceholder')"
-                @keyup.enter="handleSearch"
-                ref="searchInput"
-              />
-              <button class="search-button" @click="handleSearch">
-                <i class="ri-search-line"></i>
+            <!-- 导航菜单 -->
+            <nav class="main-nav" :class="{ 'active': isMenuActive }">
+              <ul>
+                <li><router-link to="/" @click="closeMenu">{{ $t('nav.home') }}</router-link></li>
+                <li><router-link to="/gallery" @click="closeMenu">{{ $t('nav.gallery') }}</router-link></li>
+                <li><router-link to="/blog" @click="closeMenu">{{ $t('nav.blog') }}</router-link></li>
+                <li>
+                  <router-link to="/journal" @click="closeMenu">{{ $t('nav.journal') }}</router-link>
+                </li>
+                <li><router-link to="/archive" @click="closeMenu">{{ $t('nav.archive') }}</router-link></li>
+              </ul>
+            </nav>
+
+            <div class="language-switcher">
+              <button @click="switchLanguage(currentLocale === 'zh' ? 'en' : 'zh')" class="lang-button" :title="$t('header.langSwitch')">
+                <img src="../assets/translate.svg" width="20" height="20" alt="Language" />
               </button>
             </div>
-            <div class="search-toggle" @click="toggleSearch">
-              <i class="ri-search-line"></i>
-            </div>
-          </div>
 
-          <!-- 移动端菜单按钮 -->
-          <button class="mobile-menu-btn" @click="toggleMenu" aria-label="菜单">
-            <span class="menu-icon" :class="{ 'active': isMenuActive }">
-              <span></span>
-              <span></span>
-              <span></span>
-            </span>
-          </button>
-
-          <!-- 导航菜单 -->
-          <nav class="main-nav" :class="{ 'active': isMenuActive }">
-            <ul>
-              <li><router-link to="/" @click="closeMenu">{{ $t('nav.home') }}</router-link></li>
-              <li><router-link to="/gallery" @click="closeMenu">{{ $t('nav.gallery') }}</router-link></li>
-              <li><router-link to="/blog" @click="closeMenu">{{ $t('nav.blog') }}</router-link></li>
-              <li>
-                <router-link to="/journal" @click="closeMenu">{{ $t('nav.journal') }}</router-link>
-              </li>
-              <li><router-link to="/archive" @click="closeMenu">{{ $t('nav.archive') }}</router-link></li>
-            </ul>
-          </nav>
-
-          <div class="language-switcher">
-            <button @click="switchLanguage(currentLocale === 'zh' ? 'en' : 'zh')" class="lang-button">
-              <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 0 24 24" width="20px" fill="currentColor">
-                <path d="M0 0h24v24H0V0z" fill="none"/>
-                <path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/>
-              </svg>
+            <!-- 移动端菜单按钮 -->
+            <button class="mobile-menu-btn" @click="toggleMenu" aria-label="菜单">
+              <span class="menu-icon" :class="{ 'active': isMenuActive }">
+                <span></span>
+                <span></span>
+                <span></span>
+              </span>
             </button>
           </div>
         </div>
@@ -82,9 +85,26 @@
             <p>© 2024 Kiri - 个人主页</p>
           </div>
           <div class="social-links">
-            <a href="#" title="GitHub"><i>GitHub</i></a>
-            <a href="#" title="Twitter"><i>Twitter</i></a>
-            <a href="#" title="微博"><i>微博</i></a>
+            <a href="#" title="GitHub">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+              </svg>
+            </a>
+            <a href="#" title="Twitter">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path>
+              </svg>
+            </a>
+            <a href="#" title="微博">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20.9 14.5c0-4.7-4.8-8.5-9.5-8.5S2 9.8 2 14.5s4.7 8.5 9.5 8.5 9.4-3.8 9.4-8.5z"></path>
+                <path d="M15.7 15.5c-.5-.9-1.7-1.2-2.6-.8-.9.4-1.2 1.6-.8 2.5s1.7 1.2 2.6.8c.9-.5 1.2-1.6.8-2.5z"></path>
+                <path d="M18 8.5c.6 0 1 .4 1 1s-.4 1-1 1-1-.4-1-1 .4-1 1-1z"></path>
+                <path d="M13.5 14.5c.7 0 1.2.6 1.2 1.2 0 .7-.6 1.2-1.2 1.2-.7 0-1.2-.6-1.2-1.2-.1-.7.5-1.2 1.2-1.2z"></path>
+                <path d="M10.5 13c.3 0 .5.2.5.5s-.2.5-.5.5-.5-.2-.5-.5.2-.5.5-.5z"></path>
+                <path d="M18 1.5c2.5 0 4.5 2 4.5 4.5s-2 4.5-4.5 4.5"></path>
+              </svg>
+            </a>
           </div>
         </div>
       </div>
@@ -125,7 +145,7 @@ const closeMenu = () => {
 };
 
 // 切换搜索框
-const toggleSearchBox = () => {
+const toggleSearch = () => {
   isSearchActive.value = !isSearchActive.value;
   // 如果打开搜索框，关闭菜单
   if (isSearchActive.value) {
@@ -277,6 +297,7 @@ onUnmounted(() => {
 .header-content {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   height: 70px;
   position: relative;
 }
@@ -299,7 +320,7 @@ onUnmounted(() => {
   border: none;
   cursor: pointer;
   padding: 10px;
-  margin-left: auto;
+  margin-left: 10px;
   z-index: 101;
   transition: transform 0.2s ease;
 }
@@ -340,49 +361,58 @@ onUnmounted(() => {
 /* 搜索图标 (移动端) */
 .search-icon-mobile {
   display: none;
-  cursor: pointer;
-  padding: 8px;
-  margin-left: auto;
-  margin-right: 10px;
-  color: var(--text-color);
-  transition: transform 0.2s ease, color 0.2s ease;
 }
 
-.search-icon-mobile:hover {
-  transform: scale(1.05);
-  color: var(--link-color);
-}
-
-.search-box {
+.right-section {
   display: flex;
   align-items: center;
+  height: 100%;
+}
+
+.search-container {
   position: relative;
-  margin-left: 15px;
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.search-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.search-toggle:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.search-toggle svg {
+  transition: transform 0.2s, color 0.2s;
 }
 
 .search-input-wrapper {
+  position: relative;
+  width: 260px;
+  transition: all 0.3s;
   display: flex;
   align-items: center;
-  background-color: var(--bg-color-secondary);
+  background-color: var(--bg-color);
   border-radius: 20px;
+  border: 1px solid var(--border-color);
   padding: 0 5px 0 15px;
-  max-width: 0;
   overflow: hidden;
-  transition: max-width 0.3s ease, padding 0.3s ease;
-  visibility: hidden;
-}
-
-.is-active .search-input-wrapper {
-  max-width: 200px;
-  visibility: visible;
-  padding: 0 5px 0 15px;
 }
 
 .search-input {
   border: none;
   background: transparent;
   height: 35px;
-  width: 150px;
+  width: calc(100% - 40px);
   color: var(--text-color);
   outline: none;
   font-size: 0.9rem;
@@ -391,7 +421,6 @@ onUnmounted(() => {
 .search-button {
   display: flex;
   align-items: center;
-  justify-content: center;
   background: transparent;
   border: none;
   cursor: pointer;
@@ -399,22 +428,28 @@ onUnmounted(() => {
   height: 35px;
   width: 35px;
   padding: 0;
-  font-size: 1.1rem;
 }
 
-.search-toggle {
+.language-switcher {
+  margin-left: 15px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  height: 100%;
+}
+
+.lang-button {
+  background: none;
+  border: none;
   cursor: pointer;
-  width: 35px;
-  height: 35px;
+  padding: 5px 10px;
   color: var(--text-color);
-  font-size: 1.2rem;
+  transition: color var(--transition-speed) ease, transform 0.2s ease;
+  display: flex;
+  align-items: center;
 }
 
 .main-nav {
-  margin-left: auto;
+  margin-left: 20px;
 }
 
 .main-nav ul {
@@ -435,7 +470,6 @@ onUnmounted(() => {
   text-decoration: none;
   font-weight: 500;
   padding: 5px 10px;
-  padding-bottom: 12px;
   transition: all var(--transition-speed);
   position: relative;
 }
@@ -488,24 +522,6 @@ onUnmounted(() => {
   color: var(--link-hover);
 }
 
-.language-switcher {
-  margin-left: 20px;
-}
-
-.lang-button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 5px 10px;
-  color: var(--text-color);
-  transition: color var(--transition-speed) ease, transform 0.2s ease;
-}
-
-.lang-button:hover {
-  color: var(--link-color);
-  transform: scale(1.05);
-}
-
 /* 平板断点 */
 @media (max-width: 1024px) {
   .header-content {
@@ -517,7 +533,7 @@ onUnmounted(() => {
     padding: 5px 8px;
   }
   
-  .search-box {
+  .search-container {
     max-width: 200px;
   }
   
@@ -541,37 +557,107 @@ onUnmounted(() => {
     display: block;
   }
 
-  /* 显示搜索图标 */
-  .search-icon-mobile {
-    display: block;
-  }
-
   /* 搜索框样式修改 */
-  .search-box {
-    margin-left: 5px;
-    order: -1; /* 确保搜索框在右侧图标左边 */
+  .search-container {
+    margin-right: 10px;
+    position: relative;
+  }
+  
+  .search-input-wrapper {
+    display: none;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 0;
+    width: 0;
+    max-width: none;
+    background-color: var(--bg-color);
+    box-shadow: none;
+    z-index: 100;
+    border: 1px solid var(--border-color);
+    height: 35px;
+    border-radius: 20px;
+    transition: width 0.3s ease, opacity 0.3s ease;
+    opacity: 0;
+  }
+  
+  .search-input-wrapper.desktop-search:not(.show) {
+    display: none;
+    opacity: 0;
+    width: 0;
+  }
+  
+  .search-input-wrapper.show {
+    display: flex;
+    width: 200px;
+    padding: 0 15px 0 35px;
+    opacity: 1;
+    right: -15px;
   }
   
   .search-toggle {
     display: flex;
+    z-index: 101;
+    height: 40px;
+    width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    right: -5px;
   }
   
-  .is-active .search-input-wrapper {
-    position: absolute;
-    top: 10px;
-    right: 85px; /* 给更多空间确保不会超出屏幕 */
-    width: calc(100vw - 150px); /* 更精确的宽度计算 */
-    max-width: 250px;
-    background-color: var(--bg-color);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    z-index: 100;
+  .mobile-menu-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     height: 40px;
-    border-radius: 20px;
-    padding: 0 10px;
   }
   
   .search-input {
-    width: calc(100% - 40px); /* 给按钮留出空间 */
+    width: calc(100% - 35px);
+  }
+  
+  .search-button {
+    position: absolute;
+    left: 8px;
+  }
+  
+  .close-search-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--text-color);
+    height: 35px;
+    width: 35px;
+    padding: 0;
+    position: absolute;
+    right: 5px;
+  }
+  
+  .language-switcher {
+    display: flex;
+    align-items: center;
+    margin-left: 5px;
+    margin-right: 5px;
+    height: 40px;
+  }
+  
+  .lang-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    width: 40px;
+    padding: 0;
+  }
+  
+  .lang-button img {
+    width: 20px;
+    height: 20px;
   }
 
   /* 导航菜单样式调整 */
@@ -591,6 +677,7 @@ onUnmounted(() => {
     transition: all 0.3s ease;
     z-index: 99;
     overflow-y: auto;
+    margin-left: 0;
   }
 
   .main-nav.active {
@@ -626,11 +713,6 @@ onUnmounted(() => {
     background-color: rgba(50, 115, 220, 0.05);
   }
 
-  .language-switcher {
-    margin-left: 0;
-    margin-right: 10px;
-  }
-  
   .footer-content {
     flex-direction: column;
     text-align: center;
@@ -642,6 +724,46 @@ onUnmounted(() => {
   
   .social-links a {
     margin: 0 8px;
+  }
+}
+
+/* 修复平板端的搜索框 - 针对768-960px尺寸 */
+@media (min-width: 769px) and (max-width: 1060px) {
+  .container {
+    padding: 0 10px;
+    max-width: 100%;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .header-content, .footer-content {
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .search-input-wrapper {
+    width: 180px;
+  }
+  
+  .main-nav {
+    margin-left: 8px;
+  }
+  
+  .main-nav a {
+    padding: 5px 4px;
+    font-size: 0.8rem;
+  }
+  
+  .language-switcher {
+    margin-left: 5px;
+  }
+  
+  .logo a {
+    font-size: 1.2rem;
+  }
+  
+  .logo {
+    margin-right: 10px;
   }
 }
 
@@ -657,6 +779,19 @@ onUnmounted(() => {
   
   .main-nav a {
     padding: 10px 15px;
+  }
+}
+
+/* 在这里添加大屏幕搜索框样式 */
+@media (min-width: 769px) {
+  .search-toggle {
+    display: none !important;
+  }
+  
+  .search-input-wrapper.desktop-search {
+    display: flex;
+    opacity: 1;
+    width: 260px;
   }
 }
 </style>

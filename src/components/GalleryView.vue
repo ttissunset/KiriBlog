@@ -206,15 +206,9 @@ const closeViewer = () => {
   document.body.style.overflow = ''; // 恢复滚动
 };
 
-// 监听窗口大小变化，更新布局
-const handleResize = () => {
-  // 只响应窗口大小变化，不做虚拟滚动的相关处理
-};
-
 // 监听滚动事件，更新进度
 onMounted(() => {
   window.addEventListener('scroll', updateScrollProgress);
-  window.addEventListener('resize', handleResize);
   
   // 初始加载第一批图片
   loadMoreImages();
@@ -223,7 +217,6 @@ onMounted(() => {
 // 移除滚动事件监听，防止内存泄漏
 onUnmounted(() => {
   window.removeEventListener('scroll', updateScrollProgress);
-  window.removeEventListener('resize', handleResize);
   
   if (observer) {
     observer.disconnect();

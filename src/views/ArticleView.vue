@@ -1,45 +1,155 @@
 <template>
   <MainLayout>
     <div v-if="article" class="article-page">
+      <!-- 返回博客列表 -->
       <div class="back-to-blog">
         <router-link to="/blog" class="back-button">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
             <path d="M19 12H5"></path>
             <path d="M12 19l-7-7 7-7"></path>
           </svg>
-          <span>{{ $t('common.backToList') }}</span>
+          <span>{{ $t("common.backToList") }}</span>
         </router-link>
+        
+        <div class="export-buttons">
+          <button class="export-button" @click="exportToPDF" title="导出为PDF">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <path d="M7 15h10"></path>
+              <path d="M9 11h6"></path>
+              <path d="M9 18h6"></path>
+            </svg>
+            <span>PDF</span>
+          </button>
+          <button class="export-button" @click="exportToMarkdown" title="导出为Markdown">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span>Markdown</span>
+          </button>
+        </div>
       </div>
-      
+
+      <!-- 文章内容 -->
       <article class="article-content">
         <header class="article-header">
           <h1 class="article-title">{{ article.title }}</h1>
           <div class="article-meta">
             <div class="meta-item">
               <span class="meta-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  width="16"
+                  height="16"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
                   <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                   <line x1="16" y1="2" x2="16" y2="6"></line>
                   <line x1="8" y1="2" x2="8" y2="6"></line>
                   <line x1="3" y1="10" x2="21" y2="10"></line>
                 </svg>
               </span>
-              <span class="meta-text">{{ formatDateTime(article.createdAt) }}</span>
-            </div>
-            <div class="meta-item category">
+              <span class="meta-text">{{
+                formatDateTime(article.createdAt)
+              }}</span>
+              <span class="meta-separator">•</span>
               <span class="meta-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  width="16"
+                  height="16"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
+                  ></path>
                 </svg>
               </span>
-              <router-link 
+              <router-link
                 :to="{ name: 'blog', query: { category: article.category } }"
                 class="category-link"
               >
                 {{ article.category }}
               </router-link>
             </div>
+            <span class="detail-separator">•</span>
+            <div class="meta-author">
+              <span class="author-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  width="16"
+                  height="16"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+              </span>
+              <span class="author-name">{{ article.author || "Kiri" }}</span>
+              <span class="detail-separator">•</span>
+              <span class="time-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  width="16"
+                  height="16"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+              </span>
+              <span class="time-text"
+                >{{ calculateReadingTime(article.content) }}分钟阅读</span
+              >
+            </div>
           </div>
+
+          <!-- 作者和阅读时长信息 -->
         </header>
 
         <div class="article-summary">{{ article.summary }}</div>
@@ -47,12 +157,22 @@
         <div class="ai-summary" :class="{ expanded: isSummaryExpanded }">
           <div class="summary-header">
             <span class="summary-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width="16"
+                height="16"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <polygon
+                  points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                ></polygon>
               </svg>
             </span>
-            <span class="summary-title">{{ $t('article.aiSummary') }}</span>
-            <span class="summary-powered">{{ $t('article.poweredBy') }}</span>
+            <span class="summary-title">{{ $t("article.aiSummary") }}</span>
+            <span class="summary-powered">{{ $t("article.poweredBy") }}</span>
           </div>
           <div class="summary-content">
             <p>时光如镜映代码，云舟载梦启航程。</p>
@@ -73,24 +193,51 @@
             <span v-if="!isSummaryExpanded"
               >开发 ≠ 搬运。不学习底层原理你永远不知道...</span
             >
-            <button class="show-more-btn" @click="toggleSummary" style="margin-left: auto;">
+            <button
+              class="show-more-btn"
+              @click="toggleSummary"
+              style="margin-left: auto"
+            >
               <span class="arrow-icon" :class="{ up: isSummaryExpanded }">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  width="12"
+                  height="12"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
                   <polyline points="6 9 12 15 18 9"></polyline>
                 </svg>
               </span>
-              {{ isSummaryExpanded ? $t('article.showLess') : $t('article.showMore') }}
+              {{
+                isSummaryExpanded
+                  ? $t("article.showLess")
+                  : $t("article.showMore")
+              }}
             </button>
           </div>
         </div>
 
-        <div class="markdown-body" v-html="renderedContent"></div>
+        <!-- 使用动态组件渲染Markdown内容，支持代码块 -->
+        <div v-if="processedContent.length > 0" class="markdown-body">
+          <template v-for="(block, index) in processedContent" :key="index">
+            <codepen-viewer
+              v-if="block.type === 'code'"
+              :code="block.content"
+              :language="block.language"
+            />
+            <div v-else v-html="block.content"></div>
+          </template>
+        </div>
+        <div v-else class="markdown-body" v-html="renderedContent"></div>
 
         <div class="article-footer">
           <div class="article-tags">
-            <span class="tags-label">{{ $t('common.tags') }}</span>
-            <router-link 
-              v-for="tag in article.tags" 
+            <span class="tags-label">{{ $t("common.tags") }}</span>
+            <router-link
+              v-for="tag in article.tags"
               :key="tag"
               :to="{ name: 'blog', query: { tag } }"
               class="article-tag"
@@ -98,54 +245,79 @@
               #{{ tag }}
             </router-link>
           </div>
-          
+
           <div class="article-views">
             <span class="views-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width="16"
+                height="16"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                 <circle cx="12" cy="12" r="3"></circle>
               </svg>
             </span>
-            <span class="views-count">{{ article.views }} {{ $t('common.viewCount') }}</span>
+            <span class="views-count"
+              >{{ article.views }} {{ $t("common.viewCount") }}</span
+            >
           </div>
         </div>
       </article>
 
+      <!-- 上一篇和下一篇 -->
       <div class="article-navigation">
         <div class="prev-article" v-if="prevArticle">
-          <span>{{ $t('article.prevArticle') }}</span>
-          <router-link :to="{ name: 'article', params: { id: prevArticle.id } }">
+          <span>{{ $t("article.prevArticle") }}</span>
+          <router-link
+            :to="{ name: 'article', params: { id: prevArticle.id } }"
+          >
             {{ prevArticle.title }}
           </router-link>
         </div>
         <div class="next-article" v-if="nextArticle">
-          <span>{{ $t('article.nextArticle') }}</span>
-          <router-link :to="{ name: 'article', params: { id: nextArticle.id } }">
+          <span>{{ $t("article.nextArticle") }}</span>
+          <router-link
+            :to="{ name: 'article', params: { id: nextArticle.id } }"
+          >
             {{ nextArticle.title }}
           </router-link>
         </div>
       </div>
 
+      <!-- 相关文章 -->
       <div class="related-articles" v-if="relatedArticles.length > 0">
-        <h3>{{ $t('article.relatedArticles') }}</h3>
+        <h3>{{ $t("article.relatedArticles") }}</h3>
         <div class="related-list">
-          <div v-for="relatedArticle in relatedArticles" :key="relatedArticle.id" class="related-item">
-            <router-link :to="{ name: 'article', params: { id: relatedArticle.id } }">
+          <div
+            v-for="relatedArticle in relatedArticles"
+            :key="relatedArticle.id"
+            class="related-item"
+          >
+            <router-link
+              :to="{ name: 'article', params: { id: relatedArticle.id } }"
+            >
               {{ relatedArticle.title }}
             </router-link>
             <div class="related-meta">
               <span>{{ formatDateTime(relatedArticle.createdAt) }}</span>
-              <span>{{ relatedArticle.views }} {{ $t('common.viewCount') }}</span>
+              <span
+                >{{ relatedArticle.views }} {{ $t("common.viewCount") }}</span
+              >
             </div>
           </div>
         </div>
       </div>
-
     </div>
     <div v-else class="article-not-found">
-      <h1>{{ $t('article.notFound') }}</h1>
-      <p>{{ $t('article.notFoundDesc') }}</p>
-      <router-link to="/" class="back-link">{{ $t('article.backToHome') }}</router-link>
+      <h1>{{ $t("article.notFound") }}</h1>
+      <p>{{ $t("article.notFoundDesc") }}</p>
+      <router-link to="/" class="back-link">{{
+        $t("article.backToHome")
+      }}</router-link>
     </div>
   </MainLayout>
 </template>
@@ -156,59 +328,195 @@ import { useRoute, useRouter } from "vue-router";
 import { format } from "date-fns";
 import { useBlogStore } from "../stores/blogStore";
 import MainLayout from "../layouts/Header.vue";
-import hljs from 'highlight.js';
-import 'highlight.js/styles/github.css';
-import DOMPurify from 'dompurify';
+import hljs from "highlight.js";
+import "highlight.js/styles/github.css";
+import DOMPurify from "dompurify";
+import CodepenViewer from "../components/CodepenViewer.vue";
+import html2pdf from "html2pdf.js";
+import { saveAs } from 'file-saver';
 
-// 自定义安全渲染Markdown的函数
-const renderMarkdown = (markdown) => {
-  if (!markdown || typeof markdown !== 'string') {
-    return '<p>没有内容可显示</p>';
+// 处理Markdown内容，分离代码块和普通内容
+const processMarkdown = (markdown) => {
+  if (!markdown || typeof markdown !== "string") {
+    return [];
   }
-  
+
   try {
-    // 处理代码块 (必须先处理，避免内部内容被其他规则匹配)
-    let html = markdown.replace(/```([a-z]*)\n([\s\S]+?)```/g, (match, language, code) => {
-      const langClass = language ? `language-${language}` : '';
-      const highlightedCode = language && hljs.getLanguage(language)
-        ? hljs.highlight(code.trim(), { language }).value
-        : hljs.highlightAuto(code.trim()).value;
-        
-      // 为代码添加行号
-      const codeLines = highlightedCode.split('\n');
-      let codeWithLineNumbers = '';
-      
-      // 生成带行号的代码，确保行号与代码在同一行
-      codeLines.forEach((line, index) => {
-        const lineNumber = index + 1;
-        codeWithLineNumbers += `<tr><td class="line-number">${lineNumber}</td><td class="line-content"><span class="hljs ${langClass}">${line || ' '}</span></td></tr>`;
-      });
-      
-      // 根据语言生成合适的文件名示例
-      let filename = '';
-      if (language === 'js' || language === 'javascript') {
-        filename = 'example.js';
-      } else if (language === 'ts' || language === 'typescript') {
-        filename = 'app/users/page.tsx';
-      } else if (language === 'html') {
-        filename = 'index.html';
-      } else if (language === 'css') {
-        filename = 'styles.css';
-      } else if (language === 'vue') {
-        filename = 'Component.vue';
-      } else {
-        filename = language ? `file.${language}` : 'code';
+    const result = [];
+    let lastIndex = 0;
+    const codeBlockRegex = /```([a-z]*)\n([\s\S]+?)```/g;
+    let match;
+
+    // 查找所有代码块
+    while ((match = codeBlockRegex.exec(markdown)) !== null) {
+      // 添加代码块前的内容
+      if (match.index > lastIndex) {
+        const textBefore = markdown.substring(lastIndex, match.index);
+        if (textBefore.trim()) {
+          result.push({
+            type: "text",
+            content: renderTextContent(textBefore),
+          });
+        }
       }
-      
-      return `
+
+      // 添加代码块
+      result.push({
+        type: "code",
+        language: match[1] || "",
+        content: match[2].trim(),
+      });
+
+      lastIndex = match.index + match[0].length;
+    }
+
+    // 添加最后一个代码块后的内容
+    if (lastIndex < markdown.length) {
+      const textAfter = markdown.substring(lastIndex);
+      if (textAfter.trim()) {
+        result.push({
+          type: "text",
+          content: renderTextContent(textAfter),
+        });
+      }
+    }
+
+    return result;
+  } catch (error) {
+    console.error("Markdown处理错误:", error);
+    return [];
+  }
+};
+
+// 仅渲染文本内容（非代码块）
+const renderTextContent = (text) => {
+  try {
+    // 处理标题 (h1 - h6)
+    let html = text.replace(/^(#{1,6})\s+(.+)$/gm, (match, hashes, content) => {
+      const level = hashes.length;
+      const id = content.toLowerCase().replace(/[^\w]+/g, "-");
+      return `<h${level} id="${id}">${content}</h${level}>`;
+    });
+
+    // 处理粗体
+    html = html.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+
+    // 处理斜体
+    html = html.replace(/\*(.+?)\*/g, "<em>$1</em>");
+
+    // 处理链接 [text](url)
+    html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, text, url) => {
+      return `<a href="${url}" target="_blank">${text}</a>`;
+    });
+
+    // 处理图片 ![alt](url)
+    html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, url) => {
+      return `<img src="${url}" alt="${alt}" class="markdown-image">`;
+    });
+
+    // 处理行内代码
+    html = html.replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>');
+
+    // 处理分割线
+    html = html.replace(/^---$/gm, '<hr class="markdown-hr">');
+
+    // 处理引用块
+    html = html.replace(/^>\s(.+)$/gm, "<blockquote>$1</blockquote>");
+
+    // 处理无序列表 (先标记项目，后包装列表)
+    const ulMatch = html.match(/^[\*\-]\s(.+)$/gm);
+    if (ulMatch) {
+      const items = ulMatch
+        .map((item) => `<li>${item.replace(/^[\*\-]\s/, "")}</li>`)
+        .join("");
+      html = html.replace(/^[\*\-]\s(.+)$/gm, "<!-- list-item -->");
+      html = html.replace(
+        /<!-- list-item -->([\s\S]*?)(?=(^[^<])|$)/gm,
+        "<ul>$1</ul>"
+      );
+    }
+
+    // 处理有序列表
+    const olMatch = html.match(/^\d+\.\s(.+)$/gm);
+    if (olMatch) {
+      const items = olMatch
+        .map((item) => `<li>${item.replace(/^\d+\.\s/, "")}</li>`)
+        .join("");
+      html = html.replace(/^\d+\.\s(.+)$/gm, "<!-- list-item -->");
+      html = html.replace(
+        /<!-- list-item -->([\s\S]*?)(?=(^[^<])|$)/gm,
+        "<ol>$1</ol>"
+      );
+    }
+
+    // 处理段落 (对非标签开头的行添加段落标签)
+    html = html.replace(/^(?!<[a-z]).+$/gm, "<p>$&</p>");
+
+    // 替换换行符为实际的换行
+    html = html.replace(/\n/g, "");
+
+    // 使用DOMPurify清理HTML，防止XSS攻击
+    return DOMPurify.sanitize(html);
+  } catch (error) {
+    console.error("文本渲染错误:", error);
+    return "<p>内容渲染出错，请刷新页面重试。</p>";
+  }
+};
+
+// 保留原来的Markdown渲染函数作为备用
+const renderMarkdown = (markdown) => {
+  if (!markdown || typeof markdown !== "string") {
+    return "<p>没有内容可显示</p>";
+  }
+
+  try {
+    // 处理代码块 (使用原本的HTML输出方式)
+    let html = markdown.replace(
+      /```([a-z]*)\n([\s\S]+?)```/g,
+      (match, language, code) => {
+        const langClass = language ? `language-${language}` : "";
+        const highlightedCode =
+          language && hljs.getLanguage(language)
+            ? hljs.highlight(code.trim(), { language }).value
+            : hljs.highlightAuto(code.trim()).value;
+
+        // 为代码添加行号
+        const codeLines = highlightedCode.split("\n");
+        let codeWithLineNumbers = "";
+
+        // 生成带行号的代码，确保行号与代码在同一行
+        codeLines.forEach((line, index) => {
+          const lineNumber = index + 1;
+          codeWithLineNumbers += `<tr><td class="line-number">${lineNumber}</td><td class="line-content"><span class="hljs ${langClass}">${
+            line || " "
+          }</span></td></tr>`;
+        });
+
+        // 根据语言生成合适的文件名示例
+        let typeLabel = "";
+        if (language === "js" || language === "javascript") {
+          typeLabel = "JavaScript";
+        } else if (language === "ts" || language === "typescript") {
+          typeLabel = "TypeScript";
+        } else if (language === "html") {
+          typeLabel = "HTML";
+        } else if (language === "css") {
+          typeLabel = "CSS";
+        } else if (language === "vue") {
+          typeLabel = "Vue";
+        } else if (language === "json") {
+          typeLabel = "JSON";
+        } else {
+          typeLabel = language ? language.toUpperCase() : "代码";
+        }
+
+        const totalLines = codeLines.length;
+
+        return `
         <div class="code-block-wrapper">
           <div class="code-block-header">
-            <div class="file-path">
-              <svg class="file-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                <polyline points="14 2 14 8 20 8"></polyline>
-              </svg>
-              <span>${filename}</span>
+            <div class="header-left">
+              <div class="code-type-label">${typeLabel}</div>
             </div>
             <div class="copy-button" onclick="copyCode(this)">
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -217,74 +525,95 @@ const renderMarkdown = (markdown) => {
               </svg>
             </div>
           </div>
-          <div class="code-content">
-            <table class="code-table">
-              <tbody>${codeWithLineNumbers}</tbody>
-            </table>
+          <div class="code-main-container">
+            <div class="code-content">
+              <table class="code-table">
+                <tbody>${codeWithLineNumbers}</tbody>
+              </table>
+            </div>
+          </div>
+          <div class="code-footer">
+            <a href="#" class="show-all-code">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+              展示全部 <span>${totalLines}</span> 行代码内容
+            </a>
           </div>
         </div>
       `;
-    });
-    
-    // 处理标题 (h1 - h6)
+      }
+    );
+
+    // 其余的Markdown渲染逻辑保持不变...
     html = html.replace(/^(#{1,6})\s+(.+)$/gm, (match, hashes, content) => {
       const level = hashes.length;
-      const id = content.toLowerCase().replace(/[^\w]+/g, '-');
+      const id = content.toLowerCase().replace(/[^\w]+/g, "-");
       return `<h${level} id="${id}">${content}</h${level}>`;
     });
-    
+
     // 处理粗体
-    html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-    
+    html = html.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+
     // 处理斜体
-    html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
-    
+    html = html.replace(/\*(.+?)\*/g, "<em>$1</em>");
+
     // 处理链接 [text](url)
     html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, text, url) => {
       return `<a href="${url}" target="_blank">${text}</a>`;
     });
-    
+
     // 处理图片 ![alt](url)
     html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, url) => {
       return `<img src="${url}" alt="${alt}" class="markdown-image">`;
     });
-    
+
     // 处理行内代码
     html = html.replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>');
-    
+
     // 处理分割线
     html = html.replace(/^---$/gm, '<hr class="markdown-hr">');
-    
+
     // 处理引用块
-    html = html.replace(/^>\s(.+)$/gm, '<blockquote>$1</blockquote>');
-    
+    html = html.replace(/^>\s(.+)$/gm, "<blockquote>$1</blockquote>");
+
     // 处理无序列表 (先标记项目，后包装列表)
     const ulMatch = html.match(/^[\*\-]\s(.+)$/gm);
     if (ulMatch) {
-      const items = ulMatch.map(item => `<li>${item.replace(/^[\*\-]\s/, '')}</li>`).join('');
-      html = html.replace(/^[\*\-]\s(.+)$/gm, '<!-- list-item -->');
-      html = html.replace(/<!-- list-item -->([\s\S]*?)(?=(^[^<])|$)/gm, '<ul>$1</ul>');
+      const items = ulMatch
+        .map((item) => `<li>${item.replace(/^[\*\-]\s/, "")}</li>`)
+        .join("");
+      html = html.replace(/^[\*\-]\s(.+)$/gm, "<!-- list-item -->");
+      html = html.replace(
+        /<!-- list-item -->([\s\S]*?)(?=(^[^<])|$)/gm,
+        "<ul>$1</ul>"
+      );
     }
-    
+
     // 处理有序列表
     const olMatch = html.match(/^\d+\.\s(.+)$/gm);
     if (olMatch) {
-      const items = olMatch.map(item => `<li>${item.replace(/^\d+\.\s/, '')}</li>`).join('');
-      html = html.replace(/^\d+\.\s(.+)$/gm, '<!-- list-item -->');
-      html = html.replace(/<!-- list-item -->([\s\S]*?)(?=(^[^<])|$)/gm, '<ol>$1</ol>');
+      const items = olMatch
+        .map((item) => `<li>${item.replace(/^\d+\.\s/, "")}</li>`)
+        .join("");
+      html = html.replace(/^\d+\.\s(.+)$/gm, "<!-- list-item -->");
+      html = html.replace(
+        /<!-- list-item -->([\s\S]*?)(?=(^[^<])|$)/gm,
+        "<ol>$1</ol>"
+      );
     }
-    
+
     // 处理段落 (对非标签开头的行添加段落标签)
-    html = html.replace(/^(?!<[a-z]).+$/gm, '<p>$&</p>');
-    
+    html = html.replace(/^(?!<[a-z]).+$/gm, "<p>$&</p>");
+
     // 替换换行符为实际的换行
-    html = html.replace(/\n/g, '');
-    
+    html = html.replace(/\n/g, "");
+
     // 使用DOMPurify清理HTML，防止XSS攻击
     return DOMPurify.sanitize(html);
   } catch (error) {
-    console.error('Markdown渲染错误:', error);
-    return '<p>内容渲染出错，请刷新页面重试。</p>';
+    console.error("Markdown渲染错误:", error);
+    return "<p>内容渲染出错，请刷新页面重试。</p>";
   }
 };
 
@@ -311,7 +640,13 @@ const relatedArticles = computed(() =>
   article.value ? blogStore.getRelatedArticles(articleId.value) : []
 );
 
-// 使用自定义函数处理Markdown内容为HTML
+// 处理后的内容，包含代码块和普通内容
+const processedContent = computed(() => {
+  if (!article.value || !article.value.content) return [];
+  return processMarkdown(article.value.content);
+});
+
+// 使用自定义函数处理Markdown内容为HTML（备用方案）
 const renderedContent = computed(() => {
   if (!article.value || !article.value.content) return "";
   return renderMarkdown(article.value.content);
@@ -347,9 +682,11 @@ const formatUpdatedDate = (dateString) => {
 
 // 估算文章阅读时间（基于单词数量）
 const calculateReadingTime = (content) => {
+  if (!content) return 1;
   const wordsPerMinute = 300; // 假设平均阅读速度为每分钟300个单词
   const words = content.trim().split(/\s+/).length;
-  return Math.ceil(words / wordsPerMinute);
+  const minutes = Math.ceil(words / wordsPerMinute);
+  return minutes < 1 ? 1 : minutes; // 至少1分钟
 };
 
 // 在组件挂载时添加复制代码功能
@@ -357,38 +694,101 @@ onMounted(() => {
   if (article.value) {
     blogStore.incrementArticleViews(articleId.value);
   }
-  
+
   // 添加复制代码的全局函数
   window.copyCode = (button) => {
     // 找到代码内容
-    const codeWrapper = button.closest('.code-block-wrapper');
-    const lineContents = codeWrapper.querySelectorAll('.line-content');
-    
+    const codeWrapper = button.closest(".code-block-wrapper");
+    const lineContents = codeWrapper.querySelectorAll(".line-content");
+
     // 从各行内容中提取纯文本
     const codeText = Array.from(lineContents)
-      .map(line => line.textContent)
-      .join('\n');
-    
+      .map((line) => line.textContent)
+      .join("\n");
+
     // 复制到剪贴板
-    navigator.clipboard.writeText(codeText).then(() => {
-      const originalIcon = button.innerHTML;
-      button.innerHTML = `
+    navigator.clipboard
+      .writeText(codeText)
+      .then(() => {
+        const originalIcon = button.innerHTML;
+        button.innerHTML = `
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#28a745" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="20 6 9 17 4 12"></polyline>
         </svg>
       `;
-      button.classList.add('copied');
-      
-      setTimeout(() => {
-        button.innerHTML = originalIcon;
-        button.classList.remove('copied');
-      }, 2000);
-    }).catch(err => {
-      console.error('复制失败:', err);
-      alert('复制失败，请手动复制');
-    });
+        button.classList.add("copied");
+
+        setTimeout(() => {
+          button.innerHTML = originalIcon;
+          button.classList.remove("copied");
+        }, 2000);
+      })
+      .catch((err) => {
+        console.error("复制失败:", err);
+        alert("复制失败，请手动复制");
+      });
   };
 });
+
+// 导出为PDF
+const exportToPDF = () => {
+  if (!article.value) return;
+  
+  // 创建一个临时容器用于生成PDF
+  const element = document.createElement('div');
+  element.innerHTML = `
+    <div style="padding: 20px; font-family: Arial, sans-serif;">
+      <h1 style="text-align: center; margin-bottom: 20px;">${article.value.title}</h1>
+      <div style="color: #666; text-align: center; margin-bottom: 10px;">
+        作者: ${article.value.author || 'Kiri'} | 
+        发布时间: ${formatDateTime(article.value.createdAt)}
+      </div>
+      <div style="margin: 20px 0; padding: 10px; background-color: #f5f5f5; border-left: 4px solid #ccc;">
+        ${article.value.summary}
+      </div>
+      <div>${renderedContent.value}</div>
+    </div>
+  `;
+  
+  document.body.appendChild(element);
+  
+  // 配置PDF选项
+  const options = {
+    margin: [15, 15, 15, 15],
+    filename: `${article.value.title.replace(/\s+/g, '_')}.pdf`,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, logging: false, useCORS: true },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+  
+  // 生成PDF
+  html2pdf().from(element).set(options).save().then(() => {
+    document.body.removeChild(element);
+  });
+};
+
+// 导出为Markdown
+const exportToMarkdown = () => {
+  if (!article.value) return;
+  
+  // 构建Markdown内容
+  let markdownContent = `# ${article.value.title}\n\n`;
+  markdownContent += `> 作者: ${article.value.author || 'Kiri'} | 发布时间: ${formatDateTime(article.value.createdAt)}\n\n`;
+  markdownContent += `**摘要:** ${article.value.summary}\n\n`;
+  
+  // 添加分类和标签
+  markdownContent += `**分类:** ${article.value.category}\n\n`;
+  if (article.value.tags && article.value.tags.length > 0) {
+    markdownContent += `**标签:** ${article.value.tags.map(tag => `#${tag}`).join(' ')}\n\n`;
+  }
+  
+  // 添加正文内容
+  markdownContent += `---\n\n${article.value.content}\n\n`;
+  
+  // 使用Blob和FileSaver导出为.md文件
+  const blob = new Blob([markdownContent], { type: 'text/markdown;charset=utf-8' });
+  saveAs(blob, `${article.value.title.replace(/\s+/g, '_')}.md`);
+};
 </script>
 
 <style>
@@ -499,7 +899,7 @@ onMounted(() => {
   max-width: 1200px;
   margin: 0 auto;
   position: relative;
-  padding: 30px 20px;
+  padding: 0 20px;
 }
 
 .article-content {
@@ -685,33 +1085,41 @@ onMounted(() => {
 }
 
 .code-block-wrapper {
-  margin: 1.5em 0;
-  border-radius: 8px;
+  margin: 24px 0;
+  border-radius: 0;
   overflow: hidden;
-  background-color: #ffffff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  font-family: 'Menlo', 'Monaco', 'Consolas', 'Courier New', monospace;
+  background-color: #fff;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  border: 1px solid #ddd;
 }
 
 .code-block-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 6px 12px;
-  background-color: #f5f5f5;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 8px 12px;
+  background-color: #f9f9f9;
+  border-bottom: 1px solid #ddd;
 }
 
-.file-path {
+.header-left {
   display: flex;
   align-items: center;
-  font-size: 0.85rem;
-  color: #444;
 }
 
-.file-icon {
-  margin-right: 6px;
+.code-type-label {
+  background-color: #f0f0f0;
+  color: #333;
+  padding: 2px 8px;
+  border-radius: 0;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid #ddd;
+}
+
+.code-type-arrow {
+  margin-left: 6px;
+  font-size: 12px;
   color: #666;
 }
 
@@ -719,62 +1127,139 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #666;
-  opacity: 0.7;
   cursor: pointer;
-  transition: opacity 0.2s ease;
+  width: 28px;
+  height: 28px;
+  border-radius: 3px;
+  transition: background-color 0.2s;
+  border: 1px solid #ddd;
 }
 
 .copy-button:hover {
-  opacity: 1;
+  background-color: #f0f0f0;
 }
 
 .copy-button.copied {
-  color: #28a745;
+  background-color: rgba(40, 167, 69, 0.1);
 }
 
-.code-content {
+.code-main-container {
+  display: flex;
   position: relative;
-  overflow-x: auto;
-  background-color: #ffffff;
+  border-bottom: 1px solid #ddd;
 }
 
-.code-table {
-  border-collapse: collapse;
-  border-spacing: 0;
+.line-numbers-area {
+  position: relative;
+  width: 50px;
+  background-color: #f9f9f9;
+  border-right: 1px solid #ddd;
+}
+
+.line-numbers-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  font-size: 13px;
-  font-family: 'Menlo', 'Monaco', 'Consolas', 'Courier New', monospace;
+  display: flex;
+  align-items: center;
+  padding: 4px 0;
+  font-size: 11px;
+  color: #666;
+  background-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  z-index: 5;
 }
 
-.code-table tr {
-  line-height: 1.3;
+.line-number-arrow {
+  margin: 0 4px;
 }
 
-.line-number {
-  user-select: none;
-  text-align: right;
-  color: #aaa;
-  padding: 1px 8px;
-  width: 1%;
-  min-width: 40px;
-  border-right: 1px solid #eee;
+.line-numbers-text {
   white-space: nowrap;
 }
 
+.code-content {
+  flex: 1;
+  overflow-x: auto;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.code-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.line-number {
+  width: 50px;
+  text-align: right;
+  padding: 0 8px;
+  color: #999;
+  user-select: none;
+  border-right: 1px solid #ddd;
+}
+
 .line-content {
-  padding: 1px 8px;
+  padding: 0 12px;
   white-space: pre;
-  width: 99%;
+}
+
+.line-content .hljs {
+  background: transparent;
+  padding: 0;
+}
+
+/* JSON 代码语法高亮特定颜色 */
+.language-json .hljs-attr {
+  color: #24292e;
+}
+
+.language-json .hljs-string {
+  color: #032f62;
+}
+
+.language-json .hljs-number {
+  color: #005cc5;
+}
+
+.language-json .hljs-literal {
+  color: #005cc5;
+}
+
+.code-footer {
+  padding: 8px 0;
+  text-align: center;
+  background-color: #f9f9f9;
+}
+
+.show-all-code {
+  font-size: 12px;
+  color: #666;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.show-all-code:hover {
+  text-decoration: none;
+  color: #333;
+}
+
+.show-all-code span {
+  font-weight: 600;
 }
 
 .inline-code {
-  background-color: rgba(27, 31, 35, 0.05);
-  padding: 0.2em 0.4em;
+  background-color: rgba(175, 184, 193, 0.2);
   border-radius: 3px;
-  font-family: 'Menlo', 'Monaco', 'Consolas', 'Courier New', monospace;
-  font-size: 0.85em;
-  color: #e83e8c;
+  padding: 0.2em 0.4em;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 85%;
 }
 
 .article-footer {
@@ -834,7 +1319,6 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   padding: 20px 0 30px 0;
-  margin: 40px 0;
   border-top: 1px dashed rgba(0, 0, 0, 0.1);
   border-bottom: 1px dashed rgba(0, 0, 0, 0.1);
 }
@@ -862,12 +1346,6 @@ onMounted(() => {
 .prev-article a:hover,
 .next-article a:hover {
   color: #3273dc;
-}
-
-.related-articles {
-  margin-top: 40px;
-  padding-top: 30px;
-  border-top: 1px dashed rgba(0, 0, 0, 0.1);
 }
 
 .related-articles h3 {
@@ -996,6 +1474,9 @@ onMounted(() => {
 
 /* 修改返回按钮样式 */
 .back-to-blog {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 20px;
 }
 
@@ -1025,16 +1506,177 @@ onMounted(() => {
   transform: translateX(-3px);
 }
 
+/* 导出按钮样式 */
+.export-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.export-button {
+  display: flex;
+  align-items: center;
+  padding: 6px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  background-color: #f8f9fa;
+  color: #495057;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.export-button:hover {
+  background-color: #e9ecef;
+  border-color: #ced4da;
+  color: #212529;
+}
+
+.export-button svg {
+  margin-right: 6px;
+}
+
 @media (max-width: 768px) {
+  .back-to-blog {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+  
+  .export-buttons {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
   .back-button {
     padding: 6px 0;
     font-size: 0.9rem;
   }
-  
+
   .back-button svg {
     width: 18px;
     height: 18px;
     margin-right: 6px;
+  }
+}
+
+/* 文章标题下方作者和阅读时长样式 */
+.article-details {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 5px auto 15px;
+  font-size: 14px;
+  color: #6c757d;
+}
+
+.detail-separator,
+.meta-separator {
+  color: #adb5bd;
+  margin: 0 6px;
+}
+
+.meta-author {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.author-icon,
+.time-icon {
+  display: flex;
+  align-items: center;
+}
+
+.author-name {
+  font-weight: 500;
+}
+
+.article-tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.article-tag-small {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background-color: #e9ecef;
+  color: #495057;
+  font-size: 12px;
+  text-decoration: none;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.article-tag-small:hover {
+  background-color: #dee2e6;
+  color: #212529;
+  text-decoration: none;
+}
+
+/* 文章内容样式优化 */
+.article-content {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  padding: 30px;
+  overflow: hidden;
+}
+
+.article-title {
+  font-size: 2rem;
+  margin-bottom: 12px;
+  color: #212529;
+  text-align: center;
+}
+
+.article-meta {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+  color: #6c757d;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+
+.meta-icon {
+  display: flex;
+  align-items: center;
+}
+
+.meta-text,
+.category-link {
+  font-size: 14px;
+}
+
+.article-summary {
+  margin-top: 15px;
+  margin-bottom: 20px;
+  color: #495057;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* 确保在移动设备上正确换行 */
+@media (max-width: 640px) {
+  .article-meta {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .article-content {
+    padding: 20px;
+  }
+
+  .article-title {
+    font-size: 1.7rem;
   }
 }
 </style>

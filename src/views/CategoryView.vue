@@ -43,7 +43,7 @@ const props = defineProps({
 
 const blogStore = useBlogStore()
 
-// 获取该分类下的文章列表，按分类筛选
+// 获取该分类下的文章列表
 const categoryArticles = computed(() => 
   blogStore.getArticlesByCategory(props.category)
 )

@@ -97,9 +97,9 @@
         <div v-else class="empty-journal">
           <div class="empty-prompt">
             <div class="empty-icon">📝</div>
-            <p>选择一篇随记来阅读</p>
-            <p class="empty-sub">或者创建一篇新的随记</p>
-            <button class="new-journal-btn" @click="createNewJournal">写新随记</button>
+            <p>今日还没有随记</p>
+            <p class="empty-sub">记录下今天的所思所想吧</p>
+            <button class="new-journal-btn" @click="createNewJournal">写今日随记</button>
           </div>
         </div>
       </div>
@@ -320,11 +320,23 @@ const createNewJournal = () => {
 
 // 组件挂载时
 onMounted(() => {
-  // 默认选择第一篇随记（如果有）
-  if (journalEntries.value.length > 0) {
-    selectedJournalId.value = journalEntries.value[0].id
-    selectedDate.value = new Date(journalEntries.value[0].date)
+  // 获取当前日期
+  const today = new Date();
+  selectedDate.value = today;
+  
+  // 查找今天的随记
+  const todayJournal = journalData.value.find(entry => isSameDay(new Date(entry.date), today));
+  
+  if (todayJournal) {
+    // 如果今天有随记，选中它
+    selectedJournalId.value = todayJournal.id;
+  } else if (journalEntries.value.length > 0) {
+    // 如果今天没有随记但本月有随记，选中本月第一篇
+    selectedJournalId.value = journalEntries.value[0].id;
   }
+  
+  // 确保当前显示的月份是今天所在的月份
+  currentDate.value = today;
 })
 </script>
 

@@ -4,7 +4,6 @@ import NotFoundView from '../views/NotFoundView.vue'
 import ArticleView from '../views/ArticleView.vue'
 import BlogView from '../views/BlogView.vue'
 import JournalView from '../views/JournalView.vue'
-import JournalEditView from '../views/JournalEditView.vue'
 import CategoryView from '../views/CategoryView.vue'
 import ArchivePageView from '../views/ArchivePageView.vue'
 
@@ -36,12 +35,6 @@ const router = createRouter({
       meta: { title: '随记' }
     },
     {
-      path: '/journal/edit',
-      name: 'journal-edit',
-      component: JournalEditView,
-      meta: { title: '写随笔' }
-    },
-    {
       path: '/gallery',
       name: 'gallery',
       component: CategoryView,
@@ -60,7 +53,22 @@ const router = createRouter({
       component: NotFoundView,
       meta: { title: '页面未找到' }
     }
-  ]
+  ],
+  // 添加滚动行为，在路由切换时自动滚动到顶部
+  scrollBehavior(to, from, savedPosition) {
+    // 如果存在savedPosition（例如用户点击了浏览器的前进/后退按钮）
+    if (savedPosition) {
+      return savedPosition;
+    }
+    
+    // 如果是同一个页面的不同参数（如文章ID变化）
+    if (from.name === to.name && from.params.id !== to.params.id) {
+      return { top: 0 };
+    }
+    
+    // 其他情况，滚动到顶部
+    return { top: 0 };
+  }
 })
 
 // 动态设置页面标题

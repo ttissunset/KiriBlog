@@ -20,7 +20,7 @@
           </svg>
           <span>{{ $t("common.backToList") }}</span>
         </router-link>
-        
+
         <div class="export-buttons">
           <button class="export-button" @click="exportToPDF" title="导出为PDF">
             <svg
@@ -34,7 +34,9 @@
               stroke-linecap="round"
               stroke-linejoin="round"
             >
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <path
+                d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+              ></path>
               <polyline points="14 2 14 8 20 8"></polyline>
               <path d="M7 15h10"></path>
               <path d="M9 11h6"></path>
@@ -42,7 +44,11 @@
             </svg>
             <span>PDF</span>
           </button>
-          <button class="export-button" @click="exportToMarkdown" title="导出为Markdown">
+          <button
+            class="export-button"
+            @click="exportToMarkdown"
+            title="导出为Markdown"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="18"
@@ -152,7 +158,9 @@
           <!-- 作者和阅读时长信息 -->
         </header>
 
-        <div class="article-summary">{{ article.summary }}</div>
+        <div class="article-summary">
+          {{ article.summary }}
+        </div>
 
         <div class="ai-summary" :class="{ expanded: isSummaryExpanded }">
           <div class="summary-header">
@@ -323,7 +331,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch, getCurrentInstance } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { format } from "date-fns";
 import { useBlogStore } from "../stores/blogStore";
@@ -333,7 +341,7 @@ import "highlight.js/styles/github.css";
 import DOMPurify from "dompurify";
 import CodepenViewer from "../components/CodepenViewer.vue";
 import html2pdf from "html2pdf.js";
-import { saveAs } from 'file-saver';
+import { saveAs } from "file-saver";
 
 // 处理Markdown内容，分离代码块和普通内容
 const processMarkdown = (markdown) => {
@@ -421,7 +429,7 @@ const renderTextContent = (text) => {
     html = html.replace(/^---$/gm, '<hr class="markdown-hr">');
 
     // 处理引用块
-    html = html.replace(/^>\s(.+)$/gm, "<blockquote>$1</blockquote>");
+    html = html.replace(/^>\s(.+)$/gm, "<blockquote class=\"highlighted-quote\">$1</blockquote>");
 
     // 处理无序列表 (先标记项目，后包装列表)
     const ulMatch = html.match(/^[\*\-]\s(.+)$/gm);
@@ -575,7 +583,7 @@ const renderMarkdown = (markdown) => {
     html = html.replace(/^---$/gm, '<hr class="markdown-hr">');
 
     // 处理引用块
-    html = html.replace(/^>\s(.+)$/gm, "<blockquote>$1</blockquote>");
+    html = html.replace(/^>\s(.+)$/gm, "<blockquote class=\"highlighted-quote\">$1</blockquote>");
 
     // 处理无序列表 (先标记项目，后包装列表)
     const ulMatch = html.match(/^[\*\-]\s(.+)$/gm);
@@ -631,6 +639,11 @@ const toggleSummary = () => {
 
 // 从路由参数获取文章ID
 const articleId = computed(() => Number(route.params.id));
+
+// 监听文章ID变化，滚动到顶部
+watch(() => route.params.id, () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
 
 // 根据ID获取文章详情
 const article = computed(() => blogStore.getArticleById(articleId.value));
@@ -717,6 +730,16 @@ onMounted(() => {
         </svg>
       `;
         button.classList.add("copied");
+        
+        // 显示成功提示 - 使用全局toast
+        if (window.$toast) {
+          window.$toast.success("代码已复制到剪贴板", {
+            title: "复制成功"
+          });
+        } else {
+          // 使用备用方法
+          showSimpleToast("代码已复制到剪贴板", "success");
+        }
 
         setTimeout(() => {
           button.innerHTML = originalIcon;
@@ -725,22 +748,80 @@ onMounted(() => {
       })
       .catch((err) => {
         console.error("复制失败:", err);
-        alert("复制失败，请手动复制");
+        if (window.$toast) {
+          window.$toast.error("复制失败，请手动复制", {
+            title: "复制失败"
+          });
+        } else {
+          showSimpleToast("复制失败，请手动复制", "error");
+        }
       });
   };
 });
 
+// 备用提示函数 - 简单的提示
+const showSimpleToast = (message, type = 'info') => {
+  try {
+    // 尝试使用全局toast服务
+    const instance = getCurrentInstance();
+    if (instance && instance.appContext && instance.appContext.config.globalProperties.$toast) {
+      instance.appContext.config.globalProperties.$toast[type](message, {
+        title: type === 'success' ? '成功' : 
+               type === 'error' ? '错误' : 
+               type === 'warning' ? '警告' : '提示'
+      });
+      return;
+    }
+  } catch (err) {
+    console.error("无法使用全局toast服务，降级使用内联toast:", err);
+  }
+  
+  // 备用方案 - 创建一个简单的提示元素
+  const toast = document.createElement('div');
+  toast.style.position = 'fixed';
+  toast.style.top = '20px';
+  toast.style.right = '20px';
+  toast.style.padding = '12px 16px';
+  toast.style.background = type === 'success' ? '#f0f9eb' : 
+                         type === 'error' ? '#fef0f0' : 
+                         type === 'warning' ? '#fdf6ec' : '#f4f4f5';
+  toast.style.color = '#606266';
+  toast.style.borderLeft = type === 'success' ? '4px solid #67c23a' : 
+                         type === 'error' ? '4px solid #f56c6c' : 
+                         type === 'warning' ? '4px solid #e6a23c' : '4px solid #909399';
+  toast.style.borderRadius = '8px';
+  toast.style.boxShadow = '0 2px 12px rgba(0,0,0,0.1)';
+  toast.style.zIndex = '9999';
+  toast.style.transition = 'all 0.3s';
+  toast.innerText = message;
+  
+  document.body.appendChild(toast);
+  
+  // 3秒后移除
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(100%)';
+    setTimeout(() => {
+      if (document.body.contains(toast)) {
+        document.body.removeChild(toast);
+      }
+    }, 300);
+  }, 3000);
+};
+
 // 导出为PDF
 const exportToPDF = () => {
   if (!article.value) return;
-  
+
   // 创建一个临时容器用于生成PDF
-  const element = document.createElement('div');
+  const element = document.createElement("div");
   element.innerHTML = `
     <div style="padding: 20px; font-family: Arial, sans-serif;">
-      <h1 style="text-align: center; margin-bottom: 20px;">${article.value.title}</h1>
+      <h1 style="text-align: center; margin-bottom: 20px;">${
+        article.value.title
+      }</h1>
       <div style="color: #666; text-align: center; margin-bottom: 10px;">
-        作者: ${article.value.author || 'Kiri'} | 
+        作者: ${article.value.author || "Kiri"} | 
         发布时间: ${formatDateTime(article.value.createdAt)}
       </div>
       <div style="margin: 20px 0; padding: 10px; background-color: #f5f5f5; border-left: 4px solid #ccc;">
@@ -749,45 +830,86 @@ const exportToPDF = () => {
       <div>${renderedContent.value}</div>
     </div>
   `;
-  
+
   document.body.appendChild(element);
-  
+
   // 配置PDF选项
   const options = {
     margin: [15, 15, 15, 15],
-    filename: `${article.value.title.replace(/\s+/g, '_')}.pdf`,
-    image: { type: 'jpeg', quality: 0.98 },
+    filename: `${article.value.title.replace(/\s+/g, "_")}.pdf`,
+    image: { type: "jpeg", quality: 0.98 },
     html2canvas: { scale: 2, logging: false, useCORS: true },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
   };
-  
+
   // 生成PDF
-  html2pdf().from(element).set(options).save().then(() => {
-    document.body.removeChild(element);
-  });
+  html2pdf()
+    .from(element)
+    .set(options)
+    .save()
+    .then(() => {
+      document.body.removeChild(element);
+      // 显示成功提示
+      try {
+        const instance = getCurrentInstance();
+        if (instance && instance.appContext && instance.appContext.config.globalProperties.$toast) {
+          instance.appContext.config.globalProperties.$toast.success("PDF已成功导出", {
+            title: "导出成功"
+          });
+        } else {
+          // 备用提示方式
+          showSimpleToast("PDF已成功导出", "success");
+        }
+      } catch (err) {
+        console.error("无法显示Toast提示:", err);
+        showSimpleToast("PDF已成功导出", "success");
+      }
+    });
 };
 
 // 导出为Markdown
 const exportToMarkdown = () => {
   if (!article.value) return;
-  
+
   // 构建Markdown内容
   let markdownContent = `# ${article.value.title}\n\n`;
-  markdownContent += `> 作者: ${article.value.author || 'Kiri'} | 发布时间: ${formatDateTime(article.value.createdAt)}\n\n`;
+  markdownContent += `> 作者: ${
+    article.value.author || "Kiri"
+  } | 发布时间: ${formatDateTime(article.value.createdAt)}\n\n`;
   markdownContent += `**摘要:** ${article.value.summary}\n\n`;
-  
+
   // 添加分类和标签
   markdownContent += `**分类:** ${article.value.category}\n\n`;
   if (article.value.tags && article.value.tags.length > 0) {
-    markdownContent += `**标签:** ${article.value.tags.map(tag => `#${tag}`).join(' ')}\n\n`;
+    markdownContent += `**标签:** ${article.value.tags
+      .map((tag) => `#${tag}`)
+      .join(" ")}\n\n`;
   }
-  
+
   // 添加正文内容
   markdownContent += `---\n\n${article.value.content}\n\n`;
-  
+
   // 使用Blob和FileSaver导出为.md文件
-  const blob = new Blob([markdownContent], { type: 'text/markdown;charset=utf-8' });
-  saveAs(blob, `${article.value.title.replace(/\s+/g, '_')}.md`);
+  const blob = new Blob([markdownContent], {
+    type: "text/markdown;charset=utf-8",
+  });
+  saveAs(blob, `${article.value.title.replace(/\s+/g, "_")}.md`);
+  
+  // 显示成功提示
+  try {
+    const instance = getCurrentInstance();
+    if (instance && instance.appContext && instance.appContext.config.globalProperties.$toast) {
+      instance.appContext.config.globalProperties.$toast.success("Markdown已成功导出", {
+        title: "导出成功"
+      });
+    } else {
+      // 备用提示方式
+      showSimpleToast("Markdown已成功导出", "success");
+    }
+  } catch (err) {
+    console.error("无法显示Toast提示:", err);
+    showSimpleToast("Markdown已成功导出", "success");
+  }
 };
 </script>
 
@@ -841,10 +963,12 @@ const exportToMarkdown = () => {
 }
 
 .markdown-body blockquote {
-  padding: 0 1em;
-  color: #6a737d;
-  border-left: 0.25em solid #dfe2e5;
+  padding: 0.5em 1em;
+  color: #333;
+  border-left: 0.3em solid #3498db;
   margin: 0 0 16px 0;
+  background-color: #f8f9fa;
+  border-radius: 0 4px 4px 0;
 }
 
 .markdown-body code {
@@ -889,6 +1013,27 @@ const exportToMarkdown = () => {
   margin-top: 0;
   margin-bottom: 16px;
 }
+
+.markdown-body blockquote.highlighted-quote,
+.markdown-body .highlighted-quote {
+  padding: 0.75em 1em;
+  color: #333;
+  border-left: 0.35em solid #3498db;
+  margin: 0 0 16px 0;
+  background-color: #f8f9fa;
+  border-radius: 0 4px 4px 0;
+  font-style: italic;
+}
+
+/* 暗色模式适配 */
+@media (prefers-color-scheme: dark) {
+  .markdown-body blockquote.highlighted-quote,
+  .markdown-body .highlighted-quote {
+    color: #e0e0e0;
+    background-color: #1a2939;
+    border-left-color: #3498db;
+  }
+}
 </style>
 
 <style scoped>
@@ -911,10 +1056,7 @@ const exportToMarkdown = () => {
 }
 
 .article-header {
-  margin-bottom: 40px;
   text-align: center;
-  padding-bottom: 30px;
-  border-bottom: 1px dashed rgba(0, 0, 0, 0.1);
 }
 
 .article-title {
@@ -957,13 +1099,23 @@ const exportToMarkdown = () => {
 }
 
 .article-summary {
-  font-size: 1.1rem;
+  margin: 20px 0;
+  padding: 0.75em 1em;
+  background-color: #f8f9fa;
+  border-left: 0.35em solid #3498db;
+  border-radius: 0 4px 4px 0;
   line-height: 1.6;
-  color: var(--text-color);
-  opacity: 0.85;
-  margin-bottom: 25px;
-  padding-bottom: 25px;
-  border-bottom: 1px solid var(--border-color);
+  color: #333;
+  font-style: italic;
+}
+
+/* 暗色模式下的简介样式 */
+@media (prefers-color-scheme: dark) {
+  .article-summary {
+    color: #e0e0e0;
+    background-color: #1a2939;
+    border-left-color: #3498db;
+  }
 }
 
 .ai-summary {
@@ -1477,7 +1629,6 @@ const exportToMarkdown = () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
 }
 
 .back-button {
@@ -1541,12 +1692,12 @@ const exportToMarkdown = () => {
     align-items: flex-start;
     gap: 15px;
   }
-  
+
   .export-buttons {
     width: 100%;
     justify-content: space-between;
   }
-  
+
   .back-button {
     padding: 6px 0;
     font-size: 0.9rem;

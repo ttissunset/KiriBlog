@@ -6,7 +6,7 @@
         <div class="code-type-label">{{ typeLabel }}</div>
       </div>
       <!-- 复制代码 -->
-      <div class="copy-button" @click="copyCode">
+      <div class="copy-button" @click="copyCode($event)">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="14"
@@ -63,7 +63,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, getCurrentInstance } from "vue";
 import hljs from "highlight.js";
 import "highlight.js/styles/github.css";
 
@@ -132,11 +132,12 @@ const totalLines = computed(() => {
 });
 
 // 复制代码
-const copyCode = () => {
+const copyCode = (e) => {
+  const button = e.currentTarget; // 使用事件对象获取当前按钮
+  
   navigator.clipboard
     .writeText(props.code)
     .then(() => {
-      const button = document.querySelector(".copy-button");
       const originalIcon = button.innerHTML;
       button.innerHTML = `
       <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#28a745" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -145,6 +146,26 @@ const copyCode = () => {
     `;
       button.classList.add("copied");
 
+      // 显示成功提示
+      if (window.$toast) {
+        window.$toast.success("代码已复制到剪贴板", {
+          title: "复制成功",
+          duration: 3000 // 使用较短的持续时间
+        });
+      } else {
+        // 尝试使用组件内的方法
+        const instance = getCurrentInstance();
+        if (instance && instance.appContext && instance.appContext.config.globalProperties.$toast) {
+          instance.appContext.config.globalProperties.$toast.success("代码已复制到剪贴板", {
+            title: "复制成功",
+            duration: 3000
+          });
+        } else {
+          // 备用提示方式
+          showSimpleToast("代码已复制到剪贴板", "success");
+        }
+      }
+
       setTimeout(() => {
         button.innerHTML = originalIcon;
         button.classList.remove("copied");
@@ -152,8 +173,74 @@ const copyCode = () => {
     })
     .catch((err) => {
       console.error("复制失败:", err);
-      alert("复制失败，请手动复制");
+      if (window.$toast) {
+        window.$toast.error("复制失败，请手动复制", {
+          title: "复制失败",
+          duration: 3000
+        });
+      } else {
+        // 尝试使用组件内的方法
+        const instance = getCurrentInstance();
+        if (instance && instance.appContext && instance.appContext.config.globalProperties.$toast) {
+          instance.appContext.config.globalProperties.$toast.error("复制失败，请手动复制", {
+            title: "复制失败",
+            duration: 3000
+          });
+        } else {
+          showSimpleToast("复制失败，请手动复制", "error");
+        }
+      }
     });
+};
+
+// 备用提示函数 - 简单的提示
+const showSimpleToast = (message, type = 'info') => {
+  try {
+    // 尝试使用全局toast服务
+    const instance = getCurrentInstance();
+    if (instance && instance.appContext && instance.appContext.config.globalProperties.$toast) {
+      instance.appContext.config.globalProperties.$toast[type](message, {
+        title: type === 'success' ? '成功' : 
+               type === 'error' ? '错误' : 
+               type === 'warning' ? '警告' : '提示'
+      });
+      return;
+    }
+  } catch (err) {
+    console.error("无法使用全局toast服务，降级使用内联toast:", err);
+  }
+  
+  // 备用方案 - 创建一个简单的提示元素
+  const toast = document.createElement('div');
+  toast.style.position = 'fixed';
+  toast.style.top = '20px';
+  toast.style.right = '20px';
+  toast.style.padding = '12px 16px';
+  toast.style.background = type === 'success' ? '#f0f9eb' : 
+                         type === 'error' ? '#fef0f0' : 
+                         type === 'warning' ? '#fdf6ec' : '#f4f4f5';
+  toast.style.color = '#606266';
+  toast.style.borderLeft = type === 'success' ? '4px solid #67c23a' : 
+                         type === 'error' ? '4px solid #f56c6c' : 
+                         type === 'warning' ? '4px solid #e6a23c' : '4px solid #909399';
+  toast.style.borderRadius = '8px';
+  toast.style.boxShadow = '0 2px 12px rgba(0,0,0,0.1)';
+  toast.style.zIndex = '9999';
+  toast.style.transition = 'all 0.3s';
+  toast.innerText = message;
+  
+  document.body.appendChild(toast);
+  
+  // 3秒后移除
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(100%)';
+    setTimeout(() => {
+      if (document.body.contains(toast)) {
+        document.body.removeChild(toast);
+      }
+    }, 300);
+  }, 3000);
 };
 
 // 展开/折叠代码

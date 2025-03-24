@@ -29,5 +29,11 @@ app.component('font-awesome-icon', FontAwesomeIcon)
 app.config.globalProperties.$toast = toast
 window.$toast = toast; // 添加到全局对象，便于在非组件上下文中使用
 
+// 禁用右键点击
+document.addEventListener('contextmenu', (e) => {
+  e.preventDefault();
+  return false;
+});
+
 // 挂载应用
 app.mount('#app')

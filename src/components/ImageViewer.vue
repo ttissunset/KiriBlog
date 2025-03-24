@@ -62,6 +62,10 @@
               <h4>{{ $t("gallery.location") }}</h4>
               <p>湖南省长沙市</p>
             </div>
+
+            <div class="save-image-btn">
+              <button @click="saveImage">保存图片</button>
+            </div>
           </div>
         </div>
       </div>
@@ -98,6 +102,71 @@ const formatCameraTime = (dateString) => {
   const hours = String(date.getHours()).padStart(2, "0");
   const minutes = String(date.getMinutes()).padStart(2, "0");
   return `${year}/${month}/${day} ${hours}:${minutes}`;
+};
+
+// 保存图片
+const saveImage = () => {
+  if (!props.selectedImage || !props.selectedImage.url) return;
+  
+  // 创建一个链接元素来下载图片
+  const link = document.createElement('a');
+  link.href = props.selectedImage.url;
+  
+  // 从URL中提取文件名，如果没有则使用默认名称
+  const filename = props.selectedImage.url.split('/').pop() || 'image.jpg';
+  link.download = filename;
+  
+  // 触发点击以下载图片
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  
+  // 显示成功通知
+  const notification = document.createElement('div');
+  notification.className = 'image-save-notification';
+  notification.innerHTML = `
+    <div class="notification-content">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+      </svg>
+      <span>图片已保存成功</span>
+    </div>
+  `;
+  
+  // 添加样式
+  notification.style.position = 'fixed';
+  notification.style.bottom = '20px';
+  notification.style.right = '20px';
+  notification.style.backgroundColor = '#f0f9eb';
+  notification.style.color = '#67c23a';
+  notification.style.padding = '10px 20px';
+  notification.style.borderRadius = '4px';
+  notification.style.boxShadow = '0 2px 12px rgba(0, 0, 0, 0.1)';
+  notification.style.zIndex = '9999';
+  notification.style.transition = 'all 0.3s ease';
+  
+  // 通知内容样式
+  const content = notification.querySelector('.notification-content');
+  content.style.display = 'flex';
+  content.style.alignItems = 'center';
+  
+  // 图标样式
+  const icon = notification.querySelector('svg');
+  icon.style.marginRight = '8px';
+  
+  document.body.appendChild(notification);
+  
+  // 2秒后移除通知
+  setTimeout(() => {
+    notification.style.opacity = '0';
+    notification.style.transform = 'translateX(100%)';
+    setTimeout(() => {
+      if (document.body.contains(notification)) {
+        document.body.removeChild(notification);
+      }
+    }, 300);
+  }, 2000);
 };
 </script>
 
@@ -156,7 +225,7 @@ const formatCameraTime = (dateString) => {
 }
 
 .close-btn:hover {
-  background-color: rgba(255, 255, 255, 0.3);
+  background-color: rgba(236, 61, 61, 0.726);
   color: white;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }

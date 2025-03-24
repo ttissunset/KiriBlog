@@ -1,0 +1,52 @@
+/* 颜色变量 */
+:root {
+  --primary-color: #3498db;
+  --primary-color-light: #e1f0fa;
+  --primary-color-dark: #2980b9;
+  --secondary-color: #2ecc71;
+  --secondary-color-dark: #27ae60;
+  --accent-color: #9b59b6;
+  --accent-color-dark: #8e44ad;
+  --text-color: #333333;
+  --text-color-light: #666666;
+  --text-color-lighter: #999999;
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-accent: #f1f5f9;
+  --bg-hover: #f0f2f5;
+  --bg-code: #f6f8fa;
+  --header-bg: rgba(255, 255, 255, 0.95);
+  --bg-footer: #2c3e50;
+  --border-color: #e5e7eb;
+  --border-color-dark: #d1d5db;
+  --card-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  --link-hover: #1e7fbb;
+  --transition-speed: 0.3s;
+  --font-family: 'Inter', 'SF Pro Text', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  --font-family-mono: 'SF Mono', SFMono-Regular, ui-monospace, 'DejaVu Sans Mono', Menlo, Consolas, monospace;
+}
+
+/* 暗色主题 */
+.dark-mode {
+  --primary-color: #4dabf7;
+  --primary-color-light: #2a3f58;
+  --primary-color-dark: #1971c2;
+  --secondary-color: #51cf66;
+  --secondary-color-dark: #40c057;
+  --accent-color: #cc5de8;
+  --accent-color-dark: #be4bdb;
+  --text-color: #e5e5e5;
+  --text-color-light: #b0b0b0;
+  --text-color-lighter: #888888;
+  --bg-primary: #121212;
+  --bg-secondary: #1e1e1e;
+  --bg-accent: #242424;
+  --bg-hover: #2d2d2d;
+  --bg-code: #2a2a2a;
+  --header-bg: rgba(18, 18, 18, 0.95);
+  --bg-footer: #111827;
+  --border-color: #383838;
+  --border-color-dark: #4d4d4d;
+  --card-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  --link-hover: #74c0fc;
+} 

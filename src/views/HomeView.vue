@@ -1,6 +1,6 @@
 <template>
   <MainLayout>
-    <!-- 整体GitHub风格的个人主页容器 -->
+    <!-- 人主页容器 -->
     <div class="github-profile">
       <div class="profile-container">
         <!-- 左侧内容区域 - 头像和个人基本信息 -->
@@ -108,16 +108,16 @@
                 <div class="language-stats">
                   <div class="language-bar">
                     <div
-                      class="bar-segment typescript"
+                      class="bar-segment javascript"
                       style="width: 64.8%"
                     ></div>
                     <div class="bar-segment css" style="width: 13.99%"></div>
                     <div class="bar-segment html" style="width: 21.21%"></div>
                   </div>
                   <div class="language-labels">
-                    <div class="language-label typescript">
+                    <div class="language-label javascript">
                       <span class="label-dot"></span>
-                      <span>TypeScript 64.80%</span>
+                      <span>JavaScript 64.80%</span>
                     </div>
                     <div class="language-label css">
                       <span class="label-dot"></span>
@@ -616,7 +616,7 @@ function getCellClass(week, day) {
   height: 100%;
 }
 
-.bar-segment.typescript {
+.bar-segment.javascript {
   background-color: #3178c6;
 }
 
@@ -648,7 +648,7 @@ function getCellClass(week, day) {
   margin-right: 6px;
 }
 
-.language-label.typescript .label-dot {
+.language-label.javascript .label-dot {
   background-color: #3178c6;
 }
 

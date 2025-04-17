@@ -1,3 +1,145 @@
+<script setup>
+import { ref, computed, onMounted, onUnmounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { format } from "date-fns";
+import { useBlogStore } from "../stores/blogStore";
+import MainLayout from "../layouts/Home.vue";
+
+const route = useRoute();
+const router = useRouter();
+const blogStore = useBlogStore();
+
+// 获取所有博客数据
+const { articles, categories, tags, archivedArticles } = blogStore;
+
+// 筛选条件
+const activeCategory = ref("");
+const activeTag = ref("");
+const searchQuery = ref("");
+
+// 初始化筛选条件（从URL参数）
+onMounted(() => {
+  if (route.query.category) {
+    activeCategory.value = route.query.category;
+  }
+
+  if (route.query.tag) {
+    activeTag.value = route.query.tag;
+  }
+
+  if (route.query.q) {
+    searchQuery.value = route.query.q;
+  }
+});
+
+// 筛选文章
+const filteredArticles = computed(() => {
+  // 始终按最新时间排序，确保最新的文章在最前面
+  return blogStore
+    .getFilteredArticles(
+      activeCategory.value,
+      activeTag.value,
+      searchQuery.value
+    )
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+});
+
+// 热门文章
+const popularArticles = computed(() => {
+  return blogStore.getPopularArticles().slice(0, 5);
+});
+
+// 执行搜索
+const performSearch = () => {
+  if (searchQuery.value.trim()) {
+    // 清空其他筛选条件
+    activeCategory.value = "";
+    activeTag.value = "";
+    // 更新URL查询参数
+    updateRouteQuery();
+    // 强制重新计算过滤后的文章
+    return filteredArticles.value;
+  }
+};
+
+// 按分类筛选
+const filterByCategory = (category) => {
+  activeCategory.value = category;
+  activeTag.value = "";
+  searchQuery.value = "";
+  updateRouteQuery();
+};
+
+// 按标签筛选
+const filterByTag = (tag) => {
+  activeTag.value = tag;
+  activeCategory.value = "";
+  searchQuery.value = "";
+  updateRouteQuery();
+};
+
+// 清除筛选条件
+const clearFilters = (type) => {
+  if (!type || type === "category") {
+    activeCategory.value = "";
+  }
+
+  if (!type || type === "tag") {
+    activeTag.value = "";
+  }
+
+  if (!type) {
+    searchQuery.value = "";
+  }
+
+  updateRouteQuery();
+};
+
+// 更新路由查询参数
+const updateRouteQuery = () => {
+  const query = {};
+
+  if (activeCategory.value) {
+    query.category = activeCategory.value;
+  }
+
+  if (activeTag.value) {
+    query.tag = activeTag.value;
+  }
+
+  if (searchQuery.value.trim()) {
+    query.q = searchQuery.value.trim();
+  }
+
+  router.replace({ query });
+};
+
+// 格式化日期
+const formatDate = (dateString, formatString) => {
+  return format(new Date(dateString), formatString);
+};
+
+// 精确到秒的日期格式化函数
+const formatDateTime = (dateString) => {
+  return format(new Date(dateString), "yyyy/MM/dd HH:mm:ss");
+};
+
+// 监听滚动效果
+const isScrolled = ref(false);
+
+const handleScroll = () => {
+  isScrolled.value = window.scrollY > 50;
+};
+
+onMounted(() => {
+  window.addEventListener("scroll", handleScroll);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("scroll", handleScroll);
+});
+</script>
+
 <template>
   <MainLayout>
     <div class="blog-page">
@@ -6,40 +148,57 @@
         <!-- 左侧：文章列表 -->
         <div class="articles-section">
           <!-- 时间线浏览模式 -->
-          <template v-if="filteredArticles.length > 0 && !activeCategory && !activeTag">
+          <template
+            v-if="filteredArticles.length > 0 && !activeCategory && !activeTag"
+          >
             <div class="timeline-view">
               <!-- 文章年份归档区域 -->
               <template v-if="archivedArticles">
-                <div 
-                  v-for="year in Object.keys(archivedArticles).sort((a, b) => b - a)" 
-                  :key="year" 
+                <div
+                  v-for="year in Object.keys(archivedArticles).sort(
+                    (a, b) => b - a
+                  )"
+                  :key="year"
                   class="year-block"
                 >
                   <div class="year-marker">
                     <span class="year-number">{{ year }}</span>
                   </div>
-                  
+
                   <!-- 文章月份归档区域 -->
-                  <div 
-                    v-for="month in Object.keys(archivedArticles[year] || {}).sort((a, b) => b - a)" 
-                    :key="`${year}-${month}`" 
+                  <div
+                    v-for="month in Object.keys(
+                      archivedArticles[year] || {}
+                    ).sort((a, b) => b - a)"
+                    :key="`${year}-${month}`"
                     class="month-block"
                   >
-                    <div class="month-marker">{{ month }}{{ $t('blog.month') }}</div>
-                    
+                    <div class="month-marker">
+                      {{ month }}{{ $t("blog.month") }}
+                    </div>
+
                     <div class="article-cards">
-                      <div v-for="article in archivedArticles[year][month]" :key="article.id" class="article-card">
-                        <div class="card-date">{{ formatDateTime(article.createdAt) }}</div>
-                        <router-link :to="{ name: 'article', params: { id: article.id } }" class="card-title">
+                      <div
+                        v-for="article in archivedArticles[year][month]"
+                        :key="article.id"
+                        class="article-card"
+                      >
+                        <div class="card-date">
+                          {{ formatDateTime(article.createdAt) }}
+                        </div>
+                        <router-link
+                          :to="{ name: 'article', params: { id: article.id } }"
+                          class="card-title"
+                        >
                           {{ article.title }}
                         </router-link>
-                        
+
                         <p class="card-summary">{{ article.summary }}</p>
 
                         <div class="card-footer">
                           <div class="card-tags">
-                            <router-link 
-                              v-for="tag in article.tags" 
+                            <router-link
+                              v-for="tag in article.tags"
                               :key="tag"
                               :to="{ name: 'blog', query: { tag } }"
                               class="card-tag"
@@ -61,52 +220,91 @@
               </template>
             </div>
           </template>
-          
+
           <!-- 筛选模式下的文章列表 -->
           <template v-else-if="filteredArticles.length > 0">
             <div class="filtered-view">
               <div class="filter-header" v-if="activeCategory || activeTag">
                 <h2 class="filter-title">
                   <span v-if="activeCategory">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      width="18"
+                      height="18"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path
+                        d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
+                      ></path>
                     </svg>
-                    {{ $t('blog.category') }}: {{ activeCategory }}
+                    {{ $t("blog.category") }}: {{ activeCategory }}
                   </span>
                   <span v-else-if="activeTag">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      width="18"
+                      height="18"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path
+                        d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"
+                      ></path>
                       <line x1="7" y1="7" x2="7.01" y2="7"></line>
                     </svg>
-                    {{ $t('common.tags') }}: {{ activeTag }}
+                    {{ $t("common.tags") }}: {{ activeTag }}
                   </span>
                 </h2>
                 <button class="reset-filter" @click="resetFilter">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    width="16"
+                    height="16"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
                   </svg>
-                  {{ $t('blog.resetFilter') }}
+                  {{ $t("blog.resetFilter") }}
                 </button>
               </div>
-              
+
               <div class="article-grid">
-                <div 
-                  v-for="article in filteredArticles" 
-                  :key="article.id" 
+                <div
+                  v-for="article in filteredArticles"
+                  :key="article.id"
                   class="article-card"
                 >
-                  <div class="card-date">{{ formatDateTime(article.createdAt) }}</div>
-                  <router-link :to="{ name: 'article', params: { id: article.id } }" class="card-title">
+                  <div class="card-date">
+                    {{ formatDateTime(article.createdAt) }}
+                  </div>
+                  <router-link
+                    :to="{ name: 'article', params: { id: article.id } }"
+                    class="card-title"
+                  >
                     {{ article.title }}
                   </router-link>
-                  
+
                   <p class="card-summary">{{ article.summary }}</p>
-                  
+
                   <div class="card-footer">
                     <div class="card-tags">
-                      <router-link 
-                        v-for="tag in article.tags" 
+                      <router-link
+                        v-for="tag in article.tags"
                         :key="tag"
                         :to="{ name: 'blog', query: { tag } }"
                         class="card-tag"
@@ -116,11 +314,23 @@
                     </div>
                     <div class="card-stats">
                       <span class="view-count">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          width="16"
+                          height="16"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <path
+                            d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
+                          ></path>
                           <circle cx="12" cy="12" r="3"></circle>
                         </svg>
-                        {{ article.views }} {{ $t('common.viewCount') }}
+                        {{ article.views }} {{ $t("common.viewCount") }}
                       </span>
                     </div>
                   </div>
@@ -128,22 +338,34 @@
               </div>
             </div>
           </template>
-          
+
           <!-- 无文章时显示 -->
           <div v-else class="no-articles">
             <div class="empty-state">
               <div class="empty-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  width="48"
+                  height="48"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                >
                   <path d="M14 3v4a1 1 0 0 0 1 1h4"></path>
-                  <path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z"></path>
+                  <path
+                    d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z"
+                  ></path>
                   <line x1="9" y1="9" x2="10" y2="9"></line>
                   <line x1="9" y1="13" x2="15" y2="13"></line>
                   <line x1="9" y1="17" x2="15" y2="17"></line>
                 </svg>
               </div>
-              <h3>{{ $t('blog.noArticles') }}</h3>
-              <p>{{ $t('blog.tryDifferent') }}</p>
-              <button @click="clearFilters()" class="clear-all-btn">{{ $t('blog.clearFilters') }}</button>
+              <h3>{{ $t("blog.noArticles") }}</h3>
+              <p>{{ $t("blog.tryDifferent") }}</p>
+              <button @click="clearFilters()" class="clear-all-btn">
+                {{ $t("blog.clearFilters") }}
+              </button>
             </div>
           </div>
         </div>
@@ -154,15 +376,25 @@
           <div class="sidebar-section">
             <h3 class="section-title">
               <span class="section-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  width="18"
+                  height="18"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
+                  ></path>
                 </svg>
               </span>
-              {{ $t('blog.category') }}
+              {{ $t("blog.category") }}
             </h3>
             <div class="categories-list">
-              <div 
-                v-for="category in categories" 
+              <div
+                v-for="category in categories"
                 :key="category.id"
                 class="category-item"
                 :class="{ active: activeCategory === category.name }"
@@ -173,29 +405,46 @@
               </div>
             </div>
           </div>
-          
+
           <!-- 热门文章部分 -->
           <div class="sidebar-section">
             <h3 class="section-title">
               <span class="section-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M12 2c1.1 0 2 1.7 2 3.8 0 .5 0 1.1-.2 1.7l-.7 1.8c.3 0 .7-.1 1.1-.1 1.2 0 2.4.5 3.3 1.4.6.5 1 1.2 1.3 2 .7-.3 1.3-.4 1.8-.4 2.3 0 3.4 2.7 3.4 5.1 0 2.2-1.3 4.1-2.5 5.4-1.2 1.2-2.8 2.2-4.3 2.3H9.7c-1.5-.2-3-1.1-4.2-2.3C4.3 21.7 3 19.8 3 17.6c0-2.4 1.1-5.1 3.4-5.1.6 0 1.2.2 1.9.5.3-.9.8-1.6 1.4-2.2.9-.9 2.1-1.4 3.3-1.4.5 0 .9 0 1.2.1L13.4 8c.5-.7.6-1.4.6-2 0-2.3-.9-4-2-4z"></path>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  width="18"
+                  height="18"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M12 2c1.1 0 2 1.7 2 3.8 0 .5 0 1.1-.2 1.7l-.7 1.8c.3 0 .7-.1 1.1-.1 1.2 0 2.4.5 3.3 1.4.6.5 1 1.2 1.3 2 .7-.3 1.3-.4 1.8-.4 2.3 0 3.4 2.7 3.4 5.1 0 2.2-1.3 4.1-2.5 5.4-1.2 1.2-2.8 2.2-4.3 2.3H9.7c-1.5-.2-3-1.1-4.2-2.3C4.3 21.7 3 19.8 3 17.6c0-2.4 1.1-5.1 3.4-5.1.6 0 1.2.2 1.9.5.3-.9.8-1.6 1.4-2.2.9-.9 2.1-1.4 3.3-1.4.5 0 .9 0 1.2.1L13.4 8c.5-.7.6-1.4.6-2 0-2.3-.9-4-2-4z"
+                  ></path>
                 </svg>
               </span>
-              {{ $t('blog.popularPosts') }}
+              {{ $t("blog.popularPosts") }}
             </h3>
             <div class="popular-posts">
-              <div 
-                v-for="article in popularArticles" 
+              <div
+                v-for="article in popularArticles"
                 :key="article.id"
                 class="popular-post"
               >
-                <router-link :to="{ name: 'article', params: { id: article.id } }" class="post-title">
+                <router-link
+                  :to="{ name: 'article', params: { id: article.id } }"
+                  class="post-title"
+                >
                   {{ article.title }}
                 </router-link>
                 <div class="post-meta">
-                  <span class="post-views">{{ article.views }} {{ $t('common.viewCount') }}</span>
-                  <span class="post-date">{{ formatDateTime(article.createdAt) }}</span>
+                  <span class="post-views"
+                    >{{ article.views }} {{ $t("common.viewCount") }}</span
+                  >
+                  <span class="post-date">{{
+                    formatDateTime(article.createdAt)
+                  }}</span>
                 </div>
               </div>
             </div>
@@ -205,143 +454,6 @@
     </div>
   </MainLayout>
 </template>
-
-<script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { format } from 'date-fns'
-import { useBlogStore } from '../stores/blogStore'
-import MainLayout from '../layouts/Header.vue'
-
-const route = useRoute()
-const router = useRouter()
-const blogStore = useBlogStore()
-
-// 获取所有博客数据
-const { articles, categories, tags, archivedArticles } = blogStore
-
-// 筛选条件
-const activeCategory = ref('')
-const activeTag = ref('')
-const searchQuery = ref('')
-
-// 初始化筛选条件（从URL参数）
-onMounted(() => {
-  if (route.query.category) {
-    activeCategory.value = route.query.category
-  }
-  
-  if (route.query.tag) {
-    activeTag.value = route.query.tag
-  }
-  
-  if (route.query.q) {
-    searchQuery.value = route.query.q
-  }
-})
-
-// 筛选文章
-const filteredArticles = computed(() => {
-  // 始终按最新时间排序，确保最新的文章在最前面
-  return blogStore.getFilteredArticles(activeCategory.value, activeTag.value, searchQuery.value)
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-})
-
-// 热门文章
-const popularArticles = computed(() => {
-  return blogStore.getPopularArticles().slice(0, 5);
-})
-
-// 执行搜索
-const performSearch = () => {
-  if (searchQuery.value.trim()) {
-    // 清空其他筛选条件
-    activeCategory.value = ''
-    activeTag.value = ''
-    // 更新URL查询参数
-    updateRouteQuery()
-    // 强制重新计算过滤后的文章
-    return filteredArticles.value
-  }
-}
-
-// 按分类筛选
-const filterByCategory = (category) => {
-  activeCategory.value = category
-  activeTag.value = ''
-  searchQuery.value = ''
-  updateRouteQuery()
-}
-
-// 按标签筛选
-const filterByTag = (tag) => {
-  activeTag.value = tag
-  activeCategory.value = ''
-  searchQuery.value = ''
-  updateRouteQuery()
-}
-
-// 清除筛选条件
-const clearFilters = (type) => {
-  if (!type || type === 'category') {
-    activeCategory.value = ''
-  }
-  
-  if (!type || type === 'tag') {
-    activeTag.value = ''
-  }
-  
-  if (!type) {
-    searchQuery.value = ''
-  }
-  
-  updateRouteQuery()
-}
-
-// 更新路由查询参数
-const updateRouteQuery = () => {
-  const query = {}
-  
-  if (activeCategory.value) {
-    query.category = activeCategory.value
-  }
-  
-  if (activeTag.value) {
-    query.tag = activeTag.value
-  }
-  
-  if (searchQuery.value.trim()) {
-    query.q = searchQuery.value.trim()
-  }
-  
-  router.replace({ query })
-}
-
-// 格式化日期
-const formatDate = (dateString, formatString) => {
-  return format(new Date(dateString), formatString)
-}
-
-// 精确到秒的日期格式化函数
-const formatDateTime = (dateString) => {
-  return format(new Date(dateString), "yyyy/MM/dd HH:mm:ss")
-}
-
-// 监听滚动效果
-const isScrolled = ref(false)
-
-const handleScroll = () => {
-  isScrolled.value = window.scrollY > 50
-}
-
-onMounted(() => {
-  window.addEventListener('scroll', handleScroll)
-})
-
-onUnmounted(() => {
-  window.removeEventListener('scroll', handleScroll)
-})
-</script>
 
 <style scoped>
 /* 整体布局 */
@@ -452,7 +564,7 @@ onUnmounted(() => {
 }
 
 .month-block::before {
-  content: '';
+  content: "";
   position: absolute;
   left: 0;
   top: 0;
@@ -793,11 +905,11 @@ onUnmounted(() => {
   .blog-container {
     grid-template-columns: 1fr;
   }
-  
+
   .blog-sidebar {
     order: -1;
   }
-  
+
   .sidebar-section {
     padding: 15px;
   }
@@ -807,15 +919,15 @@ onUnmounted(() => {
   .header-content {
     padding: 30px 20px;
   }
-  
+
   .blog-title {
     font-size: 2rem;
   }
-  
+
   .article-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .month-block {
     margin-left: 0;
     padding-left: 15px;
@@ -828,15 +940,15 @@ onUnmounted(() => {
     height: 180px;
     transition: height 0.3s ease;
   }
-  
+
   .blog-page.scrolled .blog-header {
     height: 120px;
   }
-  
+
   .blog-page.scrolled .blog-title {
     font-size: 2rem;
   }
-  
+
   .blog-page.scrolled .blog-description {
     font-size: 0.9rem;
   }
@@ -846,7 +958,7 @@ onUnmounted(() => {
   .blog-title {
     font-size: 2rem;
   }
-  
+
   .blog-header-decoration {
     width: 200px;
     height: 200px;
@@ -862,4 +974,4 @@ onUnmounted(() => {
   font-size: 1.3rem;
   font-weight: 600;
 }
-</style> 
+</style>

@@ -272,7 +272,7 @@
           </div>
 
           <!-- 文章大纲 -->
-          <div class="article-toc" v-if="tableOfContents.length > 0">
+          <div class="article-toc desktop-toc" v-if="tableOfContents.length > 0">
             <h3 class="toc-title">目录</h3>
             <ul class="toc-list">
               <li 
@@ -288,6 +288,65 @@
                 </a>
               </li>
             </ul>
+          </div>
+
+          <!-- 移动端悬浮目录按钮 -->
+          <div class="mobile-toc-button" @click="toggleToc" v-if="tableOfContents.length > 0">
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              width="20" 
+              height="20" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor" 
+              stroke-width="2" 
+              stroke-linecap="round" 
+              stroke-linejoin="round"
+            >
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </div>
+
+          <!-- 移动端目录弹出层 -->
+          <div class="mobile-toc-container" v-if="isTocVisible && tableOfContents.length > 0">
+            <div class="mobile-toc-overlay" @click="toggleToc"></div>
+            <div class="mobile-toc">
+              <div class="mobile-toc-header">
+                <h3 class="toc-title">目录</h3>
+                <button @click="toggleToc" class="close-toc-btn">
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    width="20" 
+                    height="20" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    stroke-width="2" 
+                    stroke-linecap="round" 
+                    stroke-linejoin="round"
+                  >
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
+              </div>
+              <ul class="toc-list">
+                <li 
+                  v-for="(heading, index) in tableOfContents" 
+                  :key="index" 
+                  :class="[`toc-level-${heading.level}`, { active: heading.isActive }]"
+                >
+                  <a 
+                    :href="`#${heading.id}`" 
+                    @click.prevent="scrollToHeading(heading.id); toggleToc();"
+                  >
+                    {{ heading.text }}
+                  </a>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </article>
@@ -351,8 +410,7 @@ import { ref, computed, onMounted, watch, getCurrentInstance, onBeforeUnmount } 
 import { useRoute, useRouter } from "vue-router";
 import { format } from "date-fns";
 import { useBlogStore } from "../stores/blogStore";
-import MainLayout from "../layouts/Header.vue";
-import hljs from "highlight.js";
+import MainLayout from "../layouts/Home.vue";
 import "highlight.js/styles/github.css";
 import DOMPurify from "dompurify";
 import CodepenViewer from "../components/CodepenViewer.vue";
@@ -534,6 +592,7 @@ const isSummaryExpanded = ref(false);
 const progressBar = ref(null);
 const tableOfContents = ref([]);
 const headingElements = ref([]);
+const isTocVisible = ref(false); // 新增：控制目录显示/隐藏状态
 
 // 获取文章ID
 const articleId = computed(() => Number(route.params.id));
@@ -675,6 +734,11 @@ const calculateReadingTime = (content) => {
 // 切换摘要展开/收起状态
 const toggleSummary = () => {
   isSummaryExpanded.value = !isSummaryExpanded.value;
+};
+
+// 切换目录显示/隐藏
+const toggleToc = () => {
+  isTocVisible.value = !isTocVisible.value;
 };
 
 // 在组件挂载时添加复制代码功能
@@ -2164,22 +2228,23 @@ const renderFallbackTable = (markdown) => {
 .article-toc {
   width: 250px;
   position: fixed;
-  right: calc((100% - 1800px) / 2 + 20px);
+  right: 40px;
   top: 80px;
-  max-height: calc(80vh - 100px);
+  max-height: 70vh;
   overflow-y: auto;
-    padding: 20px;
-  background-color: #f9f9f9;
+  padding: 15px;
+  background: #fff;
+  border: 1px solid #eee;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  z-index: 10;
 }
 
 .toc-title {
+  margin-top: 0;
+  margin-bottom: 15px;
   font-size: 18px;
-  margin-bottom: 16px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #e1e1e1;
+  font-weight: 600;
 }
 
 .toc-list {
@@ -2189,9 +2254,8 @@ const renderFallbackTable = (markdown) => {
 }
 
 .toc-list li {
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   padding-left: 0;
-  transition: all 0.2s ease;
 }
 
 .toc-list li a {
@@ -2199,199 +2263,128 @@ const renderFallbackTable = (markdown) => {
   text-decoration: none;
   font-size: 14px;
   display: block;
-  padding: 4px 0;
   transition: color 0.2s;
+  padding: 3px 0;
 }
 
 .toc-list li a:hover {
-  color: var(--primary-color, #3498db);
+  color: var(--primary-color, #2196f3);
 }
 
 .toc-list li.active a {
-  color: var(--primary-color, #3498db);
-  font-weight: 600;
+  font-weight: bold;
+  color: var(--primary-color, #2196f3);
 }
 
-.toc-level-1 { font-weight: 600; }
-.toc-level-2 { padding-left: 12px; }
-.toc-level-3 { padding-left: 24px; }
-.toc-level-4 { padding-left: 36px; }
-.toc-level-5 { padding-left: 48px; }
-.toc-level-6 { padding-left: 60px; }
+.toc-level-2 {
+  padding-left: 0;
+}
+
+.toc-level-3 {
+  padding-left: 15px;
+}
+
+.toc-level-4 {
+  padding-left: 30px;
+}
 
 /* 响应式设计 */
 @media (max-width: 1420px) {
-  .article-toc {
+  .article-toc.desktop-toc {
     right: 20px;
   }
 }
 
 @media (max-width: 1200px) {
-  .article-container {
-    flex-direction: column;
+  .article-toc.desktop-toc {
+    right: 15px;
+  }
+}
+
+@media (max-width: 991px) {
+  .desktop-toc {
+    display: none;
   }
   
-  .article-toc {
-    width: 100%;
-    position: relative;
-    top: 0;
-    right: 0;
-    order: -1; /* 在移动端，目录显示在文章内容之前 */
-    margin-bottom: 20px;
+  .article-content {
+    margin-right: 0;
   }
 }
 
-/* 暗色模式适配 */
-@media (prefers-color-scheme: dark) {
-  .article-progress-container {
-    background-color: rgba(255, 255, 255, 0.1);
-  }
-  
-  .article-toc {
-    background-color: #2a2a2a;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  }
-  
-  .toc-title {
-    border-bottom-color: #444;
-  }
-  
-  .toc-list li a {
-    color: #ddd;
-  }
-  
-  .toc-list li a:hover {
-    color: var(--primary-color, #3498db);
+/* 在大屏幕上隐藏移动端目录按钮及相关元素 */
+@media (min-width: 992px) {
+  .mobile-toc-button, 
+  .mobile-toc-container {
+    display: none;
   }
 }
 
-/* 表格样式 */
-.markdown-table-container {
-  overflow-x: auto;
-  margin: 20px 0 30px;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-}
-
-.markdown-table {
-  width: 100%;
-  border-collapse: collapse;
-  border: 1px solid var(--border-color);
-  font-size: 0.95rem;
-}
-
-.markdown-table th,
-.markdown-table td {
-  padding: 12px 16px;
-  text-align: left;
-  border: 1px solid var(--border-color);
-}
-
-.markdown-table th {
-  background-color: var(--bg-secondary);
-  font-weight: 600;
-  color: var(--text-color);
-  border-bottom: 2px solid var(--primary-color);
-}
-
-.markdown-table tr {
-  transition: background-color 0.2s;
-}
-
-.markdown-table tr:nth-child(even) {
-  background-color: var(--bg-accent);
-}
-
-.markdown-table tr:hover {
-  background-color: var(--bg-hover);
-}
-
-/* 暗色模式表格样式 */
-.dark-mode .markdown-table-container {
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-}
-
-.dark-mode .markdown-table {
-  border-color: var(--border-color-dark);
-}
-
-.dark-mode .markdown-table th,
-.dark-mode .markdown-table td {
-  border-color: var(--border-color-dark);
-}
-
-.dark-mode .markdown-table th {
-  background-color: var(--primary-color-dark);
+/* 移动端悬浮目录按钮 */
+.mobile-toc-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  background-color: rgba(33, 150, 243, 0.75);
   color: #fff;
+  border-radius: 50%;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  cursor: pointer;
+  z-index: 1000;
+  transition: all 0.3s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.dark-mode .markdown-table tr:nth-child(even) {
-  background-color: rgba(255, 255, 255, 0.05);
+.mobile-toc-button:hover,
+.mobile-toc-button:active {
+  background-color: rgba(25, 118, 210, 0.9);
+  transform: translateY(-2px);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
 }
 
-.dark-mode .markdown-table tr:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+/* 修改目录按钮内的图标大小 */
+.mobile-toc-button svg {
+  width: 18px;
+  height: 18px;
 }
 
-.markdown-list {
-  margin-left: 20px;
-  margin-bottom: 20px;
-}
-
-.markdown-list li {
-  margin-bottom: 8px;
-  line-height: 1.6;
-}
-
-ul.markdown-list {
-  list-style-type: disc;
-}
-
-ol.markdown-list {
-  list-style-type: decimal;
-}
-
-@media (max-width: 768px) {
-  .markdown-table th,
-  .markdown-table td {
-    padding: 8px 10px;
-    font-size: 0.9rem;
-  }
-}
-
-/* 增强图片样式 */
-.article-content img {
-  display: block;
-  max-width: 100%;
-  margin: 20px auto;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.article-content img:hover {
-  transform: scale(1.01);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-}
-
-.dark-mode .article-content img {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-/* 图片查看器样式 */
-.image-viewer-overlay {
+/* 移动端目录弹出层 */
+.mobile-toc-container {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.9);
+  z-index: 1001;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 2000;
-  backdrop-filter: blur(5px);
-  animation: fadeIn 0.2s ease;
+  justify-content: flex-end;
+}
+
+.mobile-toc-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.mobile-toc {
+  position: relative;
+  z-index: 2;
+  width: 80%;
+  max-width: 300px;
+  height: 100%;
+  background-color: #fff;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  overflow-y: auto;
+  animation: slideIn 0.3s ease-in-out;
 }
 
 @keyframes fadeIn {
@@ -2399,155 +2392,72 @@ ol.markdown-list {
   to { opacity: 1; }
 }
 
-.image-viewer-container {
-  position: relative;
-  max-width: 90%;
-  max-height: 90%;
+@keyframes slideIn {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+.mobile-toc-header {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
   align-items: center;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #eee;
 }
 
-.image-viewer-img {
-  max-width: 100%;
-  max-height: calc(90vh - 60px);
-  object-fit: contain;
-  border-radius: 4px;
-  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+.mobile-toc-header .toc-title {
+  margin: 0;
+  font-size: 18px;
 }
 
-.image-viewer-caption {
-  color: #fff;
-  margin-top: 15px;
-  font-size: 16px;
-  text-align: center;
-  max-width: 90%;
-}
-
-.image-viewer-close {
-  position: absolute;
-  top: -40px;
-  right: -40px;
-  background: transparent;
+.close-toc-btn {
+  background: none;
   border: none;
-  color: #fff;
-  font-size: 36px;
+  font-size: 20px;
   cursor: pointer;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0.8;
-  transition: opacity 0.2s;
-}
-
-.image-viewer-close:hover {
-  opacity: 1;
-}
-
-.image-viewer-save {
-  position: absolute;
-  bottom: -50px;
-  background: rgba(255, 255, 255, 0.2);
-  border: none;
-  border-radius: 20px;
-  color: #fff;
-  padding: 8px 16px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.image-viewer-save:hover {
-  background: rgba(255, 255, 255, 0.3);
-}
-
-.image-viewer-save svg {
-  width: 16px;
-  height: 16px;
-}
-
-/* 增强文章内图片样式 */
-.article-image-wrapper {
-  margin: 30px auto;
-  position: relative;
-  text-align: center;
-  max-width: 100%;
-  transition: transform 0.3s ease;
-}
-
-.article-image {
-  max-width: 100%;
-  border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-  cursor: zoom-in;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.article-image:hover {
-  transform: scale(1.01);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-}
-
-.image-caption {
-  margin-top: 10px;
   color: #666;
-  font-size: 14px;
-  font-style: italic;
+  transition: color 0.3s;
 }
 
-.save-image-btn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background-color: rgba(0, 0, 0, 0.6);
-  color: white;
-  border: none;
-  border-radius: 20px;
-  padding: 5px 10px;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 12px;
-  cursor: pointer;
-  opacity: 0;
-  transition: opacity 0.3s, background-color 0.2s;
+.close-toc-btn:hover {
+  color: #333;
 }
 
-.article-image-wrapper:hover .save-image-btn {
-  opacity: 1;
+/* 深色模式适配 */
+.dark-mode .article-toc {
+  background-color: #2a2a2a;
+  border-color: #444;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-.save-image-btn:hover {
-  background-color: rgba(0, 0, 0, 0.8);
+.dark-mode .article-toc .toc-title {
+  color: #fff;
 }
 
-/* 暗色模式适配 */
-@media (prefers-color-scheme: dark) {
-  .image-caption {
-    color: #aaa;
-  }
-  
-  .save-image-btn {
-    background-color: rgba(255, 255, 255, 0.2);
-  }
-  
-  .save-image-btn:hover {
-    background-color: rgba(255, 255, 255, 0.3);
-  }
+.dark-mode .toc-list li a {
+  color: #ddd;
 }
 
-@media (max-width: 768px) {
-  .image-viewer-close {
-    top: -30px;
-    right: 0;
-  }
-  
-  .image-viewer-save {
-    bottom: -60px;
-  }
+.dark-mode .toc-list li a:hover,
+.dark-mode .toc-list li.active a {
+  color: var(--primary-color, #2196f3);
+}
+
+.dark-mode .mobile-toc {
+  background-color: #2a2a2a;
+  color: #fff;
+}
+
+.dark-mode .mobile-toc-header {
+  border-bottom-color: #444;
+}
+
+.dark-mode .close-toc-btn {
+  color: #aaa;
+}
+
+.dark-mode .close-toc-btn:hover {
+  color: #fff;
 }
 </style>

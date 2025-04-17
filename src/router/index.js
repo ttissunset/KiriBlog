@@ -6,6 +6,7 @@ import BlogView from '../views/BlogView.vue'
 import JournalView from '../views/JournalView.vue'
 import CategoryView from '../views/CategoryView.vue'
 import ArchivePageView from '../views/ArchivePageView.vue'
+import HeatmapDemo from '../views/HeatmapDemo.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -46,6 +47,12 @@ const router = createRouter({
       name: 'archive',
       component: ArchivePageView,
       meta: { title: '归档' }
+    },
+    {
+      path: '/heatmap-demo',
+      name: 'heatmap-demo',
+      component: HeatmapDemo,
+      meta: { title: '热力图组件演示' }
     },
     {
       path: '/:pathMatch(.*)*',

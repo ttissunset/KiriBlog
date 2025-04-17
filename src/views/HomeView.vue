@@ -1,3 +1,49 @@
+<script setup>
+import { useBlogStore } from "../stores/blogStore";
+import MainLayout from "../layouts/Home.vue";
+import ContributionHeatmap from "../components/ContributionHeatmap.vue";
+
+const blogStore = useBlogStore();
+
+// 生成示例贡献数据（在实际应用中，这些数据应该从API获取）
+const demoContributionData = {
+  2024: generateRandomContributionData(),
+  2023: generateRandomContributionData(0.4), // 较少的贡献
+  2022: generateRandomContributionData(0.6),
+  2021: generateRandomContributionData(0.3),
+  2020: generateRandomContributionData(0.7),
+  2019: generateRandomContributionData(0.5),
+  2018: generateRandomContributionData(0.2),
+};
+
+/**
+ * 生成随机的贡献数据
+ * @param {Number} activityFactor - 活跃因子 (0-1)，值越大表示活跃度越高
+ * @returns {Object} - 年度贡献数据
+ */
+function generateRandomContributionData(activityFactor = 0.5) {
+  const result = {};
+  for (let week = 0; week < 53; week++) {
+    result[week] = {};
+    for (let day = 0; day < 7; day++) {
+      const rand = Math.random();
+      if (rand < 0.6 * (1 - activityFactor)) { // 无贡献概率随活跃度减小
+        result[week][day] = 0;
+      } else if (rand < 0.8) {
+        result[week][day] = 1;
+      } else if (rand < 0.9) {
+        result[week][day] = 2;
+      } else if (rand < 0.97) {
+        result[week][day] = 3;
+      } else {
+        result[week][day] = 4;
+      }
+    }
+  }
+  return result;
+}
+</script>
+
 <template>
   <MainLayout>
     <!-- 人主页容器 -->
@@ -177,102 +223,16 @@
             </div>
           </div>
 
-          <!-- 底部热力图部分 - 与上方README同宽 -->
-          <div class="contribution-heatmap-section">
-            <div class="heatmap-header">
-              <h3 class="heatmap-title">567 contributions in the last year</h3>
-              <div class="heatmap-buttons">
-                <button class="heatmap-button active">2024</button>
-                <button class="heatmap-button">2023</button>
-                <button class="heatmap-button">2022</button>
-                <button class="heatmap-button">2021</button>
-                <button class="heatmap-button">2020</button>
-                <button class="heatmap-button">2019</button>
-                <button class="heatmap-button">2018</button>
-              </div>
-            </div>
-
-            <!-- 贡献热力图 -->
-            <div class="heatmap-container">
-              <div class="heatmap-months">
-                <span>Jan</span>
-                <span>Feb</span>
-                <span>Mar</span>
-                <span>Apr</span>
-                <span>May</span>
-                <span>Jun</span>
-                <span>Jul</span>
-                <span>Aug</span>
-                <span>Sep</span>
-                <span>Oct</span>
-                <span>Nov</span>
-                <span>Dec</span>
-              </div>
-              <div class="heatmap-days">
-                <span>Mon</span>
-                <span>Wed</span>
-                <span>Fri</span>
-              </div>
-              <div class="heatmap-grid">
-                <!-- 热力图格子将使用v-for动态生成 -->
-                <div
-                  v-for="(week, weekIndex) in 53"
-                  :key="`week-${weekIndex}`"
-                  class="heatmap-column"
-                >
-                  <div
-                    v-for="(day, dayIndex) in 7"
-                    :key="`day-${dayIndex}`"
-                    class="heatmap-cell"
-                    :class="getCellClass(weekIndex, dayIndex)"
-                  ></div>
-                </div>
-              </div>
-              <div class="heatmap-legend">
-                <div class="legend-text">Less</div>
-                <div class="legend-cells">
-                  <div class="legend-cell level-0"></div>
-                  <div class="legend-cell level-1"></div>
-                  <div class="legend-cell level-2"></div>
-                  <div class="legend-cell level-3"></div>
-                  <div class="legend-cell level-4"></div>
-                </div>
-                <div class="legend-text">More</div>
-              </div>
-            </div>
-          </div>
+          <!-- 底部热力图部分 - 使用新的组件 -->
+          <ContributionHeatmap 
+            title="contributions in the last year" 
+            :contribution-data="demoContributionData"
+          />
         </div>
       </div>
     </div>
   </MainLayout>
 </template>
-
-<script setup>
-import { useBlogStore } from "../stores/blogStore";
-import MainLayout from "../layouts/Header.vue";
-
-const blogStore = useBlogStore();
-
-/**
- * 获取热力图单元格的CSS类
- * @param {Number} week - 周索引
- * @param {Number} day - 天索引
- * @returns {Object} - CSS类对象
- */
-function getCellClass(week, day) {
-  // 使用伪随机分布确定贡献热力等级
-  // 在真实应用中，这里应该根据实际贡献数据来确定
-  const seed = (week * 7 + day) % 17; // 使用质数作为模数，增加随机感
-  const chance = seed / 17;
-
-  // 根据不同概率分配不同等级
-  if (chance < 0.6) return { "level-0": true }; // 60%概率无贡献
-  if (chance < 0.8) return { "level-1": true }; // 20%概率低贡献
-  if (chance < 0.9) return { "level-2": true }; // 10%概率中贡献
-  if (chance < 0.97) return { "level-3": true }; // 7%概率高贡献
-  return { "level-4": true }; // 3%概率特高贡献
-}
-</script>
 
 <style scoped>
 /* 整体页面布局样式 */
@@ -393,178 +353,151 @@ function getCellClass(week, day) {
   overflow: hidden;
 }
 
-/* .file-path {
-  padding: 8px 16px;
-  background-color: #f6f8fa;
-  border-bottom: 1px solid #d0d7de;
-  color: #57606a;
-  font-size: 14px;
-  font-weight: 500;
-} */
-
+/* README内容部分样式 */
 .readme-content {
-  padding: 24px;
-  position: relative; /* 为绝对定位的图片提供定位上下文 */
+  padding: 16px;
+  position: relative;
 }
 
-.readme-title {
-  font-size: 24px;
-  margin: 0 0 10px;
-  font-weight: 600;
-  color: #24292f;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  /* 确保标题不会被图片覆盖 */
-  width: 60%;
-}
-
-.wave-emoji {
-  display: inline-block;
-  color: #f1c40f;
-}
-
-/* 动漫图片容器样式 - 绝对定位在右侧 */
+/* 动漫图片容器 */
 .anime-container {
   position: absolute;
-  top: 24px;
-  right: 24px;
+  top: 0;
+  right: 0;
   width: 300px;
-  z-index: 1;
+  height: 100%;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  overflow: hidden;
 }
 
 .anime-image {
-  width: 100%;
-  height: auto;
-  border-radius: 8px;
+  max-height: 80%;
+  max-width: 100%;
+  object-fit: contain;
 }
 
-/* 联系方式徽章样式 */
+/* README标题 */
+.readme-title {
+  font-size: 24px;
+  color: #24292f;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.wave-emoji {
+  animation: wave 1.5s infinite;
+  display: inline-block;
+  transform-origin: 70% 70%;
+}
+
+@keyframes wave {
+  0% {
+    transform: rotate(0deg);
+  }
+  10% {
+    transform: rotate(14deg);
+  }
+  20% {
+    transform: rotate(-8deg);
+  }
+  30% {
+    transform: rotate(14deg);
+  }
+  40% {
+    transform: rotate(-4deg);
+  }
+  50% {
+    transform: rotate(10deg);
+  }
+  60% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+/* 联系方式徽章 */
 .contact-badges {
   display: flex;
-  gap: 8px;
-  margin-bottom: 16px;
-  /* 确保不会被图片覆盖 */
-  width: 60%;
-  border-top: 1px solid #cecece;
-  padding-top: 10px;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
 }
 
 .badge {
   display: inline-flex;
   align-items: center;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 12px;
+  padding: 5px 10px;
+  background-color: #f6f8fa;
+  border-radius: 20px;
+  font-size: 14px;
+  transition: 0.2s;
   text-decoration: none;
-  color: #fff;
+  color: #24292f;
 }
 
-.email-badge {
-  background-color: #b31217;
-}
-
-.qq-badge {
-  background-color: #ea7e00;
+.badge:hover {
+  background-color: #eaeef2;
 }
 
 .badge-icon {
-  margin-right: 4px;
-}
-
-/* 介绍文本样式 */
-.intro-text {
+  margin-right: 5px;
   font-size: 16px;
-  margin: 16px 0;
-  font-weight: 500;
-  color: #24292f;
-  /* 确保不会被图片覆盖 */
-  width: 60%;
 }
 
-/* 信息列表样式 */
+/* 简介文本 */
+.intro-text {
+  margin-bottom: 20px;
+  font-size: 16px;
+  color: #24292f;
+  max-width: 60%;
+}
+
+/* 信息列表 */
 .info-list {
   list-style: none;
   padding: 0;
   margin: 0 0 24px;
-  /* 确保不会被图片覆盖 */
-  width: 60%;
+  max-width: 60%;
 }
 
 .info-item {
+  margin-bottom: 8px;
   display: flex;
   align-items: flex-start;
-  margin-bottom: 8px;
-  gap: 8px;
-  font-size: 14px;
   color: #24292f;
 }
 
 .bullet {
-  display: inline-block;
-  margin-right: 0;
+  margin-right: 8px;
+  color: #57606a;
 }
 
 .email-link {
   color: #0969da;
-  text-decoration: none;
   margin-left: 4px;
 }
 
-.email-link:hover {
-  text-decoration: underline;
-}
-
-/* 章节样式 */
+/* README分段样式 */
 .readme-section {
   margin-bottom: 24px;
-  /* 确保不会被图片覆盖 - 技术栈和关于我部分需要在图片下方 */
-  width: 100%;
+  max-width: 60%;
 }
 
 .section-heading {
-  font-size: 16px;
-  font-weight: 600;
-  margin: 0 0 12px;
-  color: #24292f;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.heading-icon {
   font-size: 18px;
+  color: #24292f;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #d0d7de;
+  padding-bottom: 8px;
 }
 
-/* 技术列表样式 */
-.tech-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.tech-item {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 6px;
-  font-size: 12px;
-}
-
-.tech-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 2px 8px;
-  border-radius: 4px;
-  background-color: #2d333b;
-  color: #fff;
-}
-
-.badge-icon-small {
-  margin-right: 4px;
-  font-size: 10px;
-}
-
-/* 关于我列表样式 */
+/* 关于列表样式 */
 .about-list {
   list-style: none;
   padding: 0;
@@ -572,16 +505,14 @@ function getCellClass(week, day) {
 }
 
 .about-item {
+  margin-bottom: 8px;
   display: flex;
   align-items: center;
-  margin-bottom: 6px;
-  gap: 8px;
 }
 
 .about-link {
   color: #0969da;
   text-decoration: none;
-  font-size: 14px;
 }
 
 .about-link:hover {
@@ -590,24 +521,19 @@ function getCellClass(week, day) {
 
 /* 语言统计样式 */
 .language-section {
-  padding: 16px;
-  background-color: #1e1e2e;
-  border-radius: 6px;
-  color: #fff;
-}
-
-.language-section .section-heading {
-  color: #e6edf3;
+  margin-bottom: 32px;
 }
 
 .language-stats {
-  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .language-bar {
   height: 8px;
+  background-color: #eaeef2;
   border-radius: 4px;
-  background-color: #2d333b;
   overflow: hidden;
   display: flex;
 }
@@ -617,7 +543,7 @@ function getCellClass(week, day) {
 }
 
 .bar-segment.javascript {
-  background-color: #3178c6;
+  background-color: #f7df1e;
 }
 
 .bar-segment.css {
@@ -632,24 +558,24 @@ function getCellClass(week, day) {
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
-  margin-top: 8px;
 }
 
 .language-label {
   display: flex;
   align-items: center;
   font-size: 12px;
+  color: #57606a;
 }
 
 .label-dot {
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  margin-right: 6px;
+  margin-right: 4px;
 }
 
 .language-label.javascript .label-dot {
-  background-color: #3178c6;
+  background-color: #f7df1e;
 }
 
 .language-label.css .label-dot {
@@ -662,39 +588,31 @@ function getCellClass(week, day) {
 
 /* GitHub统计样式 */
 .github-stats {
-  padding: 16px;
-  background-color: #1e1e2e;
-  border-radius: 6px;
-  color: #fff;
-}
-
-.github-stats .section-heading {
-  color: #e6edf3;
+  margin-bottom: 24px;
+  max-width: 60%;
 }
 
 .stats-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 24px;
+  margin-top: 12px;
 }
 
 .stats-data {
   display: flex;
-  flex-direction: column;
-  gap: 16px;
-  flex: 1;
+  gap: 24px;
 }
 
 .stat-item {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .stat-icon {
   font-size: 20px;
-  color: #0366d6;
+  color: #57606a;
 }
 
 .stat-details {
@@ -757,344 +675,13 @@ function getCellClass(week, day) {
   text-decoration: underline;
 }
 
-/* 贡献热力图部分样式 - 与README同宽 */
-.contribution-heatmap-section {
-  width: 100%;
-  border: 1px solid #d0d7de;
-  border-radius: 6px;
-  background-color: #fff;
-  padding: 16px;
-}
-
-/* 热力图标题区域 */
-.heatmap-header {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 16px;
-  align-items: center;
-}
-
-.heatmap-title {
-  font-size: 16px;
-  font-weight: 600;
-  margin: 0;
-  color: #24292f;
-}
-
-.heatmap-buttons {
-  display: flex;
-}
-
-.heatmap-button {
-  background: none;
-  border: none;
-  padding: 4px 8px;
-  font-size: 14px;
-  color: #57606a;
-  cursor: pointer;
-}
-
-.heatmap-button:hover {
-  color: #24292f;
-}
-
-.heatmap-button.active {
-  font-weight: 600;
-  color: #24292f;
-}
-
-/* 热力图容器 */
-.heatmap-container {
-  position: relative;
-  padding: 16px 0;
-  overflow-x: auto; /* 允许横向滚动 */
-  width: 100%;
-}
-
-/* 月份标签 */
-.heatmap-months {
-  display: flex;
-  margin-left: 30px;
-  margin-bottom: 8px;
-  font-size: 12px;
-  color: #57606a;
-  width: calc(100% - 30px); /* 减去左边距 */
-}
-
-.heatmap-months span {
-  width: calc((100% - 4px) / 12); /* 平均分配宽度给12个月份 */
-  text-align: center;
-  flex: none; /* 不使用flex布局的自动分配 */
-}
-
-/* 星期标签 */
-.heatmap-days {
-  position: absolute;
-  left: 0;
-  top: 40px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 100px;
-  font-size: 12px;
-  color: #57606a;
-  z-index: 2; /* 确保在网格上方 */
-}
-
-/* 热力图网格 */
-.heatmap-grid {
-  display: flex;
-  gap: 2px;
-  margin-left: 30px;
-  width: calc(100% - 30px); /* 减去左边距 */
-}
-
-.heatmap-column {
-  width: calc((100% - 106px) / 53); /* 平均分配宽度给53周，考虑到2px的间隙 */
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  flex: none; /* 不使用flex布局的自动分配 */
-}
-
-/* 热力图单元格 */
-.heatmap-cell {
-  width: 10px;
-  height: 10px;
-  border-radius: 2px;
-  background-color: #ebedf0; /* 默认颜色 */
-}
-
-/* 不同等级的贡献显示不同深浅的绿色 */
-.heatmap-cell.level-0 {
-  background-color: #ebedf0;
-}
-
-.heatmap-cell.level-1 {
-  background-color: #9be9a8;
-}
-
-.heatmap-cell.level-2 {
-  background-color: #40c463;
-}
-
-.heatmap-cell.level-3 {
-  background-color: #30a14e;
-}
-
-.heatmap-cell.level-4 {
-  background-color: #216e39;
-}
-
-/* 热力图图例 */
-.heatmap-legend {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  margin-top: 8px;
-  font-size: 12px;
-  color: #57606a;
-}
-
-.legend-text {
-  margin: 0 4px;
-}
-
-.legend-cells {
-  display: flex;
-  gap: 2px;
-}
-
-.legend-cell {
-  width: 10px;
-  height: 10px;
-  border-radius: 2px;
-}
-
-/* 图例单元格颜色 */
-.legend-cell.level-0 {
-  background-color: #ebedf0;
-}
-
-.legend-cell.level-1 {
-  background-color: #9be9a8;
-}
-
-.legend-cell.level-2 {
-  background-color: #40c463;
-}
-
-.legend-cell.level-3 {
-  background-color: #30a14e;
-}
-
-.legend-cell.level-4 {
-  background-color: #216e39;
-}
-
-/* 活动概览部分 */
-.activity-overview {
-  margin-top: 32px;
-  border-top: 1px solid #d0d7de;
-  padding-top: 16px;
-}
-
-.activity-header {
-  margin-bottom: 16px;
-}
-
-.activity-title {
-  font-size: 16px;
-  font-weight: 600;
-  margin: 0;
-  color: #24292f;
-}
-
-/* 活动图表 */
-.activity-chart {
-  display: flex;
-  height: 150px;
-  margin-bottom: 24px;
-  position: relative;
-}
-
-.chart-y-axis {
-  width: 100px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  font-size: 12px;
-  color: #57606a;
-}
-
-.y-center {
-  display: flex;
-  align-items: center;
-  height: 40px;
-}
-
-.chart-graph {
-  flex: 1;
-  position: relative;
-  border-left: 1px solid #d0d7de;
-  border-bottom: 1px solid #d0d7de;
-}
-
-.chart-line {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  width: 100%;
-  height: 1px;
-  background-color: #d0d7de;
-}
-
-.chart-marker {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 12px;
-  height: 12px;
-  background-color: #2da44e;
-  border-radius: 50%;
-}
-
-.chart-x-axis {
-  position: absolute;
-  bottom: -20px;
-  right: 10px;
-  font-size: 12px;
-  color: #57606a;
-}
-
-/* 贡献信息 */
-.contributions-info {
-  margin-top: 16px;
-}
-
-.contribution-text {
-  font-size: 14px;
-  color: #24292f;
-  line-height: 1.5;
-}
-
-.contribution-icon {
-  margin-right: 4px;
-}
-
-.contribution-link {
-  color: #0969da;
-  text-decoration: none;
-}
-
-.contribution-link:hover {
-  text-decoration: underline;
-}
-
-/* 贡献活动部分 */
-.contribution-activity {
-  margin-top: 32px;
-  border-top: 1px solid #d0d7de;
-  padding-top: 16px;
-}
-
-.activity-month {
-  font-size: 16px;
-  font-weight: 600;
-  margin: 0 0 16px;
-  color: #24292f;
-}
-
-.activity-item {
-  display: flex;
-  align-items: center;
-  margin-bottom: 16px;
-  font-size: 14px;
-  color: #24292f;
-}
-
-.activity-icon {
-  margin-right: 8px;
-}
-
-.activity-count {
-  flex: 1;
-}
-
-.activity-date {
-  color: #57606a;
-}
-
-/* 显示更多按钮 */
-.show-more-button {
-  width: 100%;
-  padding: 8px;
-  text-align: center;
-  background-color: #f6f8fa;
-  border: 1px solid #d0d7de;
-  border-radius: 6px;
-  color: #0969da;
-  font-size: 14px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.show-more-button:hover {
-  background-color: #f3f4f6;
-}
-
-/* 响应式布局 */
-@media (max-width: 960px) {
-  /* 屏幕变窄时调整图片位置 */
+/* 响应式样式 */
+@media (max-width: 1100px) {
   .anime-container {
-    position: relative;
-    top: 0;
-    right: 0;
-    width: 100%;
-    margin-bottom: 24px;
-    display: flex;
-    justify-content: center;
+    position: static;
+    width: auto;
+    height: auto;
+    margin-bottom: 16px;
   }
 
   .anime-image {
@@ -1126,60 +713,6 @@ function getCellClass(week, day) {
     max-width: 296px;
     margin: 0 auto 16px;
     display: block;
-  }
-
-  /* 简化热力图显示 */
-  .heatmap-grid {
-    overflow-x: auto;
-    padding-bottom: 8px;
-  }
-
-  .contribution-heatmap-section {
-    margin-top: 20px;
-  }
-
-  .heatmap-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-
-  .heatmap-buttons {
-    overflow-x: auto;
-    width: 100%;
-    padding-bottom: 5px;
-    justify-content: flex-start;
-    gap: 5px;
-  }
-
-  .heatmap-container {
-    padding-bottom: 0;
-  }
-
-  .heatmap-legend {
-    justify-content: flex-start;
-    margin-left: 30px;
-    padding-bottom: 10px;
-  }
-}
-
-@media (max-width: 480px) {
-  .heatmap-months span {
-    font-size: 10px;
-  }
-
-  .heatmap-days {
-    font-size: 10px;
-  }
-
-  .heatmap-cell {
-    width: 8px;
-    height: 8px;
-  }
-
-  .legend-cell {
-    width: 8px;
-    height: 8px;
   }
 }
 

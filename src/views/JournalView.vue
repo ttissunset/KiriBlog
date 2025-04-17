@@ -1,100 +1,3 @@
-<template>
-  <MainLayout>
-    <div class="journal-page">
-      <!-- 左侧日历 -->
-      <div class="calendar-section">
-        <div class="calendar-header">
-          <button class="calendar-nav-btn" @click="prevMonth">
-            <span class="nav-icon">‹</span>
-          </button>
-          <h2 class="current-date">
-            {{ currentYear }}年{{ currentMonth }}月{{ currentDay }}日
-          </h2>
-          <button class="calendar-nav-btn" @click="nextMonth">
-            <span class="nav-icon">›</span>
-          </button>
-        </div>
-
-        <!-- 星期表头 -->
-        <div class="calendar-weekdays">
-          <div class="weekday">日</div>
-          <div class="weekday">一</div>
-          <div class="weekday">二</div>
-          <div class="weekday">三</div>
-          <div class="weekday">四</div>
-          <div class="weekday">五</div>
-          <div class="weekday">六</div>
-        </div>
-
-        <!-- 日期网格 -->
-        <div class="calendar-grid">
-          <div
-            v-for="(day, index) in calendarDays"
-            :key="index"
-            class="calendar-day"
-            :class="{
-              'current-month': day.currentMonth,
-              today: day.isToday,
-              selected: isSelectedDay(day.date),
-              'has-journal': hasJournalEntry(day.date),
-            }"
-            @click="selectDay(day.date)"
-          >
-            {{ day.day }}
-          </div>
-        </div>
-
-        <!-- 那些浅浅的叙述 -->
-        <div class="journal-subtitle">
-          <h3 class="subtitle-text">那些</h3>
-          <h2 class="subtitle-highlight">浅浅的叙述</h2>
-          <p class="subtitle-desc">希望能留有痕迹</p>
-        </div>
-      </div>
-
-      <!-- 右侧随记内容 -->
-      <div class="journal-content-section">
-        <div v-if="selectedJournal" class="journal-content">
-          <div class="journal-header">
-            <div class="journal-title-row">
-              <h1 class="journal-title">{{ selectedJournal.title }}</h1>
-              <div class="journal-date-time">
-                {{ formatDate(selectedJournal.date) }}
-                {{ formatTime(selectedJournal.date) }}
-                <span class="journal-weather" v-if="selectedJournal.weather">{{
-                  selectedJournal.weather
-                }}</span>
-              </div>
-            </div>
-          </div>
-
-          <div
-            class="journal-text"
-            v-html="formatJournalContent(selectedJournal.content)"
-          ></div>
-
-          <div v-if="selectedJournal.image" class="journal-image">
-            <img :src="selectedJournal.image" :alt="selectedJournal.title" />
-          </div>
-
-          <div class="journal-footer">
-            <div class="journal-signature" v-if="selectedJournal.signature">
-              {{ selectedJournal.signature }}
-            </div>
-          </div>
-        </div>
-
-        <div v-else class="empty-journal">
-          <div class="empty-prompt">
-            <div class="empty-icon">📝</div>
-            <p>今日还没有随记噢</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </MainLayout>
-</template>
-
 <script setup>
 import { ref, computed, onMounted, getCurrentInstance } from "vue";
 import {
@@ -108,7 +11,7 @@ import {
   subMonths,
 } from "date-fns";
 import { useRouter } from "vue-router";
-import MainLayout from "../layouts/Header.vue";
+import MainLayout from "../layouts/Home.vue";
 
 const router = useRouter();
 
@@ -370,6 +273,103 @@ onMounted(() => {
   currentDate.value = today;
 });
 </script>
+
+<template>
+  <MainLayout>
+    <div class="journal-page">
+      <!-- 左侧日历 -->
+      <div class="calendar-section">
+        <div class="calendar-header">
+          <button class="calendar-nav-btn" @click="prevMonth">
+            <span class="nav-icon">‹</span>
+          </button>
+          <h2 class="current-date">
+            {{ currentYear }}年{{ currentMonth }}月{{ currentDay }}日
+          </h2>
+          <button class="calendar-nav-btn" @click="nextMonth">
+            <span class="nav-icon">›</span>
+          </button>
+        </div>
+
+        <!-- 星期表头 -->
+        <div class="calendar-weekdays">
+          <div class="weekday">日</div>
+          <div class="weekday">一</div>
+          <div class="weekday">二</div>
+          <div class="weekday">三</div>
+          <div class="weekday">四</div>
+          <div class="weekday">五</div>
+          <div class="weekday">六</div>
+        </div>
+
+        <!-- 日期网格 -->
+        <div class="calendar-grid">
+          <div
+            v-for="(day, index) in calendarDays"
+            :key="index"
+            class="calendar-day"
+            :class="{
+              'current-month': day.currentMonth,
+              today: day.isToday,
+              selected: isSelectedDay(day.date),
+              'has-journal': hasJournalEntry(day.date),
+            }"
+            @click="selectDay(day.date)"
+          >
+            {{ day.day }}
+          </div>
+        </div>
+
+        <!-- 那些浅浅的叙述 -->
+        <div class="journal-subtitle">
+          <h3 class="subtitle-text">那些</h3>
+          <h2 class="subtitle-highlight">浅浅的叙述</h2>
+          <p class="subtitle-desc">希望能留有痕迹</p>
+        </div>
+      </div>
+
+      <!-- 右侧随记内容 -->
+      <div class="journal-content-section">
+        <div v-if="selectedJournal" class="journal-content">
+          <div class="journal-header">
+            <div class="journal-title-row">
+              <h1 class="journal-title">{{ selectedJournal.title }}</h1>
+              <div class="journal-date-time">
+                {{ formatDate(selectedJournal.date) }}
+                {{ formatTime(selectedJournal.date) }}
+                <span class="journal-weather" v-if="selectedJournal.weather">{{
+                  selectedJournal.weather
+                }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="journal-text"
+            v-html="formatJournalContent(selectedJournal.content)"
+          ></div>
+
+          <div v-if="selectedJournal.image" class="journal-image">
+            <img :src="selectedJournal.image" :alt="selectedJournal.title" />
+          </div>
+
+          <div class="journal-footer">
+            <div class="journal-signature" v-if="selectedJournal.signature">
+              {{ selectedJournal.signature }}
+            </div>
+          </div>
+        </div>
+
+        <div v-else class="empty-journal">
+          <div class="empty-prompt">
+            <div class="empty-icon">📝</div>
+            <p>今日还没有随记噢</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </MainLayout>
+</template>
 
 <style scoped>
 /* 随记页面整体布局 */

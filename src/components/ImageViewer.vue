@@ -14,7 +14,7 @@
 
         <div class="camera-info">
           <div class="camera-info-header">
-            <h3>信息</h3>
+            <h3>{{ $t("gallery.imageInfo") || "信息" }}</h3>
           </div>
           <div class="camera-info-details">
             <div class="info-row">
@@ -64,7 +64,14 @@
             </div>
 
             <div class="save-image-btn">
-              <button @click="saveImage">保存图片</button>
+              <button @click="saveImage" class="save-button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                {{ $t("gallery.saveImage") || "保存图片" }}
+              </button>
             </div>
           </div>
         </div>
@@ -75,6 +82,7 @@
 
 <script setup>
 import { defineProps, defineEmits } from "vue";
+import toast from "../utils/toast";
 
 // 接收父组件传递的选中图片对象
 const props = defineProps({
@@ -121,52 +129,10 @@ const saveImage = () => {
   link.click();
   document.body.removeChild(link);
   
-  // 显示成功通知
-  const notification = document.createElement('div');
-  notification.className = 'image-save-notification';
-  notification.innerHTML = `
-    <div class="notification-content">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-        <polyline points="22 4 12 14.01 9 11.01"></polyline>
-      </svg>
-      <span>图片已保存成功</span>
-    </div>
-  `;
-  
-  // 添加样式
-  notification.style.position = 'fixed';
-  notification.style.bottom = '20px';
-  notification.style.right = '20px';
-  notification.style.backgroundColor = '#f0f9eb';
-  notification.style.color = '#67c23a';
-  notification.style.padding = '10px 20px';
-  notification.style.borderRadius = '4px';
-  notification.style.boxShadow = '0 2px 12px rgba(0, 0, 0, 0.1)';
-  notification.style.zIndex = '9999';
-  notification.style.transition = 'all 0.3s ease';
-  
-  // 通知内容样式
-  const content = notification.querySelector('.notification-content');
-  content.style.display = 'flex';
-  content.style.alignItems = 'center';
-  
-  // 图标样式
-  const icon = notification.querySelector('svg');
-  icon.style.marginRight = '8px';
-  
-  document.body.appendChild(notification);
-  
-  // 2秒后移除通知
-  setTimeout(() => {
-    notification.style.opacity = '0';
-    notification.style.transform = 'translateX(100%)';
-    setTimeout(() => {
-      if (document.body.contains(notification)) {
-        document.body.removeChild(notification);
-      }
-    }, 300);
-  }, 2000);
+  // 使用toast组件显示成功消息
+  toast.success("图片已保存成功", {
+    duration: 2000
+  });
 };
 </script>
 
@@ -314,6 +280,46 @@ const saveImage = () => {
   color: rgba(255, 255, 255, 0.75);
 }
 
+.save-image-btn {
+  margin-top: 20px;
+}
+
+.save-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 16px;
+  background-color: var(--primary-color, #2196f3);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(33, 150, 243, 0.3);
+}
+
+.save-button:hover {
+  background-color: var(--primary-color-dark, #1976d2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(33, 150, 243, 0.4);
+}
+
+.save-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(33, 150, 243, 0.2);
+}
+
+.save-button svg {
+  transition: transform 0.2s ease;
+}
+
+.save-button:hover svg {
+  transform: translateY(2px);
+}
+
 @media (max-width: 768px) {
   .viewer-container {
     flex-direction: column;
@@ -341,6 +347,11 @@ const saveImage = () => {
 
   .viewer-image {
     max-height: 55vh;
+  }
+  
+  .save-button {
+    padding: 8px 12px;
+    font-size: 0.9rem;
   }
 }
 </style>

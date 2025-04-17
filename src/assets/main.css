@@ -3,6 +3,61 @@
  * 包含全局样式定义和公共样式类
  */
 
+/* 引入主题变量 */
+@import './theme.css';
+
+/* 全局CSS变量 - 补充 */
+:root {
+  /* 背景颜色 */
+  --bg-color: #f5f5f5;
+  --bg-color-card: #ffffff;
+  --bg-color-secondary: #f9f9f9;
+  --bg-color-accent: #f5f5f5;
+  --bg-color-hover: #f0f0f0;
+  
+  /* 其他颜色 */
+  --success-color: #4caf50;
+  --warning-color: #ff9800;
+  --error-color: #f44336;
+  --info-color: #2196f3;
+  --header-bg: #ffffff;
+  --card-bg: #ffffff;
+  --link-color: var(--primary-color);
+  --button-bg: #f0f0f0;
+  --button-hover: #e5e5e5;
+  --input-bg: #f5f5f5;
+  --input-border: #e0e0e0;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --hover-bg: #f5f5f5;
+  --active-bg: #e5e5e5;
+  --header-shadow: 0 2px 8px var(--shadow-color);
+  --header-shadow-scrolled: 0 3px 10px var(--shadow-color);
+}
+
+/* 暗黑模式全局样式 */
+.dark-mode {
+  --bg-color: #1a1b1e;
+  --text-color: #e1e1e1;
+  --text-color-light: #a1a1aa;
+  --text-color-lighter: #71717a;
+  --header-bg: #242526;
+  --card-bg: #2a2b2e;
+  --border-color: #3a3b3e;
+  --border-color-light: #444444;
+  --link-color: var(--primary-color);
+  --button-bg: #2a2b2e;
+  --button-hover: #3a3b3e;
+  --input-bg: #2a2b2e;
+  --input-border: #3a3b3e;
+  --shadow-color: rgba(0, 0, 0, 0.3);
+  --hover-bg: #3a3b3e;
+  --active-bg: #4a4b4e;
+  --success-color: #22c55e;
+  --warning-color: #f59e0b;
+  --error-color: #ef4444;
+  --info-color: #3b82f6;
+}
+
 /* 重置基础样式 */
 * {
   margin: 0;
@@ -18,8 +73,9 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   font-size: 16px;
   line-height: 1.6;
-  color: #333;
-  background-color: #f5f7fa;
+  color: var(--text-color);
+  background-color: var(--bg-color);
+  transition: background-color 0.3s, color 0.3s;
 }
 
 a {
@@ -31,6 +87,7 @@ h1, h2, h3, h4, h5, h6 {
   margin-top: 0;
   font-weight: 600;
   line-height: 1.3;
+  color: var(--text-color);
 }
 
 button, input, select, textarea {

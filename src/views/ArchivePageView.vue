@@ -120,7 +120,7 @@
 </template>
 
 <script setup>
-import MainLayout from '../layouts/Header.vue';
+import MainLayout from '../layouts/Home.vue';
 </script>
 
 <style scoped>

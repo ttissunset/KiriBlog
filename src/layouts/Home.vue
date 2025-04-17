@@ -148,13 +148,17 @@
         </div>
       </div>
     </footer>
+
+    <!-- 主题设置组件 -->
+    <ThemeSettings />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from "vue";
-import { useRouter, useRoute } from "vue-router";
+import { ref, onMounted, onBeforeUnmount, watch, computed } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
+import ThemeSettings from '../components/ThemeSettings.vue';
 
 const router = useRouter();
 const route = useRoute();
@@ -263,7 +267,7 @@ onMounted(() => {
 });
 
 // 在组件销毁前移除事件监听器
-onUnmounted(() => {
+onBeforeUnmount(() => {
   window.removeEventListener("keydown", focusSearch);
   window.removeEventListener("scroll", handleScroll);
   document.removeEventListener('click', () => {});
@@ -624,7 +628,7 @@ onUnmounted(() => {
   justify-content: space-between;
   align-items: center;
   padding-top: 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
 }
 
 .copyright p {

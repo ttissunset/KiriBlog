@@ -1,13 +1,85 @@
+<script setup>
+import { ref, computed, onMounted, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { format } from "date-fns";
+import { useBlogStore } from "../stores/blogStore";
+import MainLayout from "../layouts/Home.vue";
+
+const route = useRoute();
+const router = useRouter();
+const blogStore = useBlogStore();
+
+// 搜索状态
+const searchQuery = ref("");
+const searchResults = ref([]);
+const searchPerformed = ref(false);
+
+// 分页
+const currentPage = ref(1);
+const itemsPerPage = 5;
+
+// 初始化搜索查询（从URL参数）
+onMounted(() => {
+  if (route.query.q) {
+    searchQuery.value = route.query.q;
+    performSearch();
+  }
+});
+
+// 监听查询参数变化
+watch(
+  () => route.query.q,
+  (newValue) => {
+    if (newValue && newValue !== searchQuery.value) {
+      searchQuery.value = newValue;
+      performSearch();
+    }
+  }
+);
+
+// 执行搜索
+const performSearch = () => {
+  if (!searchQuery.value.trim()) return;
+
+  searchResults.value = blogStore.searchArticles(searchQuery.value);
+  searchPerformed.value = true;
+  currentPage.value = 1;
+
+  // 更新URL参数
+  if (route.query.q !== searchQuery.value) {
+    router.replace({
+      query: { q: searchQuery.value },
+    });
+  }
+};
+
+// 计算分页结果
+const totalPages = computed(() =>
+  Math.ceil(searchResults.value.length / itemsPerPage)
+);
+
+const paginatedResults = computed(() => {
+  const startIndex = (currentPage.value - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  return searchResults.value.slice(startIndex, endIndex);
+});
+
+// 格式化日期
+const formatDate = (dateString) => {
+  return format(new Date(dateString), "yyyy-MM-dd");
+};
+</script>
+
 <template>
   <MainLayout>
     <div class="search-page">
       <div class="search-header">
         <h1>搜索结果</h1>
         <div class="search-form">
-          <input 
-            type="text" 
-            v-model="searchQuery" 
-            placeholder="输入关键词搜索文章..." 
+          <input
+            type="text"
+            v-model="searchQuery"
+            placeholder="输入关键词搜索文章..."
             class="search-input"
             @keyup.enter="performSearch"
           />
@@ -19,28 +91,37 @@
         <div class="results-meta">
           共找到 <strong>{{ searchResults.length }}</strong> 条结果
         </div>
-        
+
         <div class="results-list">
-          <div v-for="result in paginatedResults" :key="result.id" class="result-item">
-            <router-link :to="{ name: 'article', params: { id: result.id } }" class="result-title">
+          <div
+            v-for="result in paginatedResults"
+            :key="result.id"
+            class="result-item"
+          >
+            <router-link
+              :to="{ name: 'article', params: { id: result.id } }"
+              class="result-title"
+            >
               {{ result.title }}
             </router-link>
             <div class="result-summary">{{ result.summary }}</div>
             <div class="result-meta">
-              <span class="result-date">{{ formatDate(result.createdAt) }}</span>
+              <span class="result-date">{{
+                formatDate(result.createdAt)
+              }}</span>
               <span class="result-category">
-                分类: 
-                <router-link :to="{ name: 'blog', query: { category: result.category } }">
+                分类:
+                <router-link
+                  :to="{ name: 'blog', query: { category: result.category } }"
+                >
                   {{ result.category }}
                 </router-link>
               </span>
-              <span class="result-views">
-                {{ result.views }} 次阅读
-              </span>
+              <span class="result-views"> {{ result.views }} 次阅读 </span>
             </div>
             <div class="result-tags">
-              <router-link 
-                v-for="tag in result.tags" 
+              <router-link
+                v-for="tag in result.tags"
                 :key="tag"
                 :to="{ name: 'blog', query: { tag } }"
                 class="result-tag"
@@ -50,21 +131,21 @@
             </div>
           </div>
         </div>
-        
+
         <!-- 分页控件 -->
         <div v-if="totalPages > 1" class="pagination">
-          <button 
-            @click="currentPage = Math.max(1, currentPage - 1)" 
+          <button
+            @click="currentPage = Math.max(1, currentPage - 1)"
             :disabled="currentPage === 1"
             class="page-button"
           >
             上一页
           </button>
-          
+
           <span class="page-info">{{ currentPage }} / {{ totalPages }}</span>
-          
-          <button 
-            @click="currentPage = Math.min(totalPages, currentPage + 1)" 
+
+          <button
+            @click="currentPage = Math.min(totalPages, currentPage + 1)"
             :disabled="currentPage === totalPages"
             class="page-button"
           >
@@ -85,75 +166,6 @@
     </div>
   </MainLayout>
 </template>
-
-<script setup>
-import { ref, computed, onMounted, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { format } from 'date-fns'
-import { useBlogStore } from '../stores/blogStore'
-import MainLayout from '../layouts/Header.vue'
-
-const route = useRoute()
-const router = useRouter()
-const blogStore = useBlogStore()
-
-// 搜索状态
-const searchQuery = ref('')
-const searchResults = ref([])
-const searchPerformed = ref(false)
-
-// 分页
-const currentPage = ref(1)
-const itemsPerPage = 5
-
-// 初始化搜索查询（从URL参数）
-onMounted(() => {
-  if (route.query.q) {
-    searchQuery.value = route.query.q
-    performSearch()
-  }
-})
-
-// 监听查询参数变化
-watch(() => route.query.q, (newValue) => {
-  if (newValue && newValue !== searchQuery.value) {
-    searchQuery.value = newValue
-    performSearch()
-  }
-})
-
-// 执行搜索
-const performSearch = () => {
-  if (!searchQuery.value.trim()) return
-  
-  searchResults.value = blogStore.searchArticles(searchQuery.value)
-  searchPerformed.value = true
-  currentPage.value = 1
-  
-  // 更新URL参数
-  if (route.query.q !== searchQuery.value) {
-    router.replace({
-      query: { q: searchQuery.value }
-    })
-  }
-}
-
-// 计算分页结果
-const totalPages = computed(() => 
-  Math.ceil(searchResults.value.length / itemsPerPage)
-)
-
-const paginatedResults = computed(() => {
-  const startIndex = (currentPage.value - 1) * itemsPerPage
-  const endIndex = startIndex + itemsPerPage
-  return searchResults.value.slice(startIndex, endIndex)
-})
-
-// 格式化日期
-const formatDate = (dateString) => {
-  return format(new Date(dateString), 'yyyy-MM-dd')
-}
-</script>
 
 <style scoped>
 .search-page {

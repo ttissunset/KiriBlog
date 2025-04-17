@@ -5,6 +5,7 @@ import router from './router'
 import './assets/main.css'
 import i18n from './i18n' // 引入i18n配置
 import toast from './utils/toast' // 引入Toast服务
+import { useThemeStore } from './stores/themeStore' // 引入主题状态管理
 
 // 引入FontAwesome
 import { library } from '@fortawesome/fontawesome-svg-core'
@@ -17,10 +18,14 @@ import { far } from '@fortawesome/free-regular-svg-icons'
 library.add(fas, fab, far)
 
 const app = createApp(App)
-
-app.use(createPinia())
+const pinia = createPinia()
+app.use(pinia)
 app.use(router)
 app.use(i18n) // 使用i18n
+
+// 初始化主题设置
+const themeStore = useThemeStore()
+themeStore.initTheme()
 
 // 注册FontAwesome组件
 app.component('font-awesome-icon', FontAwesomeIcon)

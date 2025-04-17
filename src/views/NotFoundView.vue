@@ -1,3 +1,7 @@
+<script setup>
+import MainLayout from "../layouts/Home.vue";
+</script>
+
 <template>
   <MainLayout>
     <div class="not-found">
@@ -20,10 +24,6 @@
     </div>
   </MainLayout>
 </template>
-
-<script setup>
-import MainLayout from '../layouts/Header.vue'
-</script>
 
 <style scoped>
 .not-found {
@@ -72,7 +72,8 @@ import MainLayout from '../layouts/Header.vue'
 }
 
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
   }
   50% {
@@ -100,7 +101,8 @@ p {
   justify-content: center;
 }
 
-.btn-primary, .btn-secondary {
+.btn-primary,
+.btn-secondary {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -124,7 +126,8 @@ p {
   border: 1px solid #d0d7de;
 }
 
-.btn-primary:hover, .btn-secondary:hover {
+.btn-primary:hover,
+.btn-secondary:hover {
   transform: translateY(-3px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
@@ -146,23 +149,24 @@ p {
   .not-found-content {
     padding: 40px 20px;
   }
-  
+
   .error-code {
     font-size: 80px;
   }
-  
+
   .error-icon {
     font-size: 48px;
   }
-  
+
   .action-buttons {
     flex-direction: column;
     gap: 12px;
   }
-  
-  .btn-primary, .btn-secondary {
+
+  .btn-primary,
+  .btn-secondary {
     width: 100%;
     justify-content: center;
   }
 }
-</style> 
+</style>

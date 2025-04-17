@@ -1,3 +1,26 @@
+<script setup>
+import { computed } from 'vue'
+import { useBlogStore } from '../stores/blogStore'
+import MainLayout from '../layouts/Home.vue'
+import ArticleCard from '../components/ArticleCard.vue'
+import GalleryView from '../components/GalleryView.vue'
+
+// 通过props接收路由传递的分类名称
+const props = defineProps({
+  category: {
+    type: String,
+    required: true
+  }
+})
+
+const blogStore = useBlogStore()
+
+// 获取该分类下的文章列表
+const categoryArticles = computed(() => 
+  blogStore.getArticlesByCategory(props.category)
+)
+</script>
+
 <template>
   <MainLayout>
     <div class="category-page">
@@ -25,29 +48,6 @@
     </div>
   </MainLayout>
 </template>
-
-<script setup>
-import { computed } from 'vue'
-import { useBlogStore } from '../stores/blogStore'
-import MainLayout from '../layouts/Header.vue'
-import ArticleCard from '../components/ArticleCard.vue'
-import GalleryView from '../components/GalleryView.vue'
-
-// 通过props接收路由传递的分类名称
-const props = defineProps({
-  category: {
-    type: String,
-    required: true
-  }
-})
-
-const blogStore = useBlogStore()
-
-// 获取该分类下的文章列表
-const categoryArticles = computed(() => 
-  blogStore.getArticlesByCategory(props.category)
-)
-</script>
 
 <style scoped>
 .category-page {

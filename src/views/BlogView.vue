@@ -208,7 +208,7 @@ onUnmounted(() => {
                           </div>
                           <div class="card-stats">
                             <span class="view-count">
-                              <span class="view-icon">👁️</span>
+                              <span class="view-icon"><font-awesome-icon :icon="['fas', 'eye']" /></span>
                               {{ article.views }}
                             </span>
                           </div>

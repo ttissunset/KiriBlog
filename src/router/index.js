@@ -3,7 +3,6 @@ import HomeView from '../views/HomeView.vue'
 import NotFoundView from '../views/NotFoundView.vue'
 import ArticleView from '../views/ArticleView.vue'
 import BlogView from '../views/BlogView.vue'
-import JournalView from '../views/JournalView.vue'
 import CategoryView from '../views/CategoryView.vue'
 import ArchivePageView from '../views/ArchivePageView.vue'
 import HeatmapDemo from '../views/HeatmapDemo.vue'
@@ -28,12 +27,6 @@ const router = createRouter({
       name: 'article',
       component: ArticleView,
       meta: { title: '文章详情' }
-    },
-    {
-      path: '/journal',
-      name: 'journal',
-      component: JournalView,
-      meta: { title: '随记' }
     },
     {
       path: '/gallery',
@@ -80,8 +73,21 @@ const router = createRouter({
 
 // 动态设置页面标题
 router.beforeEach((to, from, next) => {
+  // 设置页面标题
   document.title = `${to.meta.title} | Kiri的个人主页`
+  
   next()
+})
+
+// 路由加载完成后
+router.afterEach(() => {
+  setTimeout(() => {
+  }, 200) // 短暂延迟以确保页面渲染完成
+})
+
+// 处理路由错误
+router.onError((error) => {
+  console.error('路由错误:', error)
 })
 
 export default router 

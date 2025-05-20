@@ -76,17 +76,17 @@ function generateRandomContributionData(activityFactor = 0.5) {
               </div>
 
               <h2 class="readme-title">
-                Hello <span class="wave-emoji">👋</span>
+                Hello <span class="wave-emoji"><font-awesome-icon :icon="['fas', 'hand-wave']" /></span>
               </h2>
 
               <!-- 联系方式 -->
               <div class="contact-badges">
                 <a href="mailto:ZyZy1724@gmail.com" class="badge email-badge">
-                  <span class="badge-icon">📧</span>
+                  <span class="badge-icon"><font-awesome-icon :icon="['fas', 'envelope']" /></span>
                   <span class="badge-text">kiricamellia@gmail.com</span>
                 </a>
                 <a href="#" class="badge qq-badge">
-                  <span class="badge-icon">🐧</span>
+                  <span class="badge-icon"><font-awesome-icon :icon="['fab', 'qq']" /></span>
                   <span class="badge-text">2733908676</span>
                 </a>
               </div>
@@ -101,11 +101,11 @@ function generateRandomContributionData(activityFactor = 0.5) {
                 </li>
                 <li class="info-item">
                   <span class="bullet">•</span>
-                  <span>🌱 目前居住在广州</span>
+                  <span><font-awesome-icon :icon="['fas', 'seedling']" /> 目前居住在广州</span>
                 </li>
                 <li class="info-item">
                   <span class="bullet">•</span>
-                  <span>💬 如果你有疑问，可以联系我</span>
+                  <span><font-awesome-icon :icon="['fas', 'comment']" /> 如果你有疑问，可以联系我</span>
                   <span class="email-link">273390867@qq.com</span>
                 </li>
               </ul>
@@ -116,15 +116,15 @@ function generateRandomContributionData(activityFactor = 0.5) {
                 <div class="tech-tags">
                   <div class="tech-row">
                     <div class="tech-tag">
-                      <span class="badge-icon-small">🔴</span>
+                      <span class="badge-icon-small"><font-awesome-icon :icon="['fab', 'js']" style="color: #f7df1e;" /></span>
                       <span>JavaScript</span>
                     </div>
                     <div class="tech-tag">
-                      <span class="badge-icon-small">🔵</span>
+                      <span class="badge-icon-small"><font-awesome-icon :icon="['fab', 'vuejs']" style="color: #42b883;" /></span>
                       <span>Vue</span>
                     </div>
                     <div class="tech-tag">
-                      <span class="badge-icon-small">🟢</span>
+                      <span class="badge-icon-small"><font-awesome-icon :icon="['fab', 'node-js']" style="color: #68a063;" /></span>
                       <span>Node.js</span>
                     </div>
                   </div>
@@ -216,7 +216,7 @@ function generateRandomContributionData(activityFactor = 0.5) {
                   happy to meet you more! 😊
                 </p>
                 <p class="from-text">
-                  <span class="wave-emoji">👋</span> From
+                  <span class="wave-emoji"><font-awesome-icon :icon="['fas', 'hand-wave']" /></span> From
                   <a href="#" class="author-link">Kiri</a>
                 </p>
               </div>
@@ -713,6 +713,11 @@ function generateRandomContributionData(activityFactor = 0.5) {
     max-width: 296px;
     margin: 0 auto 16px;
     display: block;
+  }
+  
+  .weather-section {
+    margin: 24px auto;
+    max-width: 350px;
   }
 }
 

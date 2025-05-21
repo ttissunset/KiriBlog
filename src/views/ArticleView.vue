@@ -1,69 +1,20 @@
 <template>
-  <MainLayout>
+  <div class="article-view">
     <div v-if="article" class="article-page">
       <!-- 返回博客列表 -->
       <div class="back-to-blog">
         <router-link to="/blog" class="back-button">
-          <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-            <path d="M19 12H5"></path>
-            <path d="M12 19l-7-7 7-7"></path>
-              </svg>
-          <span>{{ $t("common.backToList") }}</span>
+          <MaterialIcon icon="arrow_back" />
+          <span>返回列表</span>
         </router-link>
 
         <div class="export-buttons">
           <button class="export-button" @click="exportToPDF" title="导出为PDF">
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-              width="18"
-              height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-            >
-              <path
-                d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
-              ></path>
-              <polyline points="14 2 14 8 20 8"></polyline>
-              <path d="M7 15h10"></path>
-              <path d="M9 11h6"></path>
-              <path d="M9 18h6"></path>
-            </svg>
+            <MaterialIcon icon="picture_as_pdf" />
             <span>PDF</span>
           </button>
-          <button
-            class="export-button"
-            @click="exportToMarkdown"
-            title="导出为Markdown"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-              <polyline points="7 10 12 15 17 10"></polyline>
-              <line x1="12" y1="15" x2="12" y2="3"></line>
-            </svg>
+          <button class="export-button" @click="exportToMarkdown" title="导出为Markdown">
+            <MaterialIcon icon="download" />
             <span>Markdown</span>
           </button>
         </div>
@@ -81,78 +32,28 @@
           <div class="article-meta">
             <div class="meta-item">
               <span class="meta-icon">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  width="16"
-                  height="16"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-              >
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                <line x1="16" y1="2" x2="16" y2="6"></line>
-                <line x1="8" y1="2" x2="8" y2="6"></line>
-                <line x1="3" y1="10" x2="21" y2="10"></line>
-              </svg>
+                <MaterialIcon icon="calendar_today" />
               </span>
               <span class="meta-text">{{
                 formatDateTime(article.createdAt)
               }}</span>
               <span class="meta-separator">•</span>
               <span class="meta-icon">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  width="16"
-                  height="16"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path
-                    d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
-                  ></path>
-                </svg>
+                <MaterialIcon icon="folder" />
             </span>
-              <router-link
-                :to="{ name: 'blog', query: { category: article.category } }"
-                class="category-link"
-              >
+              <router-link :to="{ name: 'blog', query: { category: article.category } }" class="category-link">
                 {{ article.category }}
               </router-link>
             </div>
             <span class="detail-separator">•</span>
             <div class="meta-author">
               <span class="author-icon">
-                <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                  width="16"
-                  height="16"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="12" cy="7" r="4"></circle>
-              </svg>
+                <MaterialIcon icon="person" />
             </span>
               <span class="author-name">{{ article.author || "Kiri" }}</span>
               <span class="detail-separator">•</span>
               <span class="time-icon">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                  width="16"
-                  height="16"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <circle cx="12" cy="12" r="10"></circle>
-                <polyline points="12 6 12 12 16 14"></polyline>
-              </svg>
+                <MaterialIcon icon="access_time" />
             </span>
               <span class="time-text">预计阅读时间{{ calculateReadingTime(article.content) }}分钟</span>
             </div>
@@ -168,22 +69,10 @@
         <div class="ai-summary" :class="{ expanded: isSummaryExpanded }">
           <div class="summary-header">
                 <span class="summary-icon">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    width="16"
-                    height="16"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <polygon
-                      points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
-                    ></polygon>
-                  </svg>
+                  <MaterialIcon icon="star" />
                 </span>
-                <span class="summary-title">{{ $t("article.aiSummary") }}</span>
-                <span class="summary-powered">{{ $t("article.poweredBy") }}</span>
+                <span class="summary-title">AI摘要</span>
+                <span class="summary-powered">由AI提供</span>
           </div>
           <div class="summary-content">
             <p>时光如镜映代码，云舟载梦启航程。</p>
@@ -202,25 +91,11 @@
           </div>
           <div class="summary-more">
                 <span v-if="!isSummaryExpanded">开发 ≠ 搬运。不学习底层原理你永远不知道...</span>
-                <button
-                  class="show-more-btn"
-                  @click="toggleSummary"
-                  style="margin-left: auto"
-                >
+                <button class="show-more-btn" @click="toggleSummary" style="margin-left: auto">
                   <span class="arrow-icon" :class="{ up: isSummaryExpanded }">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      width="12"
-                      height="12"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <polyline points="6 9 12 15 18 9"></polyline>
-                    </svg>
+                    <MaterialIcon icon="expand_more" />
                   </span>
-                  {{ isSummaryExpanded ? $t("article.showLess") : $t("article.showMore") }}
+                  {{ isSummaryExpanded ? "显示更少" : "显示更多" }}
             </button>
           </div>
         </div>
@@ -228,11 +103,7 @@
             <!-- 使用动态组件渲染Markdown内容，支持代码块 -->
             <div v-if="processedContent.length > 0" class="markdown-body">
               <template v-for="(block, index) in processedContent" :key="index">
-                <codepen-viewer
-                  v-if="block.type === 'code'"
-                  :code="block.content"
-                  :language="block.language"
-                />
+                <codepen-viewer v-if="block.type === 'code'" :code="block.content" :language="block.language" />
                 <div v-else v-html="block.content"></div>
               </template>
             </div>
@@ -240,33 +111,17 @@
 
         <div class="article-footer">
           <div class="article-tags">
-                <span class="tags-label">{{ $t("common.tags") }}</span>
-            <router-link
-              v-for="tag in article.tags"
-              :key="tag"
-              :to="{ name: 'blog', query: { tag } }"
-                  class="article-tag"
-            >
+                <span class="tags-label">标签</span>
+                <router-link v-for="tag in article.tags" :key="tag" :to="{ name: 'blog', query: { tag } }" class="article-tag">
                   #{{ tag }}
             </router-link>
           </div>
 
               <div class="article-views">
                 <span class="views-icon">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    width="16"
-                    height="16"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                    <circle cx="12" cy="12" r="3"></circle>
-                  </svg>
+                  <MaterialIcon icon="visibility" />
                 </span>
-                <span class="views-count">{{ article.views }} {{ $t("common.viewCount") }}</span>
+                <span class="views-count">{{ article.views }} 次浏览</span>
               </div>
             </div>
           </div>
@@ -275,15 +130,8 @@
           <div class="article-toc desktop-toc" v-if="tableOfContents.length > 0">
             <h3 class="toc-title">目录</h3>
             <ul class="toc-list">
-              <li 
-                v-for="(heading, index) in tableOfContents" 
-                :key="index" 
-                :class="[`toc-level-${heading.level}`, { active: heading.isActive }]"
-              >
-                <a 
-                  :href="`#${heading.id}`" 
-                  @click.prevent="scrollToHeading(heading.id)"
-                >
+              <li v-for="(heading, index) in tableOfContents" :key="index" :class="[`toc-level-${heading.level}`, { active: heading.isActive }]">
+                <a :href="`#${heading.id}`" @click.prevent="scrollToHeading(heading.id)">
                   {{ heading.text }}
                 </a>
               </li>
@@ -292,21 +140,7 @@
 
           <!-- 移动端悬浮目录按钮 -->
           <div class="mobile-toc-button" @click="toggleToc" v-if="tableOfContents.length > 0">
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              width="20" 
-              height="20" 
-              viewBox="0 0 24 24" 
-              fill="none" 
-              stroke="currentColor" 
-              stroke-width="2" 
-              stroke-linecap="round" 
-              stroke-linejoin="round"
-            >
-              <line x1="3" y1="6" x2="21" y2="6"></line>
-              <line x1="3" y1="12" x2="21" y2="12"></line>
-              <line x1="3" y1="18" x2="21" y2="18"></line>
-            </svg>
+            <MaterialIcon icon="menu" />
           </div>
 
           <!-- 移动端目录弹出层 -->
@@ -316,32 +150,12 @@
               <div class="mobile-toc-header">
                 <h3 class="toc-title">目录</h3>
                 <button @click="toggleToc" class="close-toc-btn">
-                  <svg 
-                    xmlns="http://www.w3.org/2000/svg" 
-                    width="20" 
-                    height="20" 
-                    viewBox="0 0 24 24" 
-                    fill="none" 
-                    stroke="currentColor" 
-                    stroke-width="2" 
-                    stroke-linecap="round" 
-                    stroke-linejoin="round"
-                  >
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                  </svg>
+                  <MaterialIcon icon="close" />
                 </button>
               </div>
               <ul class="toc-list">
-                <li 
-                  v-for="(heading, index) in tableOfContents" 
-                  :key="index" 
-                  :class="[`toc-level-${heading.level}`, { active: heading.isActive }]"
-                >
-                  <a 
-                    :href="`#${heading.id}`" 
-                    @click.prevent="scrollToHeading(heading.id); toggleToc();"
-                  >
+                <li v-for="(heading, index) in tableOfContents" :key="index" :class="[`toc-level-${heading.level}`, { active: heading.isActive }]">
+                  <a :href="`#${heading.id}`" @click.prevent="scrollToHeading(heading.id); toggleToc();">
                     {{ heading.text }}
                   </a>
                 </li>
@@ -354,18 +168,14 @@
       <!-- 上一篇和下一篇 -->
       <div class="article-navigation">
         <div class="prev-article" v-if="prevArticle">
-          <span>{{ $t("article.prevArticle") }}</span>
-          <router-link
-            :to="{ name: 'article', params: { id: prevArticle.id } }"
-          >
+          <span>上一篇</span>
+          <router-link :to="{ name: 'article', params: { id: prevArticle.id } }">
             {{ prevArticle.title }}
           </router-link>
         </div>
         <div class="next-article" v-if="nextArticle">
-          <span>{{ $t("article.nextArticle") }}</span>
-          <router-link
-            :to="{ name: 'article', params: { id: nextArticle.id } }"
-          >
+          <span>下一篇</span>
+          <router-link :to="{ name: 'article', params: { id: nextArticle.id } }">
             {{ nextArticle.title }}
           </router-link>
         </div>
@@ -373,49 +183,35 @@
 
       <!-- 相关文章 -->
       <div class="related-articles" v-if="relatedArticles.length > 0">
-        <h3>{{ $t("article.relatedArticles") }}</h3>
+        <h3>相关文章</h3>
         <div class="related-list">
-          <div
-            v-for="relatedArticle in relatedArticles"
-            :key="relatedArticle.id"
-            class="related-item"
-          >
-            <router-link
-              :to="{ name: 'article', params: { id: relatedArticle.id } }"
-            >
+          <div v-for="relatedArticle in relatedArticles" :key="relatedArticle.id" class="related-item">
+            <router-link :to="{ name: 'article', params: { id: relatedArticle.id } }">
               {{ relatedArticle.title }}
             </router-link>
             <div class="related-meta">
               <span>{{ formatDateTime(relatedArticle.createdAt) }}</span>
-              <span
-                >{{ relatedArticle.views }} {{ $t("common.viewCount") }}</span
-              >
+              <span>{{ relatedArticle.views }} 次浏览</span>
             </div>
           </div>
         </div>
           </div>
     </div>
     <div v-else class="article-not-found">
-      <h1>{{ $t("article.notFound") }}</h1>
-      <p>{{ $t("article.notFoundDesc") }}</p>
-      <router-link to="/" class="back-link">{{
-        $t("article.backToHome")
-      }}</router-link>
+      <h1>文章未找到</h1>
+      <p>抱歉，您要查看的文章不存在或已被删除</p>
+      <router-link to="/" class="back-link">返回首页</router-link>
     </div>
-  </MainLayout>
+  </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch, getCurrentInstance, onBeforeUnmount } from "vue";
+import { ref, computed, onMounted, onBeforeUnmount, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { format } from "date-fns";
 import { useBlogStore } from "../stores/blogStore";
-import MainLayout from "../layouts/Home.vue";
-import "highlight.js/styles/github.css";
+import { format } from "date-fns";
+import { marked } from "marked";
 import DOMPurify from "dompurify";
-import CodepenViewer from "../components/CodepenViewer.vue";
-import TableViewer from "../components/TableViewer.vue";
-import html2pdf from "html2pdf.js";
 import { saveAs } from "file-saver";
 import { createApp } from "vue";
 
@@ -762,11 +558,7 @@ onMounted(() => {
             <div class="image-viewer-caption">${img.alt}</div>
             <button class="image-viewer-close">×</button>
             <button class="image-viewer-save">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"></path>
-                <polyline points="7 10 12 15 17 10"></polyline>
-                <line x1="12" y1="15" x2="12" y2="3"></line>
-              </svg>
+              <span class="material-icons-sharp">download</span>
               保存图片
             </button>
           </div>
@@ -1039,8 +831,7 @@ const exportToPDF = () => {
   const element = document.createElement("div");
   element.innerHTML = `
     <div style="padding: 20px; font-family: Arial, sans-serif;">
-      <h1 style="text-align: center; margin-bottom: 20px;">${
-        article.value.title
+      <h1 style="text-align: center; margin-bottom: 20px;">${article.value.title
       }</h1>
       <div style="color: #666; text-align: center; margin-bottom: 10px;">
         作者: ${article.value.author || "Kiri"} | 
@@ -1095,8 +886,7 @@ const exportToMarkdown = () => {
 
   // 构建Markdown内容
   let markdownContent = `# ${article.value.title}\n\n`;
-  markdownContent += `> 作者: ${
-    article.value.author || "Kiri"
+  markdownContent += `> 作者: ${article.value.author || "Kiri"
   } | 发布时间: ${formatDateTime(article.value.createdAt)}\n\n`;
   markdownContent += `**摘要:** ${article.value.summary}\n\n`;
 
@@ -1206,18 +996,18 @@ const renderFallbackTable = (markdown) => {
 <style>
 /* GitHub-like Markdown Styles */
 .markdown-body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial,
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial,
     sans-serif;
-  font-size: 16px;
+  font-size: var(--fs-16);
   line-height: 1.6;
-  color: #24292e;
+  color: var(--dark);
   word-wrap: break-word;
 }
 
 .markdown-body img {
   max-width: 100%;
   box-sizing: border-box;
-  background-color: #fff;
+  background-color: var(--light-white);
 }
 
 .markdown-body h1,
@@ -1228,19 +1018,19 @@ const renderFallbackTable = (markdown) => {
 .markdown-body h6 {
   margin-top: 24px;
   margin-bottom: 16px;
-  font-weight: 600;
+  font-weight: var(--fw-600);
   line-height: 1.25;
 }
 
 .markdown-body h1 {
   font-size: 2em;
-  border-bottom: 1px solid #eaecef;
+  border-bottom: 1px solid var(--border-color);
   padding-bottom: 0.3em;
 }
 
 .markdown-body h2 {
   font-size: 1.5em;
-  border-bottom: 1px solid #eaecef;
+  border-bottom: 1px solid var(--border-color);
   padding-bottom: 0.3em;
 }
 
@@ -1254,20 +1044,20 @@ const renderFallbackTable = (markdown) => {
 
 .markdown-body blockquote {
   padding: 0.5em 1em;
-  color: #333;
-  border-left: 0.3em solid #3498db;
+  color: var(--dark);
+  border-left: 0.3em solid var(--blue-crayola);
   margin: 0 0 16px 0;
-  background-color: #f8f9fa;
-  border-radius: 0 4px 4px 0;
+  background-color: var(--white_a8);
+  border-radius: 0 var(--radius-4) var(--radius-4) 0;
 }
 
 .markdown-body code {
   padding: 0.2em 0.4em;
   margin: 0;
   font-size: 85%;
-  background-color: rgba(27, 31, 35, 0.05);
-  border-radius: 3px;
-  font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+  background-color: var(--light);
+  border-radius: var(--radius-6);
+  font-family: SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace;
 }
 
 .markdown-body pre {
@@ -1276,8 +1066,8 @@ const renderFallbackTable = (markdown) => {
   overflow: auto;
   font-size: 85%;
   line-height: 1.45;
-  background-color: #f6f8fa;
-  border-radius: 3px;
+  background-color: var(--cultured);
+  border-radius: var(--radius-6);
   margin-bottom: 16px;
 }
 
@@ -1291,7 +1081,7 @@ const renderFallbackTable = (markdown) => {
 }
 
 .markdown-body a {
-  color: #0366d6;
+  color: var(--blue-crayola);
   text-decoration: none;
 }
 
@@ -1307,11 +1097,11 @@ const renderFallbackTable = (markdown) => {
 .markdown-body blockquote.highlighted-quote,
 .markdown-body .highlighted-quote {
   padding: 0.75em 1em;
-  color: #333;
-  border-left: 0.35em solid #3498db;
+  color: var(--dark);
+  border-left: 0.35em solid var(--blue-crayola);
   margin: 0 0 16px 0;
-  background-color: #f8f9fa;
-  border-radius: 0 4px 4px 0;
+  background-color: var(--cultured);
+  border-radius: 0 var(--radius-6) var(--radius-6) 0;
   font-style: italic;
 }
 
@@ -1319,9 +1109,9 @@ const renderFallbackTable = (markdown) => {
 @media (prefers-color-scheme: dark) {
   .markdown-body blockquote.highlighted-quote,
   .markdown-body .highlighted-quote {
-    color: #e0e0e0;
-    background-color: #1a2939;
-    border-left-color: #3498db;
+    color: var(--light-white);
+    background-color: var(--dark);
+    border-left-color: var(--blue-crayola);
   }
 }
 </style>
@@ -1531,7 +1321,7 @@ const renderFallbackTable = (markdown) => {
   border-radius: 0;
   overflow: hidden;
   background-color: #fff;
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
   border: 1px solid #ddd;
 }
 
@@ -1700,7 +1490,7 @@ const renderFallbackTable = (markdown) => {
   background-color: rgba(175, 184, 193, 0.2);
   border-radius: 3px;
   padding: 0.2em 0.4em;
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
   font-size: 85%;
 }
 
@@ -2388,13 +2178,21 @@ const renderFallbackTable = (markdown) => {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideIn {
-  from { transform: translateX(100%); }
-  to { transform: translateX(0); }
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
 }
 
 .mobile-toc-header {

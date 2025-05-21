@@ -1,126 +1,124 @@
 <template>
-  <MainLayout>
-    <div class="archive-page">
-      <!-- 页面头部 -->
-      <div class="archive-header">
-        <h1 class="archive-title">{{ $t('archive.title') }}</h1>
-        <p class="archive-subtitle">{{ $t('archive.subtitle') }}</p>
-      </div>
+  <div class="archive-page">
+    <!-- 页面头部 -->
+    <div class="archive-header">
+      <h1 class="archive-title">归档</h1>
+      <p class="archive-subtitle">按时间顺序浏览所有文章</p>
+    </div>
 
-      <!-- 归档内容 -->
-      <div class="archive-content">
-        <!-- 年份区块 -->
-        <div class="year-block">
-          <h2 class="year-title">2025</h2>
+    <!-- 归档内容 -->
+    <div class="archive-content">
+      <!-- 年份区块 -->
+      <div class="year-block">
+        <h2 class="year-title">2025</h2>
 
-          <div class="article-timeline">
-            <!-- 文章条目 -->
-            <div class="article-item">
-              <div class="article-date">03-16</div>
-              <div class="article-dot"></div>
-              <div class="article-content">
-                <div class="article-left">
-                  <div class="article-icon note"></div>
-                  <a href="#" class="article-title">记一次 Linux 服务器迁移与抢救历程</a>
-                </div>
-                <div class="article-right">
-                  <div class="article-tag note">记录 / 生活记录</div>
-                </div>
+        <div class="article-timeline">
+          <!-- 文章条目 -->
+          <div class="article-item">
+            <div class="article-date">03-16</div>
+            <div class="article-dot"></div>
+            <div class="article-content">
+              <div class="article-left">
+                <div class="article-icon note"></div>
+                <a href="#" class="article-title">记一次 Linux 服务器迁移与抢救历程</a>
+              </div>
+              <div class="article-right">
+                <div class="article-tag note">记录 / 生活记录</div>
               </div>
             </div>
+          </div>
 
-            <div class="article-item">
-              <div class="article-date">03-07</div>
-              <div class="article-dot"></div>
-              <div class="article-content">
-                <div class="article-left">
-                  <div class="article-icon doc"></div>
-                  <a href="#" class="article-title">Redux 数据仓库的数据持久化和 Next.js 中使用流程 | JustPure 起始页的构建历程</a>
-                </div>
-                <div class="article-right">
-                  <div class="article-tag tech">文章 / 技术学习</div>
-                </div>
+          <div class="article-item">
+            <div class="article-date">03-07</div>
+            <div class="article-dot"></div>
+            <div class="article-content">
+              <div class="article-left">
+                <div class="article-icon doc"></div>
+                <a href="#" class="article-title">Redux 数据仓库的数据持久化和 Next.js 中使用流程 | JustPure 起始页的构建历程</a>
+              </div>
+              <div class="article-right">
+                <div class="article-tag tech">文章 / 技术学习</div>
               </div>
             </div>
+          </div>
 
-            <div class="article-item">
-              <div class="article-date">03-02</div>
-              <div class="article-dot"></div>
-              <div class="article-content">
-                <div class="article-left">
-                  <div class="article-icon doc"></div>
-                  <a href="#" class="article-title">零成本手把手带你建一个学习笔记网站（AriaDocs 项目的使用简记）</a>
-                </div>
-                <div class="article-right">
-                  <div class="article-tag tech">文章 / 折腾不止</div>
-                </div>
+          <div class="article-item">
+            <div class="article-date">03-02</div>
+            <div class="article-dot"></div>
+            <div class="article-content">
+              <div class="article-left">
+                <div class="article-icon doc"></div>
+                <a href="#" class="article-title">零成本手把手带你建一个学习笔记网站（AriaDocs 项目的使用简记）</a>
+              </div>
+              <div class="article-right">
+                <div class="article-tag tech">文章 / 折腾不止</div>
               </div>
             </div>
+          </div>
 
-            <div class="article-item">
-              <div class="article-date">02-27</div>
-              <div class="article-dot"></div>
-              <div class="article-content">
-                <div class="article-left">
-                  <div class="article-icon note"></div>
-                  <a href="#" class="article-title">最近的坎坷故事_多项目并行、偶遇传染病、DeepSeek 本地化部署，及记一次开源 WAF 尝试</a>
-                </div>
-                <div class="article-right">
-                  <div class="article-tag note">记录 / 生活感悟</div>
-                </div>
+          <div class="article-item">
+            <div class="article-date">02-27</div>
+            <div class="article-dot"></div>
+            <div class="article-content">
+              <div class="article-left">
+                <div class="article-icon note"></div>
+                <a href="#" class="article-title">最近的坎坷故事_多项目并行、偶遇传染病、DeepSeek 本地化部署，及记一次开源 WAF 尝试</a>
+              </div>
+              <div class="article-right">
+                <div class="article-tag note">记录 / 生活感悟</div>
               </div>
             </div>
+          </div>
 
-            <div class="article-item">
-              <div class="article-date">02-19</div>
-              <div class="article-dot"></div>
-              <div class="article-content">
-                <div class="article-left">
-                  <div class="article-icon doc"></div>
-                  <a href="#" class="article-title">动手部署 Grtblog 前后端，即刻拥有自己的博客网站</a>
-                </div>
-                <div class="article-right">
-                  <div class="article-tag tech">文章 / 技术学习</div>
-                </div>
+          <div class="article-item">
+            <div class="article-date">02-19</div>
+            <div class="article-dot"></div>
+            <div class="article-content">
+              <div class="article-left">
+                <div class="article-icon doc"></div>
+                <a href="#" class="article-title">动手部署 Grtblog 前后端，即刻拥有自己的博客网站</a>
+              </div>
+              <div class="article-right">
+                <div class="article-tag tech">文章 / 技术学习</div>
               </div>
             </div>
+          </div>
 
-            <div class="article-item">
-              <div class="article-date">02-16</div>
-              <div class="article-dot"></div>
-              <div class="article-content">
-                <div class="article-left">
-                  <div class="article-icon doc"></div>
-                  <a href="#" class="article-title">刷机半生，归来仍是 MIUI | HyperOS2 初体验及亿些吐槽</a>
-                </div>
-                <div class="article-right">
-                  <div class="article-tag tech">文章 / 折腾不止</div>
-                </div>
+          <div class="article-item">
+            <div class="article-date">02-16</div>
+            <div class="article-dot"></div>
+            <div class="article-content">
+              <div class="article-left">
+                <div class="article-icon doc"></div>
+                <a href="#" class="article-title">刷机半生，归来仍是 MIUI | HyperOS2 初体验及亿些吐槽</a>
+              </div>
+              <div class="article-right">
+                <div class="article-tag tech">文章 / 折腾不止</div>
               </div>
             </div>
+          </div>
 
-            <div class="article-item">
-              <div class="article-date">02-11</div>
-              <div class="article-dot"></div>
-              <div class="article-content">
-                <div class="article-left">
-                  <div class="article-icon note"></div>
-                  <a href="#" class="article-title">扩展编辑器，整合搜索...问题解决清单控！</a>
-                </div>
-                <div class="article-right">
-                  <div class="article-tag note">记录 / 简单记录</div>
-                </div>
+          <div class="article-item">
+            <div class="article-date">02-11</div>
+            <div class="article-dot"></div>
+            <div class="article-content">
+              <div class="article-left">
+                <div class="article-icon note"></div>
+                <a href="#" class="article-title">扩展编辑器，整合搜索...问题解决清单控！</a>
+              </div>
+              <div class="article-right">
+                <div class="article-tag note">记录 / 简单记录</div>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </MainLayout>
+  </div>
 </template>
 
 <script setup>
-import MainLayout from '../layouts/Home.vue';
+
 </script>
 
 <style scoped>
@@ -295,34 +293,34 @@ import MainLayout from '../layouts/Home.vue';
   .archive-page {
     padding: 20px;
   }
-  
+
   .archive-title {
     font-size: 2rem;
   }
-  
+
   .article-timeline::before {
     left: 35px;
   }
-  
+
   .article-dot {
     left: 35px;
   }
-  
+
   .article-date {
     width: 30px;
     font-size: 0.8rem;
   }
-  
+
   .article-content {
     padding-left: 25px;
     flex-direction: column;
   }
-  
+
   .article-right {
     margin-top: 8px;
     align-self: flex-start;
   }
-  
+
   .article-left {
     margin-right: 0;
   }

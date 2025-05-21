@@ -1,9 +1,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useBlogStore } from '../stores/blogStore'
-import MainLayout from '../layouts/Home.vue'
 import ArticleCard from '../components/ArticleCard.vue'
-import GalleryView from '../components/GalleryView.vue'
 
 // 通过props接收路由传递的分类名称
 const props = defineProps({
@@ -22,31 +20,22 @@ const categoryArticles = computed(() =>
 </script>
 
 <template>
-  <MainLayout>
     <div class="category-page">
-      <!-- 文章列表（非图库类别） -->
-      <div v-if="category !== '图库'" class="category-header">
+    <!-- 文章列表 -->
+    <div class="category-header">
         <h1>{{ category }}</h1>
         <p>该分类下的所有文章</p>
       </div>
 
-      <!-- 图库 -->
-      <gallery-view v-if="category === '图库'" />
-
-      <!-- 文章列表（非图库类别） -->
-      <div v-else-if="categoryArticles.length > 0" class="articles-container">
-        <article-card 
-          v-for="article in categoryArticles" 
-          :key="article.id" 
-          :article="article" 
-        />
+    <!-- 文章列表 -->
+    <div v-if="categoryArticles.length > 0" class="articles-container">
+      <article-card v-for="article in categoryArticles" :key="article.id" :article="article" />
       </div>
       
       <div v-else class="no-articles">
         <p>暂无{{ category }}相关内容</p>
       </div>
     </div>
-  </MainLayout>
 </template>
 
 <style scoped>
@@ -55,6 +44,9 @@ const categoryArticles = computed(() =>
   flex-direction: column;
   gap: 30px;
   position: relative;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
 }
 
 .category-header {
@@ -66,11 +58,11 @@ const categoryArticles = computed(() =>
 .category-header h1 {
   font-size: 2rem;
   margin-bottom: 10px;
-  color: var(--text-color);
+  color: var(--dark);
 }
 
 .category-header p {
-  color: var(--text-color-light);
+  color: var(--dark-variant);
 }
 
 .articles-container {
@@ -82,8 +74,8 @@ const categoryArticles = computed(() =>
 .no-articles {
   text-align: center;
   padding: 50px 0;
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  color: var(--text-color-light);
+  background-color: var(--cultured);
+  border-radius: var(--radius-8);
+  color: var(--dark-variant);
 }
 </style> 

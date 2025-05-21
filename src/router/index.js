@@ -5,7 +5,7 @@ import ArticleView from '../views/ArticleView.vue'
 import BlogView from '../views/BlogView.vue'
 import CategoryView from '../views/CategoryView.vue'
 import ArchivePageView from '../views/ArchivePageView.vue'
-import HeatmapDemo from '../views/HeatmapDemo.vue'
+import GalleryView from '../views/GalleryView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -31,8 +31,7 @@ const router = createRouter({
     {
       path: '/gallery',
       name: 'gallery',
-      component: CategoryView,
-      props: { category: '图库' },
+      component: GalleryView,
       meta: { title: '图库' }
     },
     {
@@ -40,12 +39,6 @@ const router = createRouter({
       name: 'archive',
       component: ArchivePageView,
       meta: { title: '归档' }
-    },
-    {
-      path: '/heatmap-demo',
-      name: 'heatmap-demo',
-      component: HeatmapDemo,
-      meta: { title: '热力图组件演示' }
     },
     {
       path: '/:pathMatch(.*)*',
@@ -60,12 +53,12 @@ const router = createRouter({
     if (savedPosition) {
       return savedPosition;
     }
-    
+
     // 如果是同一个页面的不同参数（如文章ID变化）
     if (from.name === to.name && from.params.id !== to.params.id) {
       return { top: 0 };
     }
-    
+
     // 其他情况，滚动到顶部
     return { top: 0 };
   }
@@ -75,7 +68,7 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   // 设置页面标题
   document.title = `${to.meta.title} | Kiri的个人主页`
-  
+
   next()
 })
 

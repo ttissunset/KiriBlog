@@ -5,32 +5,28 @@
 
       <div class="viewer-container">
         <div class="viewer-main">
-          <img
-            :src="selectedImage.url"
-            alt="Selected image"
-            class="viewer-image"
-          />
+          <img :src="selectedImage.url" alt="Selected image" class="viewer-image" />
         </div>
 
         <div class="camera-info">
           <div class="camera-info-header">
-            <h3>{{ $t("gallery.imageInfo") || "信息" }}</h3>
+            <h3>图片信息</h3>
           </div>
           <div class="camera-info-details">
             <div class="info-row">
-              <span class="info-label">{{ $t("gallery.cameraModel") }}</span>
+              <span class="info-label">相机型号</span>
               <span class="info-value">Canon EOS R5</span>
             </div>
             <div class="info-row">
-              <span class="info-label">{{ $t("gallery.lens") }}</span>
+              <span class="info-label">镜头</span>
               <span class="info-value">RF 24-70mm F2.8L</span>
             </div>
             <div class="info-row">
-              <span class="info-label">{{ $t("gallery.aperture") }}</span>
+              <span class="info-label">光圈</span>
               <span class="info-value">f/2.8</span>
             </div>
             <div class="info-row">
-              <span class="info-label">{{ $t("gallery.shutterSpeed") }}</span>
+              <span class="info-label">快门速度</span>
               <span class="info-value">1/200s</span>
             </div>
             <div class="info-row">
@@ -38,18 +34,18 @@
               <span class="info-value">100</span>
             </div>
             <div class="info-row">
-              <span class="info-label">{{ $t("gallery.focalLength") }}</span>
+              <span class="info-label">焦距</span>
               <span class="info-value">35mm</span>
             </div>
             <div class="info-row">
-              <span class="info-label">{{ $t("gallery.photoTime") }}</span>
+              <span class="info-label">拍摄时间</span>
               <span class="info-value">{{
                 formatCameraTime(selectedImage.date || "2023-06-15T14:35:00")
               }}</span>
             </div>
 
             <div class="info-description">
-              <h4>{{ $t("gallery.photoDesc") }}</h4>
+              <h4>照片描述</h4>
               <p>
                 {{
                   selectedImage.description ||
@@ -59,18 +55,14 @@
             </div>
 
             <div class="info-location">
-              <h4>{{ $t("gallery.location") }}</h4>
+              <h4>拍摄地点</h4>
               <p>湖南省长沙市</p>
             </div>
 
             <div class="save-image-btn">
               <button @click="saveImage" class="save-button">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                  <polyline points="7 10 12 15 17 10"></polyline>
-                  <line x1="12" y1="15" x2="12" y2="3"></line>
-                </svg>
-                {{ $t("gallery.saveImage") || "保存图片" }}
+                <MaterialIcon icon="download" />
+                保存图片
               </button>
             </div>
           </div>
@@ -82,7 +74,6 @@
 
 <script setup>
 import { defineProps, defineEmits } from "vue";
-import toast from "../utils/toast";
 
 // 接收父组件传递的选中图片对象
 const props = defineProps({
@@ -115,24 +106,22 @@ const formatCameraTime = (dateString) => {
 // 保存图片
 const saveImage = () => {
   if (!props.selectedImage || !props.selectedImage.url) return;
-  
+
   // 创建一个链接元素来下载图片
   const link = document.createElement('a');
   link.href = props.selectedImage.url;
-  
+
   // 从URL中提取文件名，如果没有则使用默认名称
   const filename = props.selectedImage.url.split('/').pop() || 'image.jpg';
   link.download = filename;
-  
+
   // 触发点击以下载图片
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
-  
-  // 使用toast组件显示成功消息
-  toast.success("图片已保存成功", {
-    duration: 2000
-  });
+
+  // 简单提示成功消息
+  alert("图片已保存成功");
 };
 </script>
 
@@ -348,7 +337,7 @@ const saveImage = () => {
   .viewer-image {
     max-height: 55vh;
   }
-  
+
   .save-button {
     padding: 8px 12px;
     font-size: 0.9rem;

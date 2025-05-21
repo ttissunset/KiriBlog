@@ -7,21 +7,9 @@
       </div>
       <!-- 复制代码 -->
       <div class="copy-button" @click="copyCode($event)">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="14"
-          height="14"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-          <path
-            d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
-          ></path>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
         </svg>
       </div>
     </div>
@@ -31,10 +19,7 @@
           <tbody>
             <tr v-for="(line, index) in displayedCodeLines" :key="index">
               <td class="line-number">{{ index + 1 }}</td>
-              <td
-                class="line-content"
-                v-html="`<span class='hljs ${langClass}'>${line || ' '}</span>`"
-              ></td>
+              <td class="line-content" v-html="`<span class='hljs ${langClass}'>${line || ' '}</span>`"></td>
             </tr>
           </tbody>
         </table>
@@ -42,20 +27,7 @@
     </div>
     <div class="code-footer" v-if="shouldShowExpand">
       <a href="#" class="show-all-code" @click.prevent="toggleExpand">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="12"
-          height="12"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          :class="{ rotated: expanded }"
-        >
-          <polyline points="6 9 12 15 18 9"></polyline>
-        </svg>
+        <MaterialIcon icon="expand_more" :class="{ rotated: expanded }" />
         {{ expanded ? "收起代码" : `展示全部 ${totalLines} 行代码内容` }}
       </a>
     </div>
@@ -257,13 +229,76 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.code-block {
+  margin: 20px 0;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: #f6f8fa;
+  border-bottom: 1px solid #e1e4e8;
+  font-size: 12px;
+  color: #24292e;
+}
+
+.code-type {
+  font-weight: 600;
+}
+
+.code-content {
+  position: relative;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.code-content-inner {
+  background-color: #f6f8fa;
+  padding: 16px;
+  overflow-x: auto;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.code-footer {
+  padding: 8px 0;
+  text-align: center;
+  background-color: #f9f9f9;
+}
+
+.show-all-code {
+  font-size: 12px;
+  color: #666;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.show-all-code:hover {
+  text-decoration: none;
+  color: #333;
+}
+
+.material-icons-sharp.rotated {
+  transform: rotate(180deg);
+  transition: transform 0.3s ease;
+}
+
 /* 复用当前文章中的代码块样式 */
 .code-block-wrapper {
   margin: 24px 0;
   border-radius: 0;
   overflow: hidden;
   background-color: #fff;
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
   border: 1px solid #ddd;
 }
 
@@ -353,23 +388,6 @@ onMounted(() => {
   white-space: nowrap;
 }
 
-.code-content {
-  flex: 1;
-  overflow-x: auto;
-  overflow-y: auto;
-  transition: max-height 0.3s ease;
-  max-height: 300px;
-}
-
-.code-content.expanded {
-  max-height: none;
-}
-
-/* 折叠时设置最大高度以确保只显示前10行 */
-.code-content:not(.expanded) {
-  max-height: calc(24px * 10); /* 行高 * 最大可见行数 */
-}
-
 .code-table {
   width: 100%;
   border-collapse: collapse;
@@ -392,34 +410,6 @@ onMounted(() => {
   white-space: pre;
   font-size: 13px;
   line-height: 1.5;
-}
-
-.code-footer {
-  padding: 8px 12px;
-  font-size: 12px;
-  background-color: #f9f9f9;
-}
-
-.show-all-code {
-  display: flex;
-  align-items: center;
-  color: #666;
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.show-all-code:hover {
-  color: #333;
-}
-
-.show-all-code svg {
-  margin-right: 6px;
-  transform: rotate(0);
-  transition: transform 0.3s ease;
-}
-
-.show-all-code svg.rotated {
-  transform: rotate(180deg);
 }
 
 /* 暗色模式适配 */

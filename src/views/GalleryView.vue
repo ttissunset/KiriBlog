@@ -7,26 +7,22 @@
       </div>
       <div class="progress-text">{{ Math.round(scrollProgress) }}%</div>
     </div>
-    
+
     <div class="gallery-content">
       <div class="gallery-header">
-        <h1 class="gallery-title">{{ $t('gallery.title') }}</h1>
-        <p class="gallery-subtitle">{{ $t('gallery.subtitle') }}</p>
+        <h1 class="gallery-title">我的图库</h1>
+        <p class="gallery-subtitle">记录生活中的美好瞬间</p>
       </div>
-      
+
       <!-- 加载状态指示器 -->
       <div v-if="isLoading && !hasItems" class="loading-container">
         <div class="loading-spinner"></div>
-        <p>{{ $t('gallery.loadingImages') }}</p>
+        <p>正在加载图片...</p>
       </div>
-      
+
       <!-- 相册内容，不使用虚拟滚动 -->
       <div class="gallery-container-wrapper">
-        <div 
-          v-for="group in groupedImages" 
-          :key="group.date" 
-          class="gallery-date-group"
-        >
+        <div v-for="group in groupedImages" :key="group.date" class="gallery-date-group">
           <div class="date-label">
             <div class="date-icon"></div>
             <span>{{ group.date }}</span>
@@ -35,14 +31,7 @@
             <div v-for="(image, imageIndex) in group.images" :key="imageIndex" class="gallery-item">
               <div class="gallery-image-wrapper" @click="viewImage(image)">
                 <div v-if="!image.loaded" class="image-placeholder"></div>
-                <img 
-                  :src="image.url" 
-                  :alt="image.description" 
-                  class="gallery-image" 
-                  loading="lazy" 
-                  @load="imageLoaded(image)"
-                  :class="{ 'is-loaded': image.loaded }"
-                />
+                <img :src="image.url" :alt="image.description" class="gallery-image" loading="lazy" @load="imageLoaded(image)" :class="{ 'is-loaded': image.loaded }" />
               </div>
             </div>
           </div>
@@ -52,22 +41,18 @@
       <!-- 无限滚动加载触发器 -->
       <div v-if="hasMoreImages && hasItems" class="load-more" ref="loadMoreTrigger">
         <div class="loading-spinner"></div>
-        <p>{{ $t('gallery.loadMore') }}</p>
+        <p>加载更多</p>
       </div>
     </div>
-    
+
     <!-- 使用图片查看器组件 -->
-    <image-viewer 
-      v-if="activeImage" 
-      :selected-image="activeImage" 
-      @close="closeViewer" 
-    />
+    <image-viewer v-if="activeImage" :selected-image="activeImage" @close="closeViewer" />
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue';
-import ImageViewer from './ImageViewer.vue';
+import ImageViewer from '../components/ImageViewer.vue';
 
 // 导入图片资源
 import img1 from '../assets/1.jpg';
@@ -114,14 +99,14 @@ const galleryImages = ref([]);
 // 按日期分组图片，将相同日期的图片合并到一个组中
 const groupedImages = computed(() => {
   const groups = {};
-  
+
   galleryImages.value.forEach(image => {
     if (!groups[image.date]) {
       groups[image.date] = { date: image.date, images: [] };
     }
     groups[image.date].images.push(image);
   });
-  
+
   // 按日期从新到旧排序
   return Object.values(groups).sort((a, b) => {
     return new Date(b.date) - new Date(a.date);
@@ -143,18 +128,18 @@ const imageLoaded = (image) => {
 const loadMoreImages = () => {
   const startIndex = (currentPage.value - 1) * imagesPerPage;
   const endIndex = Math.min(startIndex + imagesPerPage, allImages.length);
-  
+
   if (startIndex < allImages.length) {
     // 模拟网络请求延迟
     setTimeout(() => {
       for (let i = startIndex; i < endIndex; i++) {
-        const newImage = {...allImages[i], loaded: false};
+        const newImage = { ...allImages[i], loaded: false };
         galleryImages.value.push(newImage);
       }
-      
+
       currentPage.value++;
       isLoading.value = false;
-      
+
       // 设置无限滚动观察器
       if (galleryImages.value.length < allImages.length) {
         nextTick(() => {
@@ -173,7 +158,7 @@ const setupIntersectionObserver = () => {
   if (observer) {
     observer.disconnect();
   }
-  
+
   if (loadMoreTrigger.value) {
     observer = new IntersectionObserver(entries => {
       const entry = entries[0];
@@ -182,7 +167,7 @@ const setupIntersectionObserver = () => {
         loadMoreImages();
       }
     }, { rootMargin: '100px' });
-    
+
     observer.observe(loadMoreTrigger.value);
   }
 };
@@ -209,7 +194,7 @@ const closeViewer = () => {
 // 监听滚动事件，更新进度
 onMounted(() => {
   window.addEventListener('scroll', updateScrollProgress);
-  
+
   // 初始加载第一批图片
   loadMoreImages();
 });
@@ -217,7 +202,7 @@ onMounted(() => {
 // 移除滚动事件监听，防止内存泄漏
 onUnmounted(() => {
   window.removeEventListener('scroll', updateScrollProgress);
-  
+
   if (observer) {
     observer.disconnect();
     observer = null;
@@ -448,7 +433,7 @@ onUnmounted(() => {
   .gallery-container {
     flex-direction: column;
   }
-  
+
   .gallery-progress {
     position: fixed;
     top: auto;
@@ -465,41 +450,41 @@ onUnmounted(() => {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     z-index: 50;
   }
-  
+
   .progress-bar {
     width: 50px;
     height: 4px;
     margin: 0 10px 0 0;
   }
-  
+
   .progress-indicator {
     height: 100%;
     width: var(--progress-width);
   }
-  
+
   .gallery-content {
     max-width: 100%;
     padding: 10px 10px 10px 10px;
     margin: 0 0 0 0;
   }
-  
+
   .gallery-waterfall {
     column-count: 2;
   }
-  
+
   .gallery-image-wrapper {
     padding-bottom: 70%; /* 缩小图片高度比例 */
   }
-  
+
   .gallery-header {
     margin-bottom: 25px;
     padding-left: 10px; /* 为标题添加左侧内边距 */
   }
-  
+
   .gallery-title {
     font-size: 1.8rem;
   }
-  
+
   .date-label {
     padding-left: 10px; /* 为日期标签添加左侧内边距 */
   }
@@ -512,24 +497,24 @@ onUnmounted(() => {
     padding: 15px 15px 15px 10px;
     margin: 0;
   }
-  
+
   .gallery-waterfall {
     column-count: 2;
     column-gap: 15px;
   }
-  
+
   .gallery-item {
     margin-bottom: 15px;
   }
-  
+
   .gallery-image-wrapper {
     padding-bottom: 80%; /* 放大图片高度比例 */
   }
-  
+
   .gallery-header {
     padding-left: 10px; /* 为标题添加左侧内边距 */
   }
-  
+
   .date-label {
     padding-left: 10px; /* 为日期标签添加左侧内边距 */
   }
@@ -540,23 +525,23 @@ onUnmounted(() => {
   .gallery-content {
     padding: 10px;
   }
-  
+
   .gallery-title {
     font-size: 1.6rem;
   }
-  
+
   .gallery-subtitle {
     font-size: 0.9rem;
   }
-  
+
   .date-label {
     font-size: 0.9rem;
   }
-  
+
   .gallery-date-group {
     margin-bottom: 25px;
   }
-  
+
   .gallery-image-wrapper {
     padding-bottom: 65%; /* 更小屏幕上进一步缩小图片 */
   }

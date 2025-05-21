@@ -1,56 +1,108 @@
 <script setup>
 import { useBlogStore } from "../stores/blogStore";
-import MainLayout from "../layouts/Home.vue";
-import ContributionHeatmap from "../components/ContributionHeatmap.vue";
+import { ref, onMounted, onUnmounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 
 const blogStore = useBlogStore();
+const router = useRouter();
+const route = useRoute();
 
-// 生成示例贡献数据（在实际应用中，这些数据应该从API获取）
-const demoContributionData = {
-  2024: generateRandomContributionData(),
-  2023: generateRandomContributionData(0.4), // 较少的贡献
-  2022: generateRandomContributionData(0.6),
-  2021: generateRandomContributionData(0.3),
-  2020: generateRandomContributionData(0.7),
-  2019: generateRandomContributionData(0.5),
-  2018: generateRandomContributionData(0.2),
-};
+// 滚动处理
+const currentPage = ref(0);
+const pages = ref([]);
+const scrollTimeout = ref(null);
 
-/**
- * 生成随机的贡献数据
- * @param {Number} activityFactor - 活跃因子 (0-1)，值越大表示活跃度越高
- * @returns {Object} - 年度贡献数据
- */
-function generateRandomContributionData(activityFactor = 0.5) {
-  const result = {};
-  for (let week = 0; week < 53; week++) {
-    result[week] = {};
-    for (let day = 0; day < 7; day++) {
-      const rand = Math.random();
-      if (rand < 0.6 * (1 - activityFactor)) { // 无贡献概率随活跃度减小
-        result[week][day] = 0;
-      } else if (rand < 0.8) {
-        result[week][day] = 1;
-      } else if (rand < 0.9) {
-        result[week][day] = 2;
-      } else if (rand < 0.97) {
-        result[week][day] = 3;
-      } else {
-        result[week][day] = 4;
+// 初始化页面并添加滚动事件监听
+onMounted(() => {
+  pages.value = document.querySelectorAll('.page');
+  window.addEventListener('wheel', handleScroll, { passive: false });
+  window.addEventListener('touchstart', handleTouchStart, { passive: false });
+  window.addEventListener('touchmove', handleTouchMove, { passive: false });
+});
+
+// 移除事件监听器
+onUnmounted(() => {
+  window.removeEventListener('wheel', handleScroll);
+  window.removeEventListener('touchstart', handleTouchStart);
+  window.removeEventListener('touchmove', handleTouchMove);
+});
+
+// 记录触摸起始位置
+let touchStartY = 0;
+function handleTouchStart(e) {
+  touchStartY = e.touches[0].clientY;
+}
+
+// 处理触摸移动
+function handleTouchMove(e) {
+  if (scrollTimeout.value) return;
+
+  const touchY = e.touches[0].clientY;
+  const diff = touchStartY - touchY;
+
+  if (Math.abs(diff) > 30) { // 至少滑动30px才触发页面切换
+    e.preventDefault();
+    if (diff > 0) {
+      // 向上滑动，前往下一页
+      if (currentPage.value < pages.value.length - 1) {
+        scrollToPage(currentPage.value + 1);
+      }
+    } else {
+      // 向下滑动，前往上一页
+      if (currentPage.value > 0) {
+        scrollToPage(currentPage.value - 1);
       }
     }
+
+    // 防抖
+    scrollTimeout.value = setTimeout(() => {
+      scrollTimeout.value = null;
+    }, 800);
   }
-  return result;
+}
+
+// 处理鼠标滚轮事件
+function handleScroll(e) {
+  if (scrollTimeout.value) return;
+
+  e.preventDefault();
+
+  if (e.deltaY > 0) {
+    // 向下滚动，前往下一页
+    if (currentPage.value < pages.value.length - 1) {
+      scrollToPage(currentPage.value + 1);
+    }
+  } else {
+    // 向上滚动，前往上一页
+    if (currentPage.value > 0) {
+      scrollToPage(currentPage.value - 1);
+    }
+  }
+
+  // 防抖，800ms内不再触发滚动
+  scrollTimeout.value = setTimeout(() => {
+    scrollTimeout.value = null;
+  }, 800);
+}
+
+// 滚动到指定页面
+function scrollToPage(pageIndex) {
+  currentPage.value = pageIndex;
+  const targetPage = pages.value[pageIndex];
+  window.scrollTo({
+    top: targetPage.offsetTop,
+    behavior: 'smooth'
+  });
 }
 </script>
 
 <template>
-  <MainLayout>
-    <!-- 人主页容器 -->
-    <div class="github-profile">
-      <div class="profile-container">
-        <!-- 左侧内容区域 - 头像和个人基本信息 -->
-        <div class="profile-left">
+  <div class="home-view">
+    <!-- 第一页：个人信息 + 背景图 -->
+    <section class="page page-one">
+      <div class="page-content">
+        <!-- 左侧1/4：个人信息 -->
+        <div class="profile-info">
           <!-- 头像及基本个人信息区域 -->
           <div class="avatar-section">
             <img src="../assets/avatar.jpg" alt="头像" class="avatar-img" />
@@ -58,235 +110,260 @@ function generateRandomContributionData(activityFactor = 0.5) {
             <p class="username">苯氨基丙酸</p>
             <div class="bio">自由独立试新茶，沉醉半生</div>
           </div>
+
+          <!-- 向下滚动提示 -->
+          <div class="scroll-hint">
+            <span>向下滚动查看更多</span>
+            <div class="scroll-arrow">
+              <MaterialIcon icon="expand_more" />
+            </div>
+          </div>
         </div>
 
-        <!-- 右侧内容区域 - README和热力图 -->
-        <div class="profile-right">
-          <!-- README容器 - 与下方热力图同宽 -->
-          <div class="readme-container">
-            <!-- README主要内容区 -->
-            <div class="readme-content">
-              <!-- 右侧动漫图片容器 - 绝对定位在右侧 -->
-              <div class="anime-container">
-                <img
-                  src="../assets/l2d.webp"
-                  alt="Anime character"
-                  class="anime-image"
-                />
-              </div>
+        <!-- 右侧3/4：背景图 -->
+        <div class="background-image-container">
+          <!-- 背景图片在CSS中设置 -->
+        </div>
+      </div>
+    </section>
 
-              <h2 class="readme-title">
-                Hello <span class="wave-emoji"><font-awesome-icon :icon="['fas', 'hand-wave']" /></span>
-              </h2>
+    <!-- 第二页：README内容横向排布 -->
+    <section class="page page-two">
+      <div class="horizontal-content">
+        <!-- 左侧：个人介绍和技术栈 -->
+        <div class="left-content">
+          <h2 class="readme-title">
+            Hello <span class="wave-emoji">
+              <MaterialIcon icon="waving_hand" />
+            </span>
+          </h2>
 
-              <!-- 联系方式 -->
-              <div class="contact-badges">
-                <a href="mailto:ZyZy1724@gmail.com" class="badge email-badge">
-                  <span class="badge-icon"><font-awesome-icon :icon="['fas', 'envelope']" /></span>
-                  <span class="badge-text">kiricamellia@gmail.com</span>
-                </a>
-                <a href="#" class="badge qq-badge">
-                  <span class="badge-icon"><font-awesome-icon :icon="['fab', 'qq']" /></span>
-                  <span class="badge-text">2733908676</span>
-                </a>
-              </div>
+          <p class="intro-text">我是 Kiri</p>
 
-              <p class="intro-text">我是 Kiri</p>
+          <!-- 个人信息列表 -->
+          <ul class="info-list">
+            <li class="info-item">
+              <span class="bullet">•</span>
+              <span>一位前端开发者</span>
+            </li>
+            <li class="info-item">
+              <span class="bullet">•</span>
+              <span>
+                <MaterialIcon icon="grass" /> 目前居住在广州
+              </span>
+            </li>
+            <li class="info-item">
+              <span class="bullet">•</span>
+              <span>
+                <MaterialIcon icon="chat" /> 如果你有疑问，可以联系我
+              </span>
+              <span class="email-link">273390867@qq.com</span>
+            </li>
+          </ul>
 
-              <!-- 个人信息列表 -->
-              <ul class="info-list">
-                <li class="info-item">
-                  <span class="bullet">•</span>
-                  <span>一位前端开发者</span>
-                </li>
-                <li class="info-item">
-                  <span class="bullet">•</span>
-                  <span><font-awesome-icon :icon="['fas', 'seedling']" /> 目前居住在广州</span>
-                </li>
-                <li class="info-item">
-                  <span class="bullet">•</span>
-                  <span><font-awesome-icon :icon="['fas', 'comment']" /> 如果你有疑问，可以联系我</span>
-                  <span class="email-link">273390867@qq.com</span>
-                </li>
-              </ul>
-
-              <!-- 技术栈部分 -->
-              <div class="tech-stack">
-                <h3>技术栈</h3>
-                <div class="tech-tags">
-                  <div class="tech-row">
-                    <div class="tech-tag">
-                      <span class="badge-icon-small"><font-awesome-icon :icon="['fab', 'js']" style="color: #f7df1e;" /></span>
-                      <span>JavaScript</span>
-                    </div>
-                    <div class="tech-tag">
-                      <span class="badge-icon-small"><font-awesome-icon :icon="['fab', 'vuejs']" style="color: #42b883;" /></span>
-                      <span>Vue</span>
-                    </div>
-                    <div class="tech-tag">
-                      <span class="badge-icon-small"><font-awesome-icon :icon="['fab', 'node-js']" style="color: #68a063;" /></span>
-                      <span>Node.js</span>
-                    </div>
-                  </div>
+          <!-- 技术栈部分 -->
+          <div class="tech-stack">
+            <h3>技术栈</h3>
+            <div class="tech-tags">
+              <div class="tech-row">
+                <div class="tech-tag">
+                  <span class="badge-icon-small js-icon">JS</span>
+                  <span>JavaScript</span>
                 </div>
-              </div>
-
-              <!-- 关于我部分 -->
-              <div class="readme-section">
-                <h3 class="section-heading">关于我</h3>
-                <ul class="about-list">
-                  <li class="about-item">
-                    <span class="bullet">•</span>
-                    <a href="https://github.com/ttissunset" class="about-link"
-                      >我的github</a
-                    >
-                  </li>
-                  <li class="about-item">
-                    <span class="bullet">•</span>
-                    <a href="#" class="about-link">简历</a>
-                  </li>
-                </ul>
-              </div>
-
-              <!-- 语言统计部分 -->
-              <div class="readme-section language-section">
-                <h3 class="section-heading">Most Used Languages</h3>
-                <div class="language-stats">
-                  <div class="language-bar">
-                    <div
-                      class="bar-segment javascript"
-                      style="width: 64.8%"
-                    ></div>
-                    <div class="bar-segment css" style="width: 13.99%"></div>
-                    <div class="bar-segment html" style="width: 21.21%"></div>
-                  </div>
-                  <div class="language-labels">
-                    <div class="language-label javascript">
-                      <span class="label-dot"></span>
-                      <span>JavaScript 64.80%</span>
-                    </div>
-                    <div class="language-label css">
-                      <span class="label-dot"></span>
-                      <span>CSS 13.99%</span>
-                    </div>
-                    <div class="language-label html">
-                      <span class="label-dot"></span>
-                      <span>HTML 21.21%</span>
-                    </div>
-                  </div>
+                <div class="tech-tag">
+                  <span class="badge-icon-small vue-icon">Vue</span>
+                  <span>Vue</span>
                 </div>
-              </div>
-
-              <!-- GitHub统计部分 -->
-              <div class="github-stats">
-                <h3>GitHub 统计</h3>
-                <div class="stats-container">
-                  <div class="stats-data">
-                    <div class="stat-item">
-                      <font-awesome-icon
-                        :icon="['fas', 'star']"
-                        class="stat-icon"
-                      />
-                      <div class="stat-details">
-                        <div class="stat-value">1024</div>
-                        <div class="stat-label">Total Stars</div>
-                      </div>
-                    </div>
-                    <div class="stat-item">
-                      <font-awesome-icon
-                        :icon="['fas', 'code-branch']"
-                        class="stat-icon"
-                      />
-                      <div class="stat-details">
-                        <div class="stat-value">512</div>
-                        <div class="stat-label">Commits (2023)</div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="github-grade">
-                    <div class="grade-circle">C</div>
-                  </div>
+                <div class="tech-tag">
+                  <span class="badge-icon-small node-icon">Node</span>
+                  <span>Node.js</span>
                 </div>
-              </div>
-
-              <!-- 友好信息 -->
-              <div class="friendly-message">
-                <p>
-                  I love to make friends, so if you want to say hi, I'll be
-                  happy to meet you more! 😊
-                </p>
-                <p class="from-text">
-                  <span class="wave-emoji"><font-awesome-icon :icon="['fas', 'hand-wave']" /></span> From
-                  <a href="#" class="author-link">Kiri</a>
-                </p>
               </div>
             </div>
           </div>
 
-          <!-- 底部热力图部分 - 使用新的组件 -->
-          <ContributionHeatmap 
-            title="contributions in the last year" 
-            :contribution-data="demoContributionData"
-          />
+          <!-- 关于我部分 -->
+          <div class="readme-section">
+            <h3 class="section-heading">关于我</h3>
+            <ul class="about-list">
+              <li class="about-item">
+                <span class="bullet">•</span>
+                <a href="https://github.com/ttissunset" class="about-link">我的github</a>
+              </li>
+              <li class="about-item">
+                <span class="bullet">•</span>
+                <a href="#" class="about-link">简历</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- 中间：技术统计和GitHub统计 -->
+        <div class="middle-content">
+          <!-- 语言统计部分 -->
+          <div class="readme-section language-section">
+            <h3 class="section-heading">Most Used Languages</h3>
+            <div class="language-stats">
+              <div class="language-bar">
+                <div class="bar-segment javascript" style="width: 64.8%"></div>
+                <div class="bar-segment css" style="width: 13.99%"></div>
+                <div class="bar-segment html" style="width: 21.21%"></div>
+              </div>
+              <div class="language-labels">
+                <div class="language-label javascript">
+                  <span class="label-dot"></span>
+                  <span>JavaScript 64.80%</span>
+                </div>
+                <div class="language-label css">
+                  <span class="label-dot"></span>
+                  <span>CSS 13.99%</span>
+                </div>
+                <div class="language-label html">
+                  <span class="label-dot"></span>
+                  <span>HTML 21.21%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- GitHub统计部分 -->
+          <div class="github-stats">
+            <h3>GitHub 统计</h3>
+            <div class="stats-container">
+              <div class="stats-data">
+                <div class="stat-item">
+                  <MaterialIcon icon="star" class="stat-icon" />
+                  <div class="stat-details">
+                    <div class="stat-value">1024</div>
+                    <div class="stat-label">Total Stars</div>
+                  </div>
+                </div>
+                <div class="stat-item">
+                  <MaterialIcon icon="fork_right" class="stat-icon" />
+                  <div class="stat-details">
+                    <div class="stat-value">512</div>
+                    <div class="stat-label">Commits (2023)</div>
+                  </div>
+                </div>
+              </div>
+              <div class="github-grade">
+                <div class="grade-circle">C</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 右侧：动漫图片和友好信息 -->
+        <div class="right-content">
+          <!-- 动漫图片容器 -->
+          <div class="anime-container">
+            <img src="../assets/l2d.webp" alt="Anime character" class="anime-image" />
+          </div>
+
+          <!-- 友好信息 -->
+          <div class="friendly-message">
+            <p>
+              I love to make friends, so if you want to say hi, I'll be
+              happy to meet you more! 😊
+            </p>
+            <p class="from-text">
+              <span class="wave-emoji">
+                <MaterialIcon icon="waving_hand" />
+              </span> From
+              <a href="#" class="author-link">Kiri</a>
+            </p>
+          </div>
         </div>
       </div>
-    </div>
-  </MainLayout>
+    </section>
+  </div>
 </template>
 
 <style scoped>
-/* 整体页面布局样式 */
-.github-profile {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 0 16px;
+.home-view {
+  color: var(--dark);
+  overflow: hidden;
 }
 
-/* 主要内容容器 */
-.profile-container {
+/* 页面通用样式 */
+.page {
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  scroll-snap-align: start;
+}
+
+/* 第一页样式 */
+.page-one {
+  background-color: var(--light-white);
+}
+
+.page-content {
   display: flex;
-  gap: 24px;
-  padding-top: 16px;
+  height: 100%;
+  overflow: hidden;
 }
 
-/* 左侧样式 - 固定宽度 */
-.profile-left {
-  width: 296px;
-  flex-shrink: 0;
-}
-
-/* 右侧样式 - 自适应宽度 */
-.profile-right {
-  flex: 1;
+/* 左侧信息区域 - 占1/4宽度 */
+.profile-info {
+  width: 25%;
+  height: 100%;
+  padding: 40px 20px;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  justify-content: center;
+  box-sizing: border-box;
+  background-color: var(--light-white);
+  z-index: 10;
+  position: relative;
+  border-right: none;
+}
+
+/* 右侧背景图 - 占3/4宽度 */
+.background-image-container {
+  width: 75%;
+  height: 100%;
+  background-image: linear-gradient(
+      to right,
+      var(--light-white) 0%,
+      rgba(255, 255, 255, 0.8) 5%,
+      rgba(255, 255, 255, 0) 20%
+    ),
+    url('../assets/00_01.jpg');
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  margin-left: -1px;
 }
 
 /* 头像部分样式 */
 .avatar-section {
-  margin-bottom: 16px;
-  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
 .avatar-img {
-  width: 296px;
-  height: 296px;
-  border-radius: 50%;
+  width: 150px;
+  height: 150px;
+  border-radius: var(--radius-circle);
   border: 1px solid #d0d7de;
   margin-bottom: 16px;
+  object-fit: cover;
 }
 
 .profile-name {
-  font-size: 24px;
+  font-size: var(--fs-24);
   line-height: 1.25;
-  font-weight: 600;
+  font-weight: var(--fw-600);
   color: #24292f;
   margin: 0 0 4px;
 }
 
 .username {
-  font-size: 20px;
+  font-size: var(--fs-20);
   font-weight: 300;
   line-height: 24px;
   color: #57606a;
@@ -296,91 +373,98 @@ function generateRandomContributionData(activityFactor = 0.5) {
 .bio {
   margin-bottom: 16px;
   color: #24292f;
-  font-size: 16px;
+  font-size: var(--fs-16);
   line-height: 1.5;
 }
 
-/* 关注者信息样式 */
-.follow-section {
-  display: flex;
-  align-items: center;
-  margin-bottom: 16px;
-  font-size: 14px;
-  color: #57606a;
-}
-
-.followers,
-.following {
-  display: flex;
-  align-items: center;
-}
-
-.count {
-  font-weight: 600;
-  color: #24292f;
-}
-
-.dot {
-  margin: 0 5px;
-}
-
-/* 关注按钮样式 */
-.follow-button {
-  width: 100%;
-  text-align: center;
-  background-color: #f6f8fa;
-  border: 1px solid rgba(27, 31, 36, 0.15);
-  border-radius: 6px;
-  color: #24292f;
-  font-size: 14px;
-  font-weight: 600;
-  padding: 5px 16px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.follow-button:hover {
-  background-color: #f3f4f6;
-  border-color: rgba(27, 31, 36, 0.15);
-}
-
-/* README容器样式 */
-.readme-container {
-  width: 100%; /* 保证与热力图等宽 */
-  border: 1px solid #d0d7de;
-  border-radius: 6px;
-  background-color: #fff;
-  overflow: hidden;
-}
-
-/* README内容部分样式 */
-.readme-content {
-  padding: 16px;
-  position: relative;
-}
-
-/* 动漫图片容器 */
-.anime-container {
+/* 滚动提示 */
+.scroll-hint {
   position: absolute;
-  top: 0;
+  bottom: 30px;
+  left: 0;
   right: 0;
-  width: 300px;
-  height: 100%;
   display: flex;
-  justify-content: flex-end;
+  flex-direction: column;
   align-items: center;
-  overflow: hidden;
+  color: #57606a;
+  font-size: var(--fs-14);
 }
 
-.anime-image {
-  max-height: 80%;
-  max-width: 100%;
-  object-fit: contain;
+.scroll-arrow {
+  margin-top: 10px;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+/* 第二页样式 */
+.page-two {
+  background-color: var(--cultured);
+  padding: 0;
+}
+
+.horizontal-content {
+  display: flex;
+  height: 100%;
+  padding: 40px;
+  box-sizing: border-box;
+}
+
+.left-content,
+.middle-content,
+.right-content {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  max-height: 100%;
+}
+
+/* 基础样式调整 */
+.contact-badges {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+  background-color: #f6f8fa;
+  border-radius: 20px;
+  font-size: var(--fs-14);
+  transition: 0.2s;
+  text-decoration: none;
+  color: #24292f;
+}
+
+.badge:hover {
+  background-color: #eaeef2;
+}
+
+.badge-icon {
+  margin-right: 5px;
+  font-size: var(--fs-16);
 }
 
 /* README标题 */
 .readme-title {
-  font-size: 24px;
+  font-size: var(--fs-24);
   color: #24292f;
   margin-bottom: 20px;
   display: flex;
@@ -421,41 +505,11 @@ function generateRandomContributionData(activityFactor = 0.5) {
   }
 }
 
-/* 联系方式徽章 */
-.contact-badges {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-bottom: 20px;
-}
-
-.badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 5px 10px;
-  background-color: #f6f8fa;
-  border-radius: 20px;
-  font-size: 14px;
-  transition: 0.2s;
-  text-decoration: none;
-  color: #24292f;
-}
-
-.badge:hover {
-  background-color: #eaeef2;
-}
-
-.badge-icon {
-  margin-right: 5px;
-  font-size: 16px;
-}
-
 /* 简介文本 */
 .intro-text {
   margin-bottom: 20px;
-  font-size: 16px;
+  font-size: var(--fs-16);
   color: #24292f;
-  max-width: 60%;
 }
 
 /* 信息列表 */
@@ -463,7 +517,6 @@ function generateRandomContributionData(activityFactor = 0.5) {
   list-style: none;
   padding: 0;
   margin: 0 0 24px;
-  max-width: 60%;
 }
 
 .info-item {
@@ -479,18 +532,17 @@ function generateRandomContributionData(activityFactor = 0.5) {
 }
 
 .email-link {
-  color: #0969da;
+  color: var(--blue-crayola);
   margin-left: 4px;
 }
 
 /* README分段样式 */
 .readme-section {
   margin-bottom: 24px;
-  max-width: 60%;
 }
 
 .section-heading {
-  font-size: 18px;
+  font-size: var(--fs-18);
   color: #24292f;
   margin-bottom: 16px;
   border-bottom: 1px solid #d0d7de;
@@ -511,7 +563,7 @@ function generateRandomContributionData(activityFactor = 0.5) {
 }
 
 .about-link {
-  color: #0969da;
+  color: var(--blue-crayola);
   text-decoration: none;
 }
 
@@ -563,14 +615,14 @@ function generateRandomContributionData(activityFactor = 0.5) {
 .language-label {
   display: flex;
   align-items: center;
-  font-size: 12px;
+  font-size: var(--fs-12);
   color: #57606a;
 }
 
 .label-dot {
   width: 12px;
   height: 12px;
-  border-radius: 50%;
+  border-radius: var(--radius-circle);
   margin-right: 4px;
 }
 
@@ -589,19 +641,20 @@ function generateRandomContributionData(activityFactor = 0.5) {
 /* GitHub统计样式 */
 .github-stats {
   margin-bottom: 24px;
-  max-width: 60%;
 }
 
 .stats-container {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
   margin-top: 12px;
 }
 
 .stats-data {
   display: flex;
-  gap: 24px;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 20px;
 }
 
 .stat-item {
@@ -611,7 +664,7 @@ function generateRandomContributionData(activityFactor = 0.5) {
 }
 
 .stat-icon {
-  font-size: 20px;
+  font-size: var(--fs-20);
   color: #57606a;
 }
 
@@ -621,13 +674,13 @@ function generateRandomContributionData(activityFactor = 0.5) {
 }
 
 .stat-value {
-  font-weight: 600;
-  font-size: 16px;
+  font-weight: var(--fw-600);
+  font-size: var(--fs-16);
   color: #24292e;
 }
 
 .stat-label {
-  font-size: 12px;
+  font-size: var(--fs-12);
   color: #586069;
 }
 
@@ -635,6 +688,7 @@ function generateRandomContributionData(activityFactor = 0.5) {
   display: flex;
   justify-content: center;
   align-items: center;
+  align-self: center;
 }
 
 .grade-circle {
@@ -643,11 +697,26 @@ function generateRandomContributionData(activityFactor = 0.5) {
   display: flex;
   justify-content: center;
   align-items: center;
-  border-radius: 50%;
+  border-radius: var(--radius-circle);
   background-color: #2da44e;
-  color: white;
+  color: var(--light-white);
   font-size: 28px;
-  font-weight: 700;
+  font-weight: var(--fw-700);
+}
+
+/* 动漫图片容器 */
+.anime-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.anime-image {
+  max-width: 100%;
+  max-height: 300px;
+  object-fit: contain;
 }
 
 /* 友好信息样式 */
@@ -655,78 +724,29 @@ function generateRandomContributionData(activityFactor = 0.5) {
   border-left: 4px solid #d0d7de;
   padding-left: 16px;
   color: #57606a;
-  font-size: 14px;
+  font-size: var(--fs-14);
   margin: 16px 0;
   font-style: italic;
 }
 
 .from-text {
   margin-top: 8px;
-  font-weight: 500;
+  font-weight: var(--fw-500);
 }
 
 .author-link {
-  color: #0969da;
+  color: var(--blue-crayola);
   text-decoration: none;
-  font-weight: 600;
+  font-weight: var(--fw-600);
 }
 
 .author-link:hover {
   text-decoration: underline;
 }
 
-/* 响应式样式 */
-@media (max-width: 1100px) {
-  .anime-container {
-    position: static;
-    width: auto;
-    height: auto;
-    margin-bottom: 16px;
-  }
-
-  .anime-image {
-    max-width: 300px;
-  }
-
-  /* 恢复内容宽度 */
-  .readme-title,
-  .contact-badges,
-  .intro-text,
-  .info-list {
-    width: 100%;
-  }
-}
-
-@media (max-width: 768px) {
-  /* 更小的屏幕尺寸时调整整体布局 */
-  .profile-container {
-    flex-direction: column;
-  }
-
-  .profile-left {
-    width: 100%;
-  }
-
-  .avatar-img {
-    width: 100%;
-    height: auto;
-    max-width: 296px;
-    margin: 0 auto 16px;
-    display: block;
-  }
-  
-  .weather-section {
-    margin: 24px auto;
-    max-width: 350px;
-  }
-}
-
 /* 技术栈样式调整 */
 .tech-stack {
   margin-bottom: 24px;
-  /* 限制宽度，确保不超过动漫图片左边缘 */
-  width: 60%;
-  max-width: 500px;
 }
 
 .tech-tags {
@@ -745,11 +765,11 @@ function generateRandomContributionData(activityFactor = 0.5) {
   align-items: center;
   gap: 4px;
   padding: 4px 8px;
-  background-color: var(--button-bg, #f1f8ff);
-  border-radius: 12px;
-  color: var(--link-color, #0366d6);
-  font-size: 12px;
-  font-weight: 500;
+  background-color: var(--youth-blue-3);
+  border-radius: var(--radius-10);
+  color: var(--blue-crayola);
+  font-size: var(--fs-12);
+  font-weight: var(--fw-500);
   flex: 1;
   justify-content: center;
   white-space: nowrap;
@@ -758,5 +778,65 @@ function generateRandomContributionData(activityFactor = 0.5) {
 .badge-icon-small {
   margin-right: 2px;
   font-size: 10px;
+}
+
+/* 技术栈图标样式 */
+.js-icon {
+  background-color: #f7df1e;
+  color: #000;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+.vue-icon {
+  background-color: #42b883;
+  color: #fff;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+.node-icon {
+  background-color: #68a063;
+  color: #fff;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+/* 响应式样式 */
+@media (max-width: 1100px) {
+  .horizontal-content {
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  .left-content,
+  .middle-content,
+  .right-content {
+    width: 100%;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .page {
+    height: auto;
+    min-height: 100vh;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-content {
+    flex-direction: column;
+  }
+
+  .profile-info {
+    width: 100%;
+    height: auto;
+    min-height: 50vh;
+  }
+
+  .background-image-container {
+    width: 100%;
+    height: 50vh;
+  }
 }
 </style>

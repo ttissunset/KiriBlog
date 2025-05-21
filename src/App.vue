@@ -1,5 +1,116 @@
 <script setup>
-import Header from './components/Header.vue';
+import Header from "./components/Header.vue";
+import { convertAniBinaryToCSS } from "ani-cursor";
+import { onMounted, ref, onUnmounted } from "vue";
+import Sakana from "sakana";
+import { createVNode, render } from 'vue';
+import Firework from './components/Firework.vue';
+
+async function applyCursor(selector, aniUrl) {
+  const response = await fetch(aniUrl);
+  const data = new Uint8Array(await response.arrayBuffer());
+
+  const style = document.createElement("style");
+  style.innerText = convertAniBinaryToCSS(selector, data);
+
+  document.head.appendChild(style);
+}
+
+// 创建烟花组件
+const createFirework = (x, y) => {
+  const container = document.createElement('div');
+  const vnode = createVNode(Firework, { x, y });
+  render(vnode, container);
+  document.body.appendChild(container);
+};
+
+// 处理点击事件
+const handleClick = (e) => {
+  // 只处理左键点击
+  if (e.button === 0) {
+    createFirework(e.clientX, e.clientY);
+  }
+};
+
+onMounted(async () => {
+  // 基础指针
+  await applyCursor("body", "/src/assets/cursor/Normal.ani");
+  await applyCursor("a", "/src/assets/cursor/Link.ani");
+  await applyCursor("input, textarea", "/src/assets/cursor/Text.ani");
+  await applyCursor("button", "/src/assets/cursor/Link.ani");
+  await applyCursor(".draggable", "/src/assets/cursor/Move.ani");
+  await applyCursor(".pointer", "/src/assets/cursor/Link.ani");
+
+  // 状态指针
+  await applyCursor(".loading, .busy", "/src/assets/cursor/Busy.ani");
+  await applyCursor(".working", "/src/assets/cursor/Working.ani");
+  await applyCursor(
+    ".disabled, [disabled]",
+    "/src/assets/cursor/Unavailable.ani"
+  );
+  await applyCursor(".precision", "/src/assets/cursor/Precision.ani");
+
+  // 交互指针
+  await applyCursor(".resize-horizontal", "/src/assets/cursor/Horizontal.ani");
+  await applyCursor(".resize-vertical", "/src/assets/cursor/Vertical.ani");
+  await applyCursor(".resize-diagonal1", "/src/assets/cursor/Diagonal1.ani");
+  await applyCursor(".resize-diagonal2", "/src/assets/cursor/Diagonal2.ani");
+  await applyCursor(".alternate", "/src/assets/cursor/Alternate.ani");
+
+  // 特殊指针
+  await applyCursor(".handwriting", "/src/assets/cursor/Handwriting.ani");
+  await applyCursor(".person", "/src/assets/cursor/Person.ani");
+  await applyCursor(".pin", "/src/assets/cursor/Pin.ani");
+
+  // 添加点击事件监听
+  document.addEventListener('click', handleClick);
+
+  // 启动
+  const sakana = Sakana.init({
+    // 选项: 默认值
+    el: ".sakana-box", // 启动元素 node 或 选择器
+    character: "takina", // 启动角色 'chisato','takina'
+    inertia: 0.01, // 惯性
+    decay: 0.99, // 衰减
+    r: 60, // 启动角度
+    y: 10, // 启动高度
+    scale: .4 , // 缩放倍数
+    translateY: 0, // 位移高度
+    canSwitchCharacter: true, // 允许换角色
+  });
+
+  // 设定静音
+  Sakana.setMute(true);
+
+  // 获取静音状态
+  const { isMute } = Sakana.Voices;
+
+  // 设定归零角度
+  sakana.setOriginRotate(10);
+
+  // 获取角色运行状态
+  const v = sakana.getValue();
+
+  // 确保运行
+  sakana.confirmRunning();
+
+  // 切换角色
+  sakana.switchCharacter();
+
+  // 暂停动作
+  sakana.pause();
+
+  // 恢复动作
+  sakana.play();
+
+  // 切换特定角色
+  sakana.setCharacter("chisato");
+});
+
+onUnmounted(() => {
+  // 移除点击事件监听
+  document.removeEventListener('click', handleClick);
+});
 </script>
 
 <template>
@@ -8,6 +119,7 @@ import Header from './components/Header.vue';
     <div class="main-content">
       <router-view></router-view>
     </div>
+    <div class="sakana-box"></div>
   </div>
 </template>
 
@@ -18,6 +130,13 @@ import Header from './components/Header.vue';
   list-style: none;
   /* 自动换行 */
   word-break: break-all;
+}
+
+.app .sakana-box {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  transform-origin: 100% 100%; /* 从右下开始变换 */
 }
 
 /* 滚动条样式 */
@@ -54,7 +173,7 @@ input {
   padding: 0;
 }
 
-input[type='checkbox'] {
+input[type="checkbox"] {
   width: 16px;
   height: 16px;
 }
@@ -75,7 +194,7 @@ input[type='checkbox'] {
   --fw-500: 500;
 
   /* font-family */
-  --ff-llt: 'llt', llt;
+  --ff-llt: "llt", llt;
 
   /* color */
   --info-dark: #7d8da1;
@@ -146,15 +265,15 @@ input[type='checkbox'] {
 }
 
 @font-face {
-  font-family: 'llt';
-  src: url('./assets/fonts/萝莉体 第二版.ttc');
+  font-family: "llt";
+  src: url("./assets/fonts/萝莉体 第二版.ttc");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
 .material-icons-sharp {
-  font-family: 'Material Icons Sharp';
+  font-family: "Material Icons Sharp";
   font-weight: normal;
   font-style: normal;
   font-size: 24px;
@@ -170,5 +289,21 @@ input[type='checkbox'] {
 
 .app {
   font-family: var(--ff-llt);
+}
+
+/* 禁止双击选中 */
+* {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* 允许输入框和文本域选中 */
+input, textarea {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
 }
 </style>

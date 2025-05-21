@@ -1,11 +1,95 @@
 <script setup>
 import { useBlogStore } from "../stores/blogStore";
-import { ref, onMounted, onUnmounted } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
+import { ref, onMounted, onUnmounted } from "vue";
+import { useRouter, useRoute } from "vue-router";
+import { debounce } from "../utils";
 
 const blogStore = useBlogStore();
 const router = useRouter();
 const route = useRoute();
+
+// 背景图数组
+const backgroundImages = [
+  "https://kirii.online/20250514-003324.jpeg",
+  "https://kirii.online/20250520-232650.webp",
+  "https://kirii.online/20250514-214947.webp",
+  "https://kirii.online/20250514-210152.jpg",
+  "https://kirii.online/20250514-205217.png",
+  "https://kirii.online/20250514-205211.png",
+  "https://kirii.online/20250514-205124.png",
+  "https://kirii.online/20250514-205120.png",
+  "https://kirii.online/20250514-205017.png",
+  "https://kirii.online/20250514-205111.png",
+  "https://kirii.online/20250514-003320.jpeg",
+  "https://kirii.online/20250514-003317.jpeg",
+  "https://kirii.online/20250514-003315.jpeg",
+  "https://kirii.online/20250514-003311.jpeg",
+  "https://kirii.online/20250514-001113.jpg",
+  "https://kirii.online/20250514-001112.jpg",
+  "https://kirii.online/20250521-210953.webp",
+  "https://kirii.online/20250521-211301.webp",
+  "https://kirii.online/20250521-211146.webp",
+  "https://kirii.online/20250521-211142.webp",
+  "https://kirii.online/20250521-211134.webp",
+  "https://kirii.online/20250521-211128.webp",
+  "https://kirii.online/20250521-211113.webp",
+  "https://kirii.online/20250521-211610.webp",
+  "https://kirii.online/20250521-211603.webp",
+  "https://kirii.online/20250521-211541.webp",
+  "https://kirii.online/20250521-211536.webp",
+  "https://kirii.online/20250521-211528.webp",
+  "https://kirii.online/20250521-211358.webp"
+];
+
+const currentBgIndex = ref(0);
+const backgroundImageContainer = ref(null);
+const preloadedImages = ref(new Set());
+
+// 预加载图片
+const preloadImage = (url) => {
+  if (preloadedImages.value.has(url)) return;
+  
+  const img = new Image();
+  img.src = url;
+  img.onload = () => {
+    preloadedImages.value.add(url);
+  };
+};
+
+// 预加载所有图片
+const preloadAllImages = () => {
+  backgroundImages.forEach(url => preloadImage(url));
+};
+
+// 随机切换背景图
+const changeBackground = debounce(() => {
+  let newIndex;
+  do {
+    newIndex = Math.floor(Math.random() * backgroundImages.length);
+  } while (newIndex === currentBgIndex.value);
+  
+  currentBgIndex.value = newIndex;
+  if (backgroundImageContainer.value) {
+    const newImage = backgroundImages[newIndex];
+    // 确保新图片已预加载
+    if (!preloadedImages.value.has(newImage)) {
+      preloadImage(newImage);
+    }
+    
+    backgroundImageContainer.value.style.backgroundImage = `linear-gradient(
+      to right,
+      var(--light-white) 0%,
+      rgba(255, 255, 255, 0.8) 5%,
+      rgba(255, 255, 255, 0) 20%
+    ),
+    url('${newImage}')`;
+  }
+}, 300); // 300ms 的防抖延迟
+
+onMounted(() => {
+  // 预加载所有图片
+  preloadAllImages();
+});
 </script>
 
 <template>
@@ -33,8 +117,12 @@ const route = useRoute();
         </div>
 
         <!-- 右侧3/4：背景图 -->
-        <div class="background-image-container">
-          <!-- 背景图片在CSS中设置 -->
+        <div class="background-image-container" ref="backgroundImageContainer">
+          <div class="refresh-button-container">
+            <button class="refresh-button" @click="changeBackground">
+              <span class="material-icons-sharp">refresh</span>
+            </button>
+          </div>
         </div>
       </div>
     </section>
@@ -45,7 +133,8 @@ const route = useRoute();
         <!-- 左侧：个人介绍和技术栈 -->
         <div class="left-content">
           <h2 class="readme-title">
-            Hello <span class="wave-emoji">
+            Hello
+            <span class="wave-emoji">
               <span class="material-icons-sharp">waving_hand</span>
             </span>
           </h2>
@@ -67,7 +156,8 @@ const route = useRoute();
             <li class="info-item">
               <span class="bullet">•</span>
               <span>
-                <span class="material-icons-sharp">chat</span> 如果你有疑问，可以联系我
+                <span class="material-icons-sharp">chat</span>
+                如果你有疑问，可以联系我
               </span>
               <span class="email-link">273390867@qq.com</span>
             </li>
@@ -100,7 +190,9 @@ const route = useRoute();
             <ul class="about-list">
               <li class="about-item">
                 <span class="bullet">•</span>
-                <a href="https://github.com/ttissunset" class="about-link">我的github</a>
+                <a href="https://github.com/ttissunset" class="about-link"
+                  >我的github</a
+                >
               </li>
               <li class="about-item">
                 <span class="bullet">•</span>
@@ -169,19 +261,24 @@ const route = useRoute();
         <div class="right-content">
           <!-- 动漫图片容器 -->
           <div class="anime-container">
-            <img src="../assets/l2d.webp" alt="Anime character" class="anime-image" />
+            <img
+              src="../assets/l2d.webp"
+              alt="Anime character"
+              class="anime-image"
+            />
           </div>
 
           <!-- 友好信息 -->
           <div class="friendly-message">
             <p>
-              I love to make friends, so if you want to say hi, I'll be
-              happy to meet you more! 😊
+              I love to make friends, so if you want to say hi, I'll be happy to
+              meet you more! 😊
             </p>
             <p class="from-text">
               <span class="wave-emoji">
                 <span class="material-icons-sharp">waving_hand</span>
-              </span> From
+              </span>
+              From
               <a href="#" class="author-link">Kiri</a>
             </p>
           </div>
@@ -242,11 +339,12 @@ const route = useRoute();
       rgba(255, 255, 255, 0.8) 5%,
       rgba(255, 255, 255, 0) 20%
     ),
-    url('../assets/00_01.jpg');
+    url("https://kirii.online/20250514-003324.jpeg");
   background-size: cover;
   background-position: center;
   position: relative;
   margin-left: -1px;
+  transition: background-image 0.5s ease;
 }
 
 /* 头像部分样式 */
@@ -756,5 +854,74 @@ const route = useRoute();
     width: 100%;
     height: 50vh;
   }
+}
+
+/* 刷新按钮样式 */
+.refresh-button-container {
+  position: absolute;
+  bottom: 20px;
+  right: 50%;
+  transform: translateX(50%);
+}
+
+.refresh-button {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: var(--light-white);
+  border: none;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0px 0px 0px 4px rgba(180, 160, 255, 0.253);
+  transition-duration: 0.3s;
+  overflow: hidden;
+  position: relative;
+}
+
+.refresh-button .material-icons-sharp {
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--blue-crayola);
+  transition-duration: 0.3s;
+}
+
+.refresh-text {
+  position: absolute;
+  bottom: -20px;
+  color: var(--blue-crayola);
+  font-size: 13px;
+  opacity: 0;
+  transition-duration: 0.3s;
+}
+
+.refresh-button:hover {
+  width: 120px;
+  border-radius: 50px;
+  transition-duration: 0.3s;
+  align-items: center;
+  background-color: var(--youth-blue-2);
+}
+
+.refresh-button:hover .material-icons-sharp {
+  transition-duration: 0.3s;
+  transform: translateY(-200%);
+}
+
+.refresh-button::before {
+  position: absolute;
+  bottom: -20px;
+  content: "“换个口味”";
+  color: var(--blue-crayola);
+  /* transition-duration: .3s; */
+  font-size: 0px;
+}
+
+.refresh-button:hover::before {
+  font-size: 13px;
+  opacity: 1;
+  bottom: unset;
+  transition-duration: 0.3s;
 }
 </style>

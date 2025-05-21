@@ -10,16 +10,12 @@ const isRopeAppear = ref(false);    // 抽绳出现动画
 const showHeader = () => {
   isHeaderVisible.value = true;
   isRopeVisible.value = false;
+  isRopeAppear.value = false;
 };
 const hideHeader = () => {
   isHeaderVisible.value = false;
   isRopeVisible.value = true;
-  nextTick(() => {
-    isRopeAppear.value = false;
-    setTimeout(() => {
-      isRopeAppear.value = true;
-    }, 10);
-  });
+  isRopeAppear.value = true;
 };
 
 const pullRope = async () => {
@@ -28,8 +24,7 @@ const pullRope = async () => {
   setTimeout(() => {
     isRopePulling.value = false;
     showHeader();
-    isRopeAppear.value = false;
-  }, 500); // 抽绳动画持续0.5s
+  }, 200); // 与动画时间保持一致
 };
 
 const handleScroll = () => {
@@ -71,6 +66,7 @@ onBeforeUnmount(() => {
             <li><router-link to="/gallery">相册</router-link></li>
             <li><router-link to="/blog">文章</router-link></li>
             <li><router-link to="/archive">归档</router-link></li>
+            <li><router-link to="/blog">随记</router-link></li>
           </ul>
         </nav>
       </div>
@@ -97,21 +93,19 @@ onBeforeUnmount(() => {
 .side-header {
   position: fixed;
   top: 0;
-  left: 150px;
-  width: 25vw;
-  max-width: 480px;
-  min-width: 220px;
+  left: 50px;
+  width: 20vw;
   height: 100px;
   background: rgba(255, 255, 255, 0.85);
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
   border-radius: 0 0 24px 0;
   z-index: 200;
   transform: translateY(-100%);
-  transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1), background 0.4s;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), background 0.4s;
   display: flex;
   align-items: flex-start;
   justify-content: flex-start;
-  padding: 0 32px;
+  padding: 0 20px;
 }
 .side-header.visible {
   transform: translateY(0);
@@ -169,8 +163,7 @@ onBeforeUnmount(() => {
   flex-direction: column;
   align-items: center;
   cursor: pointer;
-  transition: none;
-  /* 绳子动画控制 */
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .header-rope .rope-line {
   width: 3px;
@@ -178,14 +171,14 @@ onBeforeUnmount(() => {
   border-radius: 2px;
   margin: 0 auto;
   height: 0;
-  transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .header-rope.rope-appear .rope-line {
   height: 60px;
 }
 .header-rope.pulling .rope-line {
   height: 120px;
-  transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .header-rope .bulb-wrap {
   display: flex;
@@ -193,15 +186,16 @@ onBeforeUnmount(() => {
   align-items: center;
   opacity: 0;
   transform: translateY(-16px);
-  transition: opacity 0.3s 0.5s, transform 0.3s 0.5s;
+  transition: opacity 0.3s, transform 0.3s;
 }
 .header-rope.rope-appear .bulb-wrap {
   opacity: 1;
   transform: translateY(0);
+  transition: opacity 0.3s 0.3s, transform 0.3s 0.3s;
 }
 .header-rope.pulling .bulb-wrap {
-  transition: transform 0.5s;
-  transform: translateY(60px);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateY(-100%);
 }
 .header-rope .bulb {
   width: 32px;
@@ -263,18 +257,7 @@ onBeforeUnmount(() => {
 }
 
 .header-rope.pulling {
-  animation: rope-pull 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
-@keyframes rope-pull {
-  0% {
-    transform: translateY(0);
-  }
-  40% {
-    transform: translateY(40px);
-  }
-  100% {
-    transform: translateY(-100%);
-  }
+  transform: translateY(-100%);
 }
 
 @media (max-width: 900px) {

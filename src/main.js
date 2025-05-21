@@ -9,12 +9,6 @@ const pinia = createPinia()
 app.use(pinia)
 app.use(router)
 
-// 创建一个全局组件用于Material Icons
-app.component('MaterialIcon', {
-  props: ['icon'],
-  template: '<span class="material-icons-sharp">{{ icon }}</span>'
-})
-
 // 禁用右键点击
 document.addEventListener('contextmenu', (e) => {
   e.preventDefault();

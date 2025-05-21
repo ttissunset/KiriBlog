@@ -4,17 +4,17 @@
       <!-- 返回博客列表 -->
       <div class="back-to-blog">
         <router-link to="/blog" class="back-button">
-          <MaterialIcon icon="arrow_back" />
+          <span class="material-icons-sharp">arrow_back</span>
           <span>返回列表</span>
         </router-link>
 
         <div class="export-buttons">
           <button class="export-button" @click="exportToPDF" title="导出为PDF">
-            <MaterialIcon icon="picture_as_pdf" />
+            <span class="material-icons-sharp">picture_as_pdf</span>
             <span>PDF</span>
           </button>
           <button class="export-button" @click="exportToMarkdown" title="导出为Markdown">
-            <MaterialIcon icon="download" />
+            <span class="material-icons-sharp">download</span>
             <span>Markdown</span>
           </button>
         </div>
@@ -26,21 +26,21 @@
         <div class="article-progress-container">
           <div class="article-progress-bar" ref="progressBar"></div>
         </div>
-        
+
         <header class="article-header">
           <h1 class="article-title">{{ article.title }}</h1>
           <div class="article-meta">
             <div class="meta-item">
               <span class="meta-icon">
-                <MaterialIcon icon="calendar_today" />
+                <span class="material-icons-sharp">calendar_today</span>
               </span>
               <span class="meta-text">{{
                 formatDateTime(article.createdAt)
               }}</span>
               <span class="meta-separator">•</span>
               <span class="meta-icon">
-                <MaterialIcon icon="folder" />
-            </span>
+                <span class="material-icons-sharp">folder</span>
+              </span>
               <router-link :to="{ name: 'blog', query: { category: article.category } }" class="category-link">
                 {{ article.category }}
               </router-link>
@@ -48,13 +48,13 @@
             <span class="detail-separator">•</span>
             <div class="meta-author">
               <span class="author-icon">
-                <MaterialIcon icon="person" />
-            </span>
+                <span class="material-icons-sharp">person</span>
+              </span>
               <span class="author-name">{{ article.author || "Kiri" }}</span>
               <span class="detail-separator">•</span>
               <span class="time-icon">
-                <MaterialIcon icon="access_time" />
-            </span>
+                <span class="material-icons-sharp">access_time</span>
+              </span>
               <span class="time-text">预计阅读时间{{ calculateReadingTime(article.content) }}分钟</span>
             </div>
           </div>
@@ -66,39 +66,39 @@
               {{ article.summary }}
             </div>
 
-        <div class="ai-summary" :class="{ expanded: isSummaryExpanded }">
-          <div class="summary-header">
+            <div class="ai-summary" :class="{ expanded: isSummaryExpanded }">
+              <div class="summary-header">
                 <span class="summary-icon">
-                  <MaterialIcon icon="star" />
+                  <span class="material-icons-sharp">star</span>
                 </span>
                 <span class="summary-title">AI摘要</span>
                 <span class="summary-powered">由AI提供</span>
-          </div>
-          <div class="summary-content">
-            <p>时光如镜映代码，云舟载梦启航程。</p>
-            <p>星火轻盈燃运维，容器万千纳轻舟。</p>
-            <div v-if="isSummaryExpanded" class="summary-full-content">
-              <p>
-                云计算是一种通过互联网提供计算服务的模式，它允许用户在不拥有实际物理设备的情况下，通过网络按需访问计算资源。
-              </p>
-              <p>
-                容器技术如Docker简化了应用程序部署流程，使应用能够运行在任何支持容器的环境中，无需考虑底层系统配置差异。
-              </p>
-              <p>
-                本文将探讨Docker容器技术的核心概念、实际应用场景及部署最佳实践，帮助开发者充分利用容器化技术优势。
-              </p>
-            </div>
-          </div>
-          <div class="summary-more">
+              </div>
+              <div class="summary-content">
+                <p>时光如镜映代码，云舟载梦启航程。</p>
+                <p>星火轻盈燃运维，容器万千纳轻舟。</p>
+                <div v-if="isSummaryExpanded" class="summary-full-content">
+                  <p>
+                    云计算是一种通过互联网提供计算服务的模式，它允许用户在不拥有实际物理设备的情况下，通过网络按需访问计算资源。
+                  </p>
+                  <p>
+                    容器技术如Docker简化了应用程序部署流程，使应用能够运行在任何支持容器的环境中，无需考虑底层系统配置差异。
+                  </p>
+                  <p>
+                    本文将探讨Docker容器技术的核心概念、实际应用场景及部署最佳实践，帮助开发者充分利用容器化技术优势。
+                  </p>
+                </div>
+              </div>
+              <div class="summary-more">
                 <span v-if="!isSummaryExpanded">开发 ≠ 搬运。不学习底层原理你永远不知道...</span>
                 <button class="show-more-btn" @click="toggleSummary" style="margin-left: auto">
                   <span class="arrow-icon" :class="{ up: isSummaryExpanded }">
-                    <MaterialIcon icon="expand_more" />
+                    <span class="material-icons-sharp">expand_more</span>
                   </span>
                   {{ isSummaryExpanded ? "显示更少" : "显示更多" }}
-            </button>
-          </div>
-        </div>
+                </button>
+              </div>
+            </div>
 
             <!-- 使用动态组件渲染Markdown内容，支持代码块 -->
             <div v-if="processedContent.length > 0" class="markdown-body">
@@ -109,17 +109,17 @@
             </div>
             <div v-else class="markdown-body" v-html="renderedContent"></div>
 
-        <div class="article-footer">
-          <div class="article-tags">
+            <div class="article-footer">
+              <div class="article-tags">
                 <span class="tags-label">标签</span>
                 <router-link v-for="tag in article.tags" :key="tag" :to="{ name: 'blog', query: { tag } }" class="article-tag">
                   #{{ tag }}
-            </router-link>
-          </div>
+                </router-link>
+              </div>
 
               <div class="article-views">
                 <span class="views-icon">
-                  <MaterialIcon icon="visibility" />
+                  <span class="material-icons-sharp">visibility</span>
                 </span>
                 <span class="views-count">{{ article.views }} 次浏览</span>
               </div>
@@ -140,7 +140,7 @@
 
           <!-- 移动端悬浮目录按钮 -->
           <div class="mobile-toc-button" @click="toggleToc" v-if="tableOfContents.length > 0">
-            <MaterialIcon icon="menu" />
+            <span class="material-icons-sharp">menu</span>
           </div>
 
           <!-- 移动端目录弹出层 -->
@@ -150,7 +150,7 @@
               <div class="mobile-toc-header">
                 <h3 class="toc-title">目录</h3>
                 <button @click="toggleToc" class="close-toc-btn">
-                  <MaterialIcon icon="close" />
+                  <span class="material-icons-sharp">close</span>
                 </button>
               </div>
               <ul class="toc-list">
@@ -195,7 +195,7 @@
             </div>
           </div>
         </div>
-          </div>
+      </div>
     </div>
     <div v-else class="article-not-found">
       <h1>文章未找到</h1>
@@ -220,7 +220,7 @@ const processMarkdown = (markdown) => {
   if (!markdown || typeof markdown !== "string") {
     return [];
   }
-  
+
   try {
     const result = [];
     let lastIndex = 0;
@@ -276,29 +276,29 @@ const renderTextContent = (text) => {
     if (imgMatches) {
       console.log('找到图片语法:', imgMatches.length, imgMatches);
     }
-    
+
     // 处理标题 (h1 - h6)
     let html = text.replace(/^(#{1,6})\s+(.+)$/gm, (match, hashes, content) => {
       const level = hashes.length;
       const id = content.toLowerCase().replace(/[^\w]+/g, "-");
       return `<h${level} id="${id}">${content}</h${level}>`;
     });
-    
+
     // 处理粗体
     html = html.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
-    
+
     // 处理斜体
     html = html.replace(/\*(.+?)\*/g, "<em>$1</em>");
-    
+
     // 重要：先处理图片语法，避免与链接语法冲突
     // 图片语法：![alt](url)
     html = html.replace(/!\[(.*?)\]\((.*?)\)/g, (match, alt, url) => {
       try {
         const safeUrl = url.trim();
         const safeAlt = (alt || '').trim() || '图片';
-        
+
         console.log('处理图片:', { match, alt: safeAlt, url: safeUrl });
-        
+
         return `
           <figure class="article-image-wrapper">
             <img src="${safeUrl}" alt="${safeAlt}" class="article-image" title="${safeAlt}">
@@ -309,36 +309,36 @@ const renderTextContent = (text) => {
         return `<img src="${url}" alt="${alt || '图片'}" class="fallback-image">`;
       }
     });
-    
+
     // 处理链接 [text](url)
     html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, text, url) => {
       const safeUrl = url.trim();
       const safeText = text.trim();
       return `<a href="${safeUrl}" target="_blank">${safeText}</a>`;
     });
-    
+
     // 继续其他处理...
     // 处理行内代码
     html = html.replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>');
-    
+
     // 处理分割线
     html = html.replace(/^---$/gm, '<hr class="markdown-hr">');
-    
+
     // 处理引用块
     html = html.replace(/^>\s(.+)$/gm, "<blockquote class=\"highlighted-quote\">$1</blockquote>");
-    
+
     // 处理表格
     if (html.includes('|')) {
       // 改进的表格正则表达式，更精确地匹配Markdown表格结构
       const tableRegex = /(?:^\|.+\|[ \t]*$[\r\n]+^\|[-:| \t]+\|[ \t]*$[\r\n]+(^\|.+\|[ \t]*$[\r\n]+)+)/gm;
-      
+
       html = html.replace(tableRegex, (match) => {
         // 确保表格数据正确传递
         console.log('匹配到表格:', match);
         return `<div class="table-component-wrapper" data-markdown-table="${encodeURIComponent(match)}"></div>`;
       });
     }
-    
+
     // 处理无序列表 (先标记项目，后包装列表)
     const ulMatch = html.match(/^[\*\-]\s(.+)$/gm);
     if (ulMatch) {
@@ -348,11 +348,11 @@ const renderTextContent = (text) => {
       html = html.replace(/^[\*\-]\s(.+)$/gm, (match) => {
         return `<li>${match.replace(/^[\*\-]\s/, "")}</li>`;
       });
-      
+
       // 将连续的<li>元素用<ul>包裹
       html = html.replace(/(<li>[\s\S]+?<\/li>)(?!\s*<li>)/g, "<ul class=\"markdown-list\">$1</ul>");
     }
-    
+
     // 处理有序列表
     const olMatch = html.match(/^\d+\.\s(.+)$/gm);
     if (olMatch) {
@@ -362,17 +362,17 @@ const renderTextContent = (text) => {
       html = html.replace(/^\d+\.\s(.+)$/gm, (match) => {
         return `<li>${match.replace(/^\d+\.\s/, "")}</li>`;
       });
-      
+
       // 将连续的<li>元素用<ol>包裹
       html = html.replace(/(<li>[\s\S]+?<\/li>)(?!\s*<li>)/g, "<ol class=\"markdown-list\">$1</ol>");
     }
-    
+
     // 处理段落 (对非标签开头的行添加段落标签)
     html = html.replace(/^(?!<[a-z]).+$/gm, "<p>$&</p>");
-    
+
     // 替换换行符为实际的换行
     html = html.replace(/\n/g, "");
-    
+
     // 使用DOMPurify清理HTML，防止XSS攻击
     return DOMPurify.sanitize(html);
   } catch (error) {
@@ -401,22 +401,22 @@ const generateTableOfContents = () => {
   // 需要等待DOM渲染完成
   setTimeout(() => {
     const headings = document.querySelectorAll('.markdown-body h1, .markdown-body h2, .markdown-body h3, .markdown-body h4, .markdown-body h5, .markdown-body h6');
-    
+
     if (headings.length === 0) return;
-    
+
     const contents = [];
     headingElements.value = Array.from(headings);
-    
+
     headingElements.value.forEach(heading => {
       const level = parseInt(heading.tagName.substring(1));
       const text = heading.textContent;
       const id = heading.id || text.toLowerCase().replace(/[^\w]+/g, '-');
-      
+
       // 确保每个标题都有ID，以便能够跳转
       if (!heading.id) {
         heading.id = id;
       }
-      
+
       contents.push({
         level,
         text,
@@ -424,7 +424,7 @@ const generateTableOfContents = () => {
         isActive: false
       });
     });
-    
+
     tableOfContents.value = contents;
   }, 100);
 };
@@ -440,24 +440,24 @@ const scrollToHeading = (headingId) => {
 // 更新阅读进度条和目录高亮
 const updateProgress = () => {
   if (!progressBar.value) return;
-  
+
   // 计算滚动百分比
   const scrollPosition = window.scrollY;
   const documentHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
   const scrollPercentage = (scrollPosition / documentHeight) * 100;
-  
+
   // 更新进度条
   progressBar.value.style.width = `${scrollPercentage}%`;
-  
+
   // 更新目录高亮
   if (headingElements.value.length > 0) {
     // 找到当前视口中的标题
     let currentHeadingIndex = -1;
-    
+
     for (let i = 0; i < headingElements.value.length; i++) {
       const heading = headingElements.value[i];
       const rect = heading.getBoundingClientRect();
-      
+
       // 认为标题进入视口顶部100px内就是当前位置
       if (rect.top <= 100) {
         currentHeadingIndex = i;
@@ -465,7 +465,7 @@ const updateProgress = () => {
         break;
       }
     }
-    
+
     // 更新目录激活状态
     tableOfContents.value.forEach((item, index) => {
       item.isActive = index === currentHeadingIndex;
@@ -542,13 +542,13 @@ onMounted(() => {
   if (article.value) {
     blogStore.incrementArticleViews(articleId.value);
   }
-  
+
   // 处理图片点击事件，添加放大查看功能
   setTimeout(() => {
     document.querySelectorAll('.article-image').forEach(img => {
       img.addEventListener('click', (e) => {
         e.preventDefault();
-        
+
         // 创建放大查看容器
         const viewer = document.createElement('div');
         viewer.className = 'image-viewer-overlay';
@@ -563,18 +563,18 @@ onMounted(() => {
             </button>
           </div>
         `;
-        
+
         document.body.appendChild(viewer);
-        
+
         // 禁止背景滚动
         document.body.style.overflow = 'hidden';
-        
+
         // 添加关闭事件
         viewer.querySelector('.image-viewer-close').addEventListener('click', () => {
           document.body.removeChild(viewer);
           document.body.style.overflow = '';
         });
-        
+
         // 点击背景关闭
         viewer.addEventListener('click', (e) => {
           if (e.target === viewer) {
@@ -582,7 +582,7 @@ onMounted(() => {
             document.body.style.overflow = '';
           }
         });
-        
+
         // 添加保存事件
         viewer.querySelector('.image-viewer-save').addEventListener('click', () => {
           window.saveImage(img.src, img.alt);
@@ -597,15 +597,15 @@ onMounted(() => {
       try {
         const markdownTable = decodeURIComponent(wrapper.getAttribute('data-markdown-table'));
         console.log('解码后的表格数据:', markdownTable);
-        
+
         // 清理表格数据，移除可能干扰解析的前后空白
         const cleanedTable = markdownTable.trim();
-        
+
         // 创建TableViewer组件实例
         const app = createApp(TableViewer, {
           markdown: cleanedTable
         });
-        
+
         // 挂载组件
         const mountElement = document.createElement('div');
         wrapper.innerHTML = ''; // 清空原有内容
@@ -620,30 +620,30 @@ onMounted(() => {
       }
     });
   }, 100);
-  
+
   // 添加复制代码的全局函数
   window.copyCode = (button) => {
     // 找到代码内容
     const codeWrapper = button.closest(".code-block-wrapper");
     const lineContents = codeWrapper.querySelectorAll(".line-content");
-    
+
     // 从各行内容中提取纯文本
     const codeText = Array.from(lineContents)
       .map((line) => line.textContent)
       .join("\n");
-    
+
     // 复制到剪贴板
     navigator.clipboard
       .writeText(codeText)
       .then(() => {
-      const originalIcon = button.innerHTML;
-      button.innerHTML = `
+        const originalIcon = button.innerHTML;
+        button.innerHTML = `
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#28a745" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="20 6 9 17 4 12"></polyline>
         </svg>
       `;
         button.classList.add("copied");
-        
+
         // 显示成功提示 - 使用全局toast
         if (window.$toast) {
           window.$toast.success("代码已复制到剪贴板", {
@@ -653,11 +653,11 @@ onMounted(() => {
           // 使用备用方法
           showSimpleToast("代码已复制到剪贴板", "success");
         }
-      
-      setTimeout(() => {
-        button.innerHTML = originalIcon;
+
+        setTimeout(() => {
+          button.innerHTML = originalIcon;
           button.classList.remove("copied");
-      }, 2000);
+        }, 2000);
       })
       .catch((err) => {
         console.error("复制失败:", err);
@@ -668,9 +668,9 @@ onMounted(() => {
         } else {
           showSimpleToast("复制失败，请手动复制", "error");
         }
-    });
+      });
   };
-  
+
   // 添加保存图片的全局函数
   window.saveImage = (url, filename) => {
     try {
@@ -682,27 +682,27 @@ onMounted(() => {
           const pathname = urlObj.pathname;
           const parts = pathname.split('/');
           let name = parts[parts.length - 1];
-          
+
           // 移除查询参数
           if (name.includes('?')) {
             name = name.split('?')[0];
           }
-          
+
           // 确保有扩展名
           if (!name.includes('.')) {
             name += '.jpg'; // 默认扩展名
           }
-          
+
           return name || (filename ? `${filename}.jpg` : 'image.jpg');
         } catch (e) {
           console.error('URL解析错误:', e);
           return filename ? `${filename}.jpg` : 'image.jpg';
         }
       };
-      
+
       const imgFilename = extractFilename(url);
       console.log('保存图片:', { url, filename: imgFilename });
-      
+
       // 创建链接元素
       fetch(url)
         .then(response => {
@@ -714,22 +714,22 @@ onMounted(() => {
         .then(blob => {
           // 创建临时URL
           const blobUrl = URL.createObjectURL(blob);
-          
+
           // 创建下载链接
           const link = document.createElement('a');
           link.href = blobUrl;
           link.download = imgFilename;
           document.body.appendChild(link);
-          
+
           // 触发下载
           link.click();
-          
+
           // 清理
           setTimeout(() => {
             URL.revokeObjectURL(blobUrl);
             document.body.removeChild(link);
           }, 100);
-          
+
           // 显示成功提示
           if (window.$toast) {
             window.$toast.success(`图片 "${imgFilename}" 已保存`, {
@@ -757,13 +757,13 @@ onMounted(() => {
       showSimpleToast("图片保存出错，请稍后重试", "error");
     }
   };
-  
+
   // 生成文章大纲
   generateTableOfContents();
-  
+
   // 监听滚动事件，更新阅读进度
   window.addEventListener('scroll', updateProgress);
-  
+
   // 初始更新一次进度
   updateProgress();
 });
@@ -780,37 +780,37 @@ const showSimpleToast = (message, type = 'info') => {
     const instance = getCurrentInstance();
     if (instance && instance.appContext && instance.appContext.config.globalProperties.$toast) {
       instance.appContext.config.globalProperties.$toast[type](message, {
-        title: type === 'success' ? '成功' : 
-               type === 'error' ? '错误' : 
-               type === 'warning' ? '警告' : '提示'
+        title: type === 'success' ? '成功' :
+          type === 'error' ? '错误' :
+            type === 'warning' ? '警告' : '提示'
       });
       return;
     }
   } catch (err) {
     console.error("无法使用全局toast服务，降级使用内联toast:", err);
   }
-  
+
   // 备用方案 - 创建一个简单的提示元素
   const toast = document.createElement('div');
   toast.style.position = 'fixed';
   toast.style.top = '20px';
   toast.style.right = '20px';
   toast.style.padding = '12px 16px';
-  toast.style.background = type === 'success' ? '#f0f9eb' : 
-                         type === 'error' ? '#fef0f0' : 
-                         type === 'warning' ? '#fdf6ec' : '#f4f4f5';
+  toast.style.background = type === 'success' ? '#f0f9eb' :
+    type === 'error' ? '#fef0f0' :
+      type === 'warning' ? '#fdf6ec' : '#f4f4f5';
   toast.style.color = '#606266';
-  toast.style.borderLeft = type === 'success' ? '4px solid #67c23a' : 
-                         type === 'error' ? '4px solid #f56c6c' : 
-                         type === 'warning' ? '4px solid #e6a23c' : '4px solid #909399';
+  toast.style.borderLeft = type === 'success' ? '4px solid #67c23a' :
+    type === 'error' ? '4px solid #f56c6c' :
+      type === 'warning' ? '4px solid #e6a23c' : '4px solid #909399';
   toast.style.borderRadius = '8px';
   toast.style.boxShadow = '0 2px 12px rgba(0,0,0,0.1)';
   toast.style.zIndex = '9999';
   toast.style.transition = 'all 0.3s';
   toast.innerText = message;
-  
+
   document.body.appendChild(toast);
-  
+
   // 3秒后移除
   setTimeout(() => {
     toast.style.opacity = '0';
@@ -832,7 +832,7 @@ const exportToPDF = () => {
   element.innerHTML = `
     <div style="padding: 20px; font-family: Arial, sans-serif;">
       <h1 style="text-align: center; margin-bottom: 20px;">${article.value.title
-      }</h1>
+    }</h1>
       <div style="color: #666; text-align: center; margin-bottom: 10px;">
         作者: ${article.value.author || "Kiri"} | 
         发布时间: ${formatDateTime(article.value.createdAt)}
@@ -887,7 +887,7 @@ const exportToMarkdown = () => {
   // 构建Markdown内容
   let markdownContent = `# ${article.value.title}\n\n`;
   markdownContent += `> 作者: ${article.value.author || "Kiri"
-  } | 发布时间: ${formatDateTime(article.value.createdAt)}\n\n`;
+    } | 发布时间: ${formatDateTime(article.value.createdAt)}\n\n`;
   markdownContent += `**摘要:** ${article.value.summary}\n\n`;
 
   // 添加分类和标签
@@ -906,7 +906,7 @@ const exportToMarkdown = () => {
     type: "text/markdown;charset=utf-8",
   });
   saveAs(blob, `${article.value.title.replace(/\s+/g, "_")}.md`);
-  
+
   // 显示成功提示
   try {
     const instance = getCurrentInstance();
@@ -934,16 +934,16 @@ watch(() => route.params.id, () => {
 // 添加一个表格回退渲染函数
 const renderFallbackTable = (markdown) => {
   const rows = markdown.split(/[\r\n]+/).filter(row => row.trim() !== '');
-  
+
   if (rows.length < 3) return markdown; // 需要至少有表头、分隔符和一行数据
-  
+
   // 处理表头行
   const headerRow = rows[0];
   const headers = headerRow
     .split('|')
     .filter((cell, index, array) => index > 0 && index < array.length - 1) // 去除首尾空单元格
     .map(cell => cell.trim());
-  
+
   // 处理分隔行，确定列对齐方式
   const alignmentRow = rows[1];
   const alignments = alignmentRow
@@ -952,18 +952,18 @@ const renderFallbackTable = (markdown) => {
     .map(cell => {
       const trimmed = cell.trim();
       if (!trimmed || trimmed.length === 0) return 'left';
-      
+
       if (trimmed.startsWith(':') && trimmed.endsWith(':')) return 'center';
       if (trimmed.endsWith(':')) return 'right';
       return 'left';
     });
-  
+
   // 处理数据行
   const dataRows = rows.slice(2);
-  
+
   // 构建表格HTML
   let tableHTML = '<div class="markdown-table-container"><table class="markdown-table">';
-  
+
   // 添加表头
   tableHTML += '<thead><tr>';
   headers.forEach((header, index) => {
@@ -971,7 +971,7 @@ const renderFallbackTable = (markdown) => {
     tableHTML += `<th style="text-align:${align}">${header}</th>`;
   });
   tableHTML += '</tr></thead>';
-  
+
   // 添加表格内容
   tableHTML += '<tbody>';
   dataRows.forEach(row => {
@@ -980,14 +980,14 @@ const renderFallbackTable = (markdown) => {
       .split('|')
       .filter((cell, index, array) => index > 0 && index < array.length - 1)
       .map(cell => cell.trim());
-    
+
     cells.forEach((cell, index) => {
       const align = alignments[index] || 'left';
       tableHTML += `<td style="text-align:${align}">${cell}</td>`;
     });
     tableHTML += '</tr>';
   });
-  
+
   tableHTML += '</tbody></table></div>';
   return tableHTML;
 };
@@ -1768,10 +1768,10 @@ const renderFallbackTable = (markdown) => {
 
 @media (max-width: 768px) {
   .back-to-blog {
-  flex-direction: column;
+    flex-direction: column;
     align-items: flex-start;
-  gap: 15px;
-}
+    gap: 15px;
+  }
 
   .export-buttons {
     width: 100%;
@@ -2095,7 +2095,7 @@ const renderFallbackTable = (markdown) => {
   .desktop-toc {
     display: none;
   }
-  
+
   .article-content {
     margin-right: 0;
   }
@@ -2103,7 +2103,7 @@ const renderFallbackTable = (markdown) => {
 
 /* 在大屏幕上隐藏移动端目录按钮及相关元素 */
 @media (min-width: 992px) {
-  .mobile-toc-button, 
+  .mobile-toc-button,
   .mobile-toc-container {
     display: none;
   }

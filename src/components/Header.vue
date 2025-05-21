@@ -1,242 +1,288 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue';
 
-// 导航菜单的状态
 const isMenuActive = ref(false);
-const isScrolled = ref(false);
+const isHeaderVisible = ref(false); // header是否可见
+const isRopeVisible = ref(false);   // 抽绳是否可见
+const isRopePulling = ref(false);   // 抽绳拉动动画
+const isRopeAppear = ref(false);    // 抽绳出现动画
 
-// 切换导航菜单
-const toggleMenu = () => {
-  isMenuActive.value = !isMenuActive.value;
+const showHeader = () => {
+  isHeaderVisible.value = true;
+  isRopeVisible.value = false;
 };
-
-// 处理滚动效果
-const handleScroll = () => {
-  isScrolled.value = window.scrollY > 20;
-};
-
-// 初始化组件
-onMounted(() => {
-  // 添加全局键盘事件监听器
-  window.addEventListener("scroll", handleScroll);
-
-  // 点击页面其他地方关闭菜单
-  document.addEventListener('click', (e) => {
-    const header = document.querySelector('.header');
-    if (header && !header.contains(e.target)) {
-      isMenuActive.value = false;
-    }
+const hideHeader = () => {
+  isHeaderVisible.value = false;
+  isRopeVisible.value = true;
+  nextTick(() => {
+    isRopeAppear.value = false;
+    setTimeout(() => {
+      isRopeAppear.value = true;
+    }, 10);
   });
+};
+
+const pullRope = async () => {
+  isRopePulling.value = true;
+  await nextTick();
+  setTimeout(() => {
+    isRopePulling.value = false;
+    showHeader();
+    isRopeAppear.value = false;
+  }, 500); // 抽绳动画持续0.5s
+};
+
+const handleScroll = () => {
+  if (window.scrollY > 40) {
+    hideHeader();
+  } else {
+    showHeader();
+  }
+};
+
+onMounted(() => {
+  // 首次加载header从顶部滑入
+  setTimeout(() => {
+    showHeader();
+  }, 200);
+  window.addEventListener("scroll", handleScroll);
+  // 抽绳动画初始
+  setTimeout(() => {
+    isRopeAppear.value = true;
+  }, 10);
 });
 
-// 在组件销毁前移除事件监听器
 onBeforeUnmount(() => {
   window.removeEventListener("scroll", handleScroll);
-  document.removeEventListener('click', () => { });
 });
 </script>
 
 <template>
-  <header class="header" :class="{ 'scrolled': isScrolled }">
-    <div class="container">
+  <div>
+    <!-- Header主栏 -->
+    <header class="side-header" :class="{ 'visible': isHeaderVisible, 'hidden': !isHeaderVisible }">
       <div class="header-content">
         <div class="logo">
           <router-link to="/">山茶</router-link>
         </div>
-
-        <div class="right-section">
-          <!-- 导航菜单 -->
-          <nav class="main-nav" :class="{ 'active': isMenuActive }">
-            <ul>
-              <li><router-link to="/">首页</router-link></li>
-              <li><router-link to="/gallery">相册</router-link></li>
-              <li><router-link to="/blog">文章</router-link></li>
-              <li><router-link to="/archive">归档</router-link></li>
-            </ul>
-          </nav>
-
-          <!-- 移动端菜单按钮 -->
-          <button class="mobile-menu-btn" @click="toggleMenu" aria-label="菜单">
-            <span class="menu-icon" :class="{ 'active': isMenuActive }">
-              <span></span>
-              <span></span>
-              <span></span>
-            </span>
-          </button>
+        <nav class="main-nav">
+          <ul>
+            <li><router-link to="/">首页</router-link></li>
+            <li><router-link to="/gallery">相册</router-link></li>
+            <li><router-link to="/blog">文章</router-link></li>
+            <li><router-link to="/archive">归档</router-link></li>
+          </ul>
+        </nav>
+      </div>
+    </header>
+    <!-- 灯泡拉绳 -->
+    <div v-if="isRopeVisible" class="header-rope" :class="{ 'pulling': isRopePulling, 'rope-appear': isRopeAppear }" @click="pullRope">
+      <div class="rope-line"></div>
+      <div class="bulb-wrap">
+        <div class="bulb">
+          <div class="bulb-ball"></div>
+          <div class="bulb-filament">
+            <svg viewBox="0 0 16 10">
+              <path d="M2 8 Q8 2 14 8" stroke="#e6b800" stroke-width="2" fill="none" />
+            </svg>
+          </div>
         </div>
+        <div class="bulb-base"></div>
       </div>
     </div>
-  </header>
+  </div>
 </template>
 
 <style scoped>
-.container {
-  max-width: 100%;
-  width: 100%;
-  margin: 0 auto;
-  padding: 0 20px;
-}
-
-.header {
-  background-color: var(--light-white);
-  box-shadow: var(--shadow-1);
+.side-header {
   position: fixed;
-  top: 50px;
-  right: 0;
-  z-index: 100;
-  transition: all var(--transition-3) ease;
-  width: 62.5%; /* 5/8的宽度 */
-  left: calc(25% + (75% - 62.5%) / 2); /* 右侧3/4宽度上居中 */
-  border-radius: 8px;
+  top: 0;
+  left: 150px;
+  width: 25vw;
+  max-width: 480px;
+  min-width: 220px;
+  height: 100px;
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  border-radius: 0 0 24px 0;
+  z-index: 200;
+  transform: translateY(-100%);
+  transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1), background 0.4s;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 0 32px;
 }
-
-.header.scrolled {
-  box-shadow: var(--shadow-2);
+.side-header.visible {
+  transform: translateY(0);
 }
-
+.side-header.hidden {
+  transform: translateY(-100%);
+}
 .header-content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 70px;
-  position: relative;
-}
-
-.logo {
-  margin-right: 30px;
-}
-
-.logo a {
-  font-size: 1.5rem;
-  font-weight: var(--fw-700);
-  color: var(--dark);
-  text-decoration: none;
-}
-
-/* 移动端菜单按钮 */
-.mobile-menu-btn {
-  display: none;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 10px;
-  margin-left: 10px;
-  z-index: 101;
-  transition: transform 0.2s ease;
-}
-
-.mobile-menu-btn:hover {
-  transform: scale(1.05);
-}
-
-.menu-icon {
-  display: flex;
-  flex-direction: column;
-  width: 24px;
-  height: 18px;
-  justify-content: space-between;
-  position: relative;
-}
-
-.menu-icon span {
-  display: block;
-  height: 2px;
   width: 100%;
-  background-color: var(--dark);
-  transition: all var(--transition-3) ease;
-}
-
-.menu-icon.active span:nth-child(1) {
-  transform: rotate(45deg) translate(5px, 5px);
-}
-
-.menu-icon.active span:nth-child(2) {
-  opacity: 0;
-}
-
-.menu-icon.active span:nth-child(3) {
-  transform: rotate(-45deg) translate(5px, -5px);
-}
-
-.right-section {
   display: flex;
+  flex-direction: row;
   align-items: center;
-  height: 100%;
+  justify-content: flex-start;
+  height: 100px;
+  gap: 32px;
 }
-
-.main-nav {
-  margin-left: 20px;
+.logo a {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #7a6a5f;
+  text-decoration: none;
+  letter-spacing: 2px;
+  margin-bottom: 0;
+  display: block;
 }
-
 .main-nav ul {
   display: flex;
+  flex-direction: row;
+  gap: 18px;
   list-style: none;
   margin: 0;
   padding: 0;
 }
+.main-nav a {
+  color: #7a6a5f;
+  font-size: 1.1rem;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+.main-nav a.router-link-active,
+.main-nav a:hover {
+  color: #6d41d1;
+}
 
-.main-nav li {
-  position: relative;
+/* 灯泡拉绳子样式 */
+.header-rope {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 56px;
+  height: 140px;
+  z-index: 210;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: none;
+  /* 绳子动画控制 */
+}
+.header-rope .rope-line {
+  width: 3px;
+  background: linear-gradient(to bottom, #bdbdbd 80%, #e0e0e0 100%);
+  border-radius: 2px;
+  margin: 0 auto;
+  height: 0;
+  transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.header-rope.rope-appear .rope-line {
+  height: 60px;
+}
+.header-rope.pulling .rope-line {
+  height: 120px;
+  transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.header-rope .bulb-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0;
+  transform: translateY(-16px);
+  transition: opacity 0.3s 0.5s, transform 0.3s 0.5s;
+}
+.header-rope.rope-appear .bulb-wrap {
+  opacity: 1;
+  transform: translateY(0);
+}
+.header-rope.pulling .bulb-wrap {
+  transition: transform 0.5s;
+  transform: translateY(60px);
+}
+.header-rope .bulb {
+  width: 32px;
+  height: 32px;
+  background: radial-gradient(circle at 60% 40%, #fffbe6 70%, #ffe066 100%);
+  border-radius: 50%;
+  box-shadow: 0 2px 12px 0 rgba(255, 230, 102, 0.25);
   display: flex;
   align-items: center;
-}
-
-.main-nav a {
-  color: var(--dark);
-  text-decoration: none;
-  font-weight: var(--fw-500);
-  padding: 5px 10px;
-  transition: all var(--transition-3);
+  justify-content: center;
   position: relative;
+  transition: box-shadow 0.3s, background 0.3s;
+}
+.header-rope .bulb:hover {
+  box-shadow: 0 0 24px 8px #ffe066, 0 2px 12px 0 rgba(255, 230, 102, 0.35);
+  background: radial-gradient(circle at 60% 40%, #fffbe6 60%, #ffe066 100%);
+}
+.header-rope .bulb-base {
+  width: 16px;
+  height: 8px;
+  background: #bdbdbd;
+  border-radius: 0 0 6px 6px;
+  margin-top: -2px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+.header-rope .bulb-filament {
+  position: absolute;
+  left: 8px;
+  top: 13px;
+  width: 16px;
+  height: 10px;
+  pointer-events: none;
 }
 
-.main-nav a:hover {
-  color: var(--blue-crayola);
+/* 灯丝SVG */
+.header-rope .bulb-filament svg {
+  width: 16px;
+  height: 10px;
+  display: block;
 }
 
-.main-nav a.router-link-active {
-  color: var(--blue-crayola);
-  background-color: transparent;
-  border-bottom: 2px solid var(--blue-crayola);
+.header-rope .bulb-ball {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
 }
 
-/* 响应式样式 */
-@media (max-width: 768px) {
-  /* 移动端导航调整 */
-  .mobile-menu-btn {
-    display: block;
-  }
+.header-rope .bulb-ball:after {
+  content: '';
+  display: block;
+  width: 8px;
+  height: 8px;
+  background: #ffe066;
+  border-radius: 50%;
+  position: absolute;
+  left: 12px;
+  top: 8px;
+  opacity: 0.5;
+}
 
-  .main-nav {
-    position: fixed;
-    top: 70px;
-    left: 0;
-    width: 100%;
-    background-color: var(--light-white);
-    box-shadow: var(--shadow-1);
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height var(--transition-3) ease;
-    margin-left: 0;
+.header-rope.pulling {
+  animation: rope-pull 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+@keyframes rope-pull {
+  0% {
+    transform: translateY(0);
   }
-
-  .main-nav.active {
-    max-height: 300px;
+  40% {
+    transform: translateY(40px);
   }
-
-  .main-nav ul {
-    flex-direction: column;
-    padding: 10px 0;
+  100% {
+    transform: translateY(-100%);
   }
+}
 
-  .main-nav li {
-    width: 100%;
-  }
-
-  .main-nav a {
-    display: block;
-    padding: 10px 20px;
-    width: 100%;
+@media (max-width: 900px) {
+  .side-header {
+    width: 90vw;
+    min-width: 0;
+    max-width: 100vw;
+    padding: 0 10vw;
   }
 }
 </style> 

@@ -74,6 +74,9 @@ input[type='checkbox'] {
   --fw-600: 600;
   --fw-500: 500;
 
+  /* font-family */
+  --ff-llt: 'llt', llt;
+
   /* color */
   --info-dark: #7d8da1;
   --dark: #363949;
@@ -142,6 +145,14 @@ input[type='checkbox'] {
   --box-shadow-2: 0 0.2em 1em rgba(202, 166, 243, 0.5);
 }
 
+@font-face {
+  font-family: 'llt';
+  src: url('./assets/fonts/萝莉体 第二版.ttc');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 .material-icons-sharp {
   font-family: 'Material Icons Sharp';
   font-weight: normal;
@@ -155,5 +166,9 @@ input[type='checkbox'] {
   word-wrap: normal;
   direction: ltr;
   -webkit-font-smoothing: antialiased;
+}
+
+.app {
+  font-family: var(--ff-llt);
 }
 </style>

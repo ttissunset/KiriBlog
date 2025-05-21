@@ -6,94 +6,6 @@ import { useRouter, useRoute } from 'vue-router';
 const blogStore = useBlogStore();
 const router = useRouter();
 const route = useRoute();
-
-// 滚动处理
-const currentPage = ref(0);
-const pages = ref([]);
-const scrollTimeout = ref(null);
-
-// 初始化页面并添加滚动事件监听
-onMounted(() => {
-  pages.value = document.querySelectorAll('.page');
-  window.addEventListener('wheel', handleScroll, { passive: false });
-  window.addEventListener('touchstart', handleTouchStart, { passive: false });
-  window.addEventListener('touchmove', handleTouchMove, { passive: false });
-});
-
-// 移除事件监听器
-onUnmounted(() => {
-  window.removeEventListener('wheel', handleScroll);
-  window.removeEventListener('touchstart', handleTouchStart);
-  window.removeEventListener('touchmove', handleTouchMove);
-});
-
-// 记录触摸起始位置
-let touchStartY = 0;
-function handleTouchStart(e) {
-  touchStartY = e.touches[0].clientY;
-}
-
-// 处理触摸移动
-function handleTouchMove(e) {
-  if (scrollTimeout.value) return;
-
-  const touchY = e.touches[0].clientY;
-  const diff = touchStartY - touchY;
-
-  if (Math.abs(diff) > 30) { // 至少滑动30px才触发页面切换
-    e.preventDefault();
-    if (diff > 0) {
-      // 向上滑动，前往下一页
-      if (currentPage.value < pages.value.length - 1) {
-        scrollToPage(currentPage.value + 1);
-      }
-    } else {
-      // 向下滑动，前往上一页
-      if (currentPage.value > 0) {
-        scrollToPage(currentPage.value - 1);
-      }
-    }
-
-    // 防抖
-    scrollTimeout.value = setTimeout(() => {
-      scrollTimeout.value = null;
-    }, 800);
-  }
-}
-
-// 处理鼠标滚轮事件
-function handleScroll(e) {
-  if (scrollTimeout.value) return;
-
-  e.preventDefault();
-
-  if (e.deltaY > 0) {
-    // 向下滚动，前往下一页
-    if (currentPage.value < pages.value.length - 1) {
-      scrollToPage(currentPage.value + 1);
-    }
-  } else {
-    // 向上滚动，前往上一页
-    if (currentPage.value > 0) {
-      scrollToPage(currentPage.value - 1);
-    }
-  }
-
-  // 防抖，800ms内不再触发滚动
-  scrollTimeout.value = setTimeout(() => {
-    scrollTimeout.value = null;
-  }, 800);
-}
-
-// 滚动到指定页面
-function scrollToPage(pageIndex) {
-  currentPage.value = pageIndex;
-  const targetPage = pages.value[pageIndex];
-  window.scrollTo({
-    top: targetPage.offsetTop,
-    behavior: 'smooth'
-  });
-}
 </script>
 
 <template>
@@ -108,14 +20,14 @@ function scrollToPage(pageIndex) {
             <img src="../assets/avatar.jpg" alt="头像" class="avatar-img" />
             <h1 class="profile-name">Kiri</h1>
             <p class="username">苯氨基丙酸</p>
-            <div class="bio">自由独立试新茶，沉醉半生</div>
+            <div class="bio">“自由独立试新茶，沉醉半生”</div>
           </div>
 
           <!-- 向下滚动提示 -->
           <div class="scroll-hint">
             <span>向下滚动查看更多</span>
             <div class="scroll-arrow">
-              <MaterialIcon icon="expand_more" />
+              <span class="material-icons-sharp">expand_more</span>
             </div>
           </div>
         </div>
@@ -134,7 +46,7 @@ function scrollToPage(pageIndex) {
         <div class="left-content">
           <h2 class="readme-title">
             Hello <span class="wave-emoji">
-              <MaterialIcon icon="waving_hand" />
+              <span class="material-icons-sharp">waving_hand</span>
             </span>
           </h2>
 
@@ -149,13 +61,13 @@ function scrollToPage(pageIndex) {
             <li class="info-item">
               <span class="bullet">•</span>
               <span>
-                <MaterialIcon icon="grass" /> 目前居住在广州
+                <span class="material-icons-sharp">grass</span> 目前居住在广州
               </span>
             </li>
             <li class="info-item">
               <span class="bullet">•</span>
               <span>
-                <MaterialIcon icon="chat" /> 如果你有疑问，可以联系我
+                <span class="material-icons-sharp">chat</span> 如果你有疑问，可以联系我
               </span>
               <span class="email-link">273390867@qq.com</span>
             </li>
@@ -232,14 +144,14 @@ function scrollToPage(pageIndex) {
             <div class="stats-container">
               <div class="stats-data">
                 <div class="stat-item">
-                  <MaterialIcon icon="star" class="stat-icon" />
+                  <span class="material-icons-sharp">star</span>
                   <div class="stat-details">
                     <div class="stat-value">1024</div>
                     <div class="stat-label">Total Stars</div>
                   </div>
                 </div>
                 <div class="stat-item">
-                  <MaterialIcon icon="fork_right" class="stat-icon" />
+                  <span class="material-icons-sharp">fork_right</span>
                   <div class="stat-details">
                     <div class="stat-value">512</div>
                     <div class="stat-label">Commits (2023)</div>
@@ -268,7 +180,7 @@ function scrollToPage(pageIndex) {
             </p>
             <p class="from-text">
               <span class="wave-emoji">
-                <MaterialIcon icon="waving_hand" />
+                <span class="material-icons-sharp">waving_hand</span>
               </span> From
               <a href="#" class="author-link">Kiri</a>
             </p>
@@ -375,6 +287,9 @@ function scrollToPage(pageIndex) {
   color: #24292f;
   font-size: var(--fs-16);
   line-height: 1.5;
+  font-style: italic;
+  border-left: 3px solid #e0e0e0;
+  padding-left: 16px;
 }
 
 /* 滚动提示 */
@@ -392,22 +307,25 @@ function scrollToPage(pageIndex) {
 
 .scroll-arrow {
   margin-top: 10px;
-  animation: bounce 2s infinite;
+  animation: fadeDown 1.8s infinite;
 }
 
-@keyframes bounce {
-  0%,
-  20%,
-  50%,
-  80%,
-  100% {
-    transform: translateY(0);
-  }
-  40% {
+@keyframes fadeDown {
+  0% {
+    opacity: 0;
     transform: translateY(-10px);
   }
-  60% {
-    transform: translateY(-5px);
+  20% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  80% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(10px);
   }
 }
 

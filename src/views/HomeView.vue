@@ -48,7 +48,7 @@ const preloadedImages = ref(new Set());
 // 预加载图片
 const preloadImage = (url) => {
   if (preloadedImages.value.has(url)) return;
-  
+
   const img = new Image();
   img.src = url;
   img.onload = () => {
@@ -67,22 +67,38 @@ const changeBackground = debounce(() => {
   do {
     newIndex = Math.floor(Math.random() * backgroundImages.length);
   } while (newIndex === currentBgIndex.value);
-  
-  currentBgIndex.value = newIndex;
+
   if (backgroundImageContainer.value) {
     const newImage = backgroundImages[newIndex];
     // 确保新图片已预加载
     if (!preloadedImages.value.has(newImage)) {
       preloadImage(newImage);
     }
-    
-    backgroundImageContainer.value.style.backgroundImage = `linear-gradient(
-      to right,
-      var(--light-white) 0%,
-      rgba(255, 255, 255, 0.8) 5%,
-      rgba(255, 255, 255, 0) 20%
-    ),
-    url('${newImage}')`;
+
+    // 添加切换动画类
+    backgroundImageContainer.value.classList.add('changing');
+
+    // 等待动画完成后再切换图片
+    setTimeout(() => {
+      backgroundImageContainer.value.style.backgroundImage = `linear-gradient(
+        to right,
+        var(--light-white) 0%,
+        rgba(255, 255, 255, 0.8) 5%,
+        rgba(255, 255, 255, 0) 20%
+      ),
+      url('${newImage}')`;
+
+      // 移除旧动画类并添加新动画类
+      backgroundImageContainer.value.classList.remove('changing');
+      backgroundImageContainer.value.classList.add('changed');
+
+      // 动画完成后移除类
+      setTimeout(() => {
+        backgroundImageContainer.value.classList.remove('changed');
+      }, 400);
+
+      currentBgIndex.value = newIndex;
+    }, 400);
   }
 }, 300); // 300ms 的防抖延迟
 
@@ -190,9 +206,7 @@ onMounted(() => {
             <ul class="about-list">
               <li class="about-item">
                 <span class="bullet">•</span>
-                <a href="https://github.com/ttissunset" class="about-link"
-                  >我的github</a
-                >
+                <a href="https://github.com/ttissunset" class="about-link">我的github</a>
               </li>
               <li class="about-item">
                 <span class="bullet">•</span>
@@ -261,11 +275,7 @@ onMounted(() => {
         <div class="right-content">
           <!-- 动漫图片容器 -->
           <div class="anime-container">
-            <img
-              src="../assets/l2d.webp"
-              alt="Anime character"
-              class="anime-image"
-            />
+            <img src="../assets/l2d.webp" alt="Anime character" class="anime-image" />
           </div>
 
           <!-- 友好信息 -->
@@ -339,12 +349,77 @@ onMounted(() => {
       rgba(255, 255, 255, 0.8) 5%,
       rgba(255, 255, 255, 0) 20%
     ),
-    url("https://kirii.online/20250514-003324.jpeg");
+    url('https://kirii.online/20250514-003324.jpeg');
   background-size: cover;
   background-position: center;
   position: relative;
   margin-left: -1px;
-  transition: background-image 0.5s ease;
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: center;
+  animation: initialZoom 1.5s ease-out;
+}
+
+@keyframes initialZoom {
+  0% {
+    transform: scale(1.2);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.background-image-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  pointer-events: none;
+}
+
+.background-image-container:hover::before {
+  opacity: 1;
+}
+
+/* 添加图片切换动画 */
+@keyframes slideIn {
+  0% {
+    transform: translateX(100%) scale(1.2);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  0% {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-100%) scale(0.8);
+    opacity: 0;
+  }
+}
+
+.background-image-container.changing {
+  animation: slideOut 0.4s ease-out forwards;
+}
+
+.background-image-container.changed {
+  animation: slideIn 0.4s ease-out forwards;
 }
 
 /* 头像部分样式 */
@@ -912,7 +987,7 @@ onMounted(() => {
 .refresh-button::before {
   position: absolute;
   bottom: -20px;
-  content: "“换个口味”";
+  content: '“换个口味”';
   color: var(--blue-crayola);
   /* transition-duration: .3s; */
   font-size: 0px;

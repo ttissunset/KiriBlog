@@ -227,7 +227,7 @@ onUnmounted(cleanupAudio);
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 70%; /* 进一步缩小整体跨度 */
+  width: 90%; /* 进一步缩小整体跨度 */
   margin: 0 auto; /* 水平居中 */
   box-sizing: border-box;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);

@@ -114,6 +114,8 @@ onMounted(() => {
   <div class="home-view">
     <!-- 第一页：背景图 -->
     <section class="page page-one">
+      <!-- 渐变覆盖层 -->
+      <div class="gradient-overlay"></div>
       <div class="background-image-container" ref="backgroundImageContainer">
         <div class="refresh-button-container">
           <button class="refresh-button" @click="changeBackground">
@@ -296,25 +298,45 @@ onMounted(() => {
 /* 第一页样式 */
 .page-one {
   background-color: var(--light-white);
+  position: relative; /* Ensure positioning context for overlay */
+}
+
+/* 渐变覆盖层 */
+.gradient-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40%; /* Might need to adjust width to accommodate longer fade */
+  height: 100%;
+  background-image: linear-gradient(
+    to right,
+    var(--light-white) 0%,
+    rgba(255, 255, 255, 0.98) 2%,
+    rgba(255, 255, 255, 0.95) 5%,
+    rgba(255, 255, 255, 0.9) 8%,
+    rgba(255, 255, 255, 0.85) 12%,
+    rgba(255, 255, 255, 0.75) 18%,
+    rgba(255, 255, 255, 0.6) 25%,
+    rgba(255, 255, 255, 0.4) 35%,
+    rgba(255, 255, 255, 0.2) 45%,
+    rgba(255, 255, 255, 0) 55% /* Extend the fade out range for a more thorough dissolve */
+  );
+  z-index: 2; /* Ensure it's above the background image */
+  pointer-events: none; /* Allow clicks to pass through */
 }
 
 /* 背景图容器 */
 .background-image-container {
   width: 100%;
   height: 100%;
-  background-image: linear-gradient(
-      to right,
-      var(--light-white) 0%,
-      rgba(255, 255, 255, 0.8) 5%,
-      rgba(255, 255, 255, 0) 20%
-    ),
-    url('https://kirii.online/20250514-003324.jpeg');
+  background-image: url('https://kirii.online/20250514-003324.jpeg'); /* Initial image without gradient */
   background-size: cover;
   background-position: center;
   position: relative;
   transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   transform-origin: center;
   animation: initialZoom 1.5s ease-out;
+  z-index: 1; /* Ensure it's below the overlay */
 }
 
 @keyframes initialZoom {
@@ -338,7 +360,7 @@ onMounted(() => {
   background: linear-gradient(
     45deg,
     rgba(255, 255, 255, 0.1) 0%,
-    rgba(255, 255, 255, 0) 100%
+    rgba(255, 255, 255, 0) 100% 版
   );
   opacity: 0;
   transition: opacity 0.8s ease;
@@ -352,28 +374,28 @@ onMounted(() => {
 /* 添加图片切换动画 */
 @keyframes slideIn {
   0% {
-    transform: translateX(100%) scale(1.2);
+    transform: translateX(100%) scale(1.2); /* Keep animation */
     opacity: 0;
   }
   100% {
-    transform: translateX(0) scale(1);
+    transform: translateX(0) scale(1); /* Keep animation */
     opacity: 1;
   }
 }
 
 @keyframes slideOut {
   0% {
-    transform: translateX(0) scale(1);
+    transform: translateX(0) scale(1); /* Keep animation */
     opacity: 1;
   }
   100% {
-    transform: translateX(-100%) scale(0.8);
+    transform: translateX(-100%) scale(0.8); /* Keep animation */
     opacity: 0;
   }
 }
 
 .background-image-container.changing {
-  animation: slideOut 0.4s ease-out forwards;
+  animation: slideOut 0.4s ease-out forwards; /* Apply animation only to image */
 }
 
 /* 第二页样式 */
@@ -785,36 +807,5 @@ onMounted(() => {
   color: #fff;
   padding: 2px 4px;
   border-radius: 4px;
-}
-
-@media (max-width: 1100px) {
-  .horizontal-content {
-    flex-direction: column;
-    overflow-y: auto;
-  }
-
-  .left-content,
-  .middle-content,
-  .right-content {
-    width: 100%;
-    max-height: none;
-    overflow: visible;
-  }
-
-  .page {
-    height: auto;
-    min-height: 100vh;
-  }
-}
-
-@media (max-width: 768px) {
-  .page-content {
-    flex-direction: column;
-  }
-
-  .background-image-container {
-    width: 100%;
-    height: 50vh;
-  }
 }
 </style>

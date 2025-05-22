@@ -3,8 +3,8 @@ import Sidebar from "./components/Sidebar.vue";
 import { convertAniBinaryToCSS } from "ani-cursor";
 import { onMounted, ref, onUnmounted } from "vue";
 import Sakana from "sakana";
-import { createVNode, render } from 'vue';
-import Firework from './components/Firework.vue';
+import { createVNode, render } from "vue";
+import Firework from "./components/Firework.vue";
 
 async function applyCursor(selector, aniUrl) {
   try {
@@ -20,7 +20,7 @@ async function applyCursor(selector, aniUrl) {
 
 // 创建烟花组件
 const createFirework = (x, y) => {
-  const container = document.createElement('div');
+  const container = document.createElement("div");
   const vnode = createVNode(Firework, { x, y });
   render(vnode, container);
   document.body.appendChild(container);
@@ -47,11 +47,17 @@ onMounted(async () => {
     // 状态指针
     await applyCursor("#loading, .busy", "/src/assets/cursor/Busy.ani");
     await applyCursor("#working", "/src/assets/cursor/Working.ani");
-    await applyCursor("#disabled, [disabled]", "/src/assets/cursor/Unavailable.ani");
+    await applyCursor(
+      "#disabled, [disabled]",
+      "/src/assets/cursor/Unavailable.ani"
+    );
     await applyCursor("#precision", "/src/assets/cursor/Precision.ani");
 
     // 交互指针
-    await applyCursor("#resize-horizontal", "/src/assets/cursor/Horizontal.ani");
+    await applyCursor(
+      "#resize-horizontal",
+      "/src/assets/cursor/Horizontal.ani"
+    );
     await applyCursor("#resize-vertical", "/src/assets/cursor/Vertical.ani");
     await applyCursor("#resize-diagonal1", "/src/assets/cursor/Diagonal1.ani");
     await applyCursor("#resize-diagonal2", "/src/assets/cursor/Diagonal2.ani");
@@ -66,7 +72,7 @@ onMounted(async () => {
   }
 
   // 添加点击事件监听
-  document.addEventListener('click', handleClick);
+  document.addEventListener("click", handleClick);
 
   // 启动 Sakana
   const sakana = Sakana.init({
@@ -76,7 +82,7 @@ onMounted(async () => {
     decay: 0.99,
     r: 60,
     y: 10,
-    scale: .4,
+    scale: 0.4,
     translateY: 0,
     canSwitchCharacter: true,
   });
@@ -111,7 +117,7 @@ onMounted(async () => {
 
 onUnmounted(() => {
   // 移除点击事件监听
-  document.removeEventListener('click', handleClick);
+  document.removeEventListener("click", handleClick);
 });
 </script>
 
@@ -138,7 +144,7 @@ onUnmounted(() => {
   position: fixed;
   right: 0;
   bottom: 0;
-  cursor: none;
+  z-index: 9999;
   transform-origin: 100% 100%; /* 从右下开始变换 */
 }
 
@@ -176,7 +182,7 @@ input {
   padding: 0;
 }
 
-input[type='checkbox'] {
+input[type="checkbox"] {
   width: 16px;
   height: 16px;
 }
@@ -190,10 +196,10 @@ input[type='checkbox'] {
 }
 
 /* 全局 pointer 样式 */
-[style*='cursor: pointer'],
-[class*='cursor-pointer'],
+[style*="cursor: pointer"],
+[class*="cursor-pointer"],
 .cursor-pointer {
-  cursor: url('/src/assets/cursor/Link.ani'), pointer !important;
+  cursor: url("/src/assets/cursor/Link.ani"), pointer !important;
 }
 
 /* 允许输入框和文本域选中 */
@@ -222,7 +228,7 @@ textarea {
   --fw-500: 500;
 
   /* font-family */
-  --ff-llt: 'llt', llt;
+  --ff-llt: "llt", llt;
 
   /* color */
   --info-dark: #7d8da1;
@@ -293,15 +299,15 @@ textarea {
 }
 
 @font-face {
-  font-family: 'llt';
-  src: url('./assets/fonts/萝莉体 第二版.ttc');
+  font-family: "llt";
+  src: url("./assets/fonts/萝莉体 第二版.ttc");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
 .material-icons-sharp {
-  font-family: 'Material Icons Sharp';
+  font-family: "Material Icons Sharp";
   font-weight: normal;
   font-style: normal;
   font-size: 24px;
@@ -327,12 +333,5 @@ textarea {
   width: 75%;
   min-height: 100vh;
   position: relative;
-}
-
-@media (max-width: 768px) {
-  .main-content {
-    margin-left: 0;
-    width: 100%;
-  }
 }
 </style>

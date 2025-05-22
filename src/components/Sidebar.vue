@@ -162,14 +162,4 @@ const handleScroll = () => {
     transform: translateY(10px);
   }
 }
-
-@media (max-width: 768px) {
-  .sidebar {
-    width: 100%;
-    height: auto;
-    position: relative;
-    min-height: 50vh;
-    top: 0;
-  }
-}
 </style> 

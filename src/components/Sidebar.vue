@@ -60,14 +60,14 @@ const handleScroll = () => {
 <style scoped>
 .sidebar {
   width: 25%;
-  height: calc(100vh - 60px); /* 减去 Header 的高度 */
+  height: 100%; /* 减去 Header 的高度 */
   padding: 40px 20px;
+  padding-bottom: 10px;
   box-sizing: border-box;
   background-color: var(--light-white);
   z-index: 10;
   position: fixed;
   left: 0;
-  top: 60px; /* Header 的高度 */
 }
 
 .sidebar-content {
@@ -124,7 +124,7 @@ const handleScroll = () => {
 /* 滚动提示 */
 .scroll-hint {
   position: absolute;
-  bottom: 30px;
+  bottom: 0;
   left: 0;
   right: 0;
   display: flex;

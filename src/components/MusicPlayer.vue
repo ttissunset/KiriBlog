@@ -1,30 +1,30 @@
 <template>
-  <div class="music-player">
+  <div class="music-player" :class="{ playing: isPlaying }">
     <!-- 音乐播放器内容 -->
     <div class="player-content">
-      <div class="album-cover">
-        <img src="../assets/5.jpg" alt="Album Cover" class="cover-img" />
+      <div class="album-cover" v-if="currentSong">
+        <img :src="currentSong.cover" alt="Album Cover" class="cover-img" />
       </div>
 
       <!-- 右侧内容区域 -->
-      <div class="right-section">
+      <div class="right-section" v-if="currentSong">
         <!-- 歌曲标题 -->
-        <div class="song-title">焼けのスター</div>
+        <div class="song-title">{{ currentSong.title }}</div>
 
         <!-- Artist 和播放控制放在同一行 -->
         <div class="artist-controls-row">
           <!-- 左侧 Artist -->
-          <div class="artist">今井麻美</div>
+          <div class="artist">{{ currentSong.artist }}</div>
 
           <!-- 右侧播放控制和音量 -->
           <div class="controls-volume-wrapper">
             <!-- 播放控制 -->
             <div class="controls">
-              <span class="material-icons-sharp control-btn" id="pointer">skip_previous</span>
+              <span class="material-icons-sharp control-btn" id="pointer" @click="playPrevious">skip_previous</span>
               <span class="material-icons-sharp control-btn play-pause" id="pointer" @click="togglePlayPause">
                 {{ isPlaying ? 'pause' : 'play_arrow' }}
               </span>
-              <span class="material-icons-sharp control-btn" id="pointer">skip_next</span>
+              <span class="material-icons-sharp control-btn" id="pointer" @click="playNext">skip_next</span>
             </div>
 
             <!-- 音量控制 -->
@@ -38,9 +38,9 @@
 
         <!-- 进度条 -->
         <div class="progress-bar">
-          <div class="current-time">0:00</div>
-          <input type="range" min="0" max="100" value="0" class="progress-slider">
-          <div class="total-time">0:00</div>
+          <div class="current-time">{{ formatTime(currentTime) }}</div>
+          <input type="range" min="0" max="100" v-model="progress" class="progress-slider" @input="onProgressChange" id="pointer">
+          <div class="total-time">{{ currentSong.duration || '0:00' }}</div>
         </div>
 
       </div>
@@ -50,37 +50,148 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
-// 后续可以添加播放逻辑
+import { ref, watch, onMounted, onUnmounted, computed } from 'vue';
+import songData from '../assets/mp3.json';
 
+// 音乐数据
+const allSongs = ref([]);
+const currentSongIndex = ref(0);
+const currentSong = ref(null);
+const audioElement = ref(null);
+const currentTime = ref(0);
+const progress = ref(0);
+
+// 播放状态
 const isPlaying = ref(false);
 const isMuted = ref(false);
-const volume = ref(30); // 默认音量100
+const volume = ref(30); // 默认音量30
 
+// 初始化
+onMounted(async () => {
+  try {
+    // 加载所有歌曲数据
+    allSongs.value = songData.mp3Files;
+
+    // 设置当前歌曲为第一首
+    if (allSongs.value.length > 0) {
+      currentSong.value = allSongs.value[0];
+    }
+
+    // 创建音频元素
+    audioElement.value = new Audio();
+
+    // 设置音频源
+    if (currentSong.value) {
+      audioElement.value.src = currentSong.value.url;
+      audioElement.value.volume = volume.value / 100;
+    }
+
+    // 音频事件监听
+    audioElement.value.addEventListener('timeupdate', updateProgress);
+    audioElement.value.addEventListener('ended', () => {
+      playNext();
+    });
+
+  } catch (error) {
+    console.error('加载音乐数据失败:', error);
+  }
+});
+
+// 切换播放/暂停
 const togglePlayPause = () => {
+  if (!audioElement.value) return;
+
+  if (isPlaying.value) {
+    audioElement.value.pause();
+  } else {
+    audioElement.value.play();
+  }
+
   isPlaying.value = !isPlaying.value;
 };
 
+// 切换静音
 const toggleMute = () => {
+  if (!audioElement.value) return;
+
   isMuted.value = !isMuted.value;
+  audioElement.value.muted = isMuted.value;
 };
 
-const onVolumeChange = () => {
-  // 这里可以对接实际音频元素的音量设置
-  // 例如 audioRef.value.volume = volume.value / 100;
+// 播放上一首
+const playPrevious = () => {
+  if (allSongs.value.length <= 1) return;
+
+  currentSongIndex.value = (currentSongIndex.value - 1 + allSongs.value.length) % allSongs.value.length;
+  loadSong(currentSongIndex.value);
 };
 
-// 监听播放状态变化，添加或移除playing类
-watch(isPlaying, (newValue) => {
-  const playerElement = document.querySelector('.music-player');
-  if (playerElement) {
-    if (newValue) {
-      playerElement.classList.add('playing');
-    } else {
-      playerElement.classList.remove('playing');
-    }
+// 播放下一首
+const playNext = () => {
+  if (allSongs.value.length <= 1) return;
+
+  currentSongIndex.value = (currentSongIndex.value + 1) % allSongs.value.length;
+  loadSong(currentSongIndex.value);
+};
+
+// 加载歌曲
+const loadSong = (index) => {
+  if (!audioElement.value) return;
+
+  currentSong.value = allSongs.value[index];
+  audioElement.value.src = currentSong.value.url;
+  audioElement.value.load();
+
+  if (isPlaying.value) {
+    audioElement.value.play();
+  }
+};
+
+// 更新进度
+const updateProgress = () => {
+  if (!audioElement.value) return;
+
+  currentTime.value = audioElement.value.currentTime;
+  progress.value = (audioElement.value.currentTime / audioElement.value.duration) * 100 || 0;
+};
+
+// 修改进度
+const onProgressChange = () => {
+  if (!audioElement.value) return;
+
+  const newTime = (progress.value / 100) * audioElement.value.duration;
+  audioElement.value.currentTime = newTime;
+  currentTime.value = newTime;
+};
+
+// 格式化时间
+const formatTime = (timeInSeconds) => {
+  if (!timeInSeconds) return '0:00';
+
+  const minutes = Math.floor(timeInSeconds / 60);
+  const seconds = Math.floor(timeInSeconds % 60);
+  return `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+};
+
+// 监听音量变化
+watch(volume, (newVolume) => {
+  if (audioElement.value) {
+    audioElement.value.volume = newVolume / 100;
   }
 });
+
+// 组件卸载时清理
+const cleanupAudio = () => {
+  if (audioElement.value) {
+    audioElement.value.removeEventListener('timeupdate', updateProgress);
+    audioElement.value.removeEventListener('ended', playNext);
+    audioElement.value.pause();
+    audioElement.value = null;
+  }
+};
+
+// 注册组件卸载时的清理函数
+onUnmounted(cleanupAudio);
 </script>
 
 <style scoped>

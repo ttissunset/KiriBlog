@@ -3,7 +3,7 @@
     <!-- 音乐播放器内容 -->
     <div class="player-content">
       <div class="album-cover" v-if="currentSong">
-        <img :src="currentSong.cover" alt="Album Cover" class="cover-img" />
+        <img :src="currentSong.cover" :key="currentSongIndex" alt="Album Cover" class="cover-img" />
       </div>
 
       <!-- 右侧内容区域 -->
@@ -101,13 +101,22 @@ onMounted(async () => {
 const togglePlayPause = () => {
   if (!audioElement.value) return;
 
-  if (isPlaying.value) {
-    audioElement.value.pause();
-  } else {
-    audioElement.value.play();
-  }
+  try {
+    if (isPlaying.value) {
+      audioElement.value.pause();
+    } else {
+      // 尝试播放，并处理可能的自动播放限制错误
+      audioElement.value.play().catch(err => {
+        console.error('播放失败:', err);
+        isPlaying.value = false;
+        return;
+      });
+    }
 
-  isPlaying.value = !isPlaying.value;
+    isPlaying.value = !isPlaying.value;
+  } catch (err) {
+    console.error('播放控制错误:', err);
+  }
 };
 
 // 切换静音
@@ -138,12 +147,27 @@ const playNext = () => {
 const loadSong = (index) => {
   if (!audioElement.value) return;
 
+  // 保存當前播放狀態
+  const wasPlaying = isPlaying.value;
+
+  // 暫停當前播放
+  if (isPlaying.value) {
+    audioElement.value.pause();
+  }
+
+  // 更新當前歌曲
   currentSong.value = allSongs.value[index];
   audioElement.value.src = currentSong.value.url;
   audioElement.value.load();
 
-  if (isPlaying.value) {
-    audioElement.value.play();
+  // 如果之前正在播放，則繼續播放新歌曲
+  if (wasPlaying) {
+    audioElement.value.play().catch(err => {
+      console.error('無法自動播放歌曲:', err);
+      isPlaying.value = false;
+    });
+  } else {
+    isPlaying.value = false;
   }
 };
 
@@ -248,6 +272,11 @@ onUnmounted(cleanupAudio);
   object-fit: cover;
   animation: cover-rotate 15s linear infinite;
   animation-play-state: paused; /* 默认暂停 */
+  transform-origin: center center;
+  /* 添加 will-change 提高旋转性能 */
+  will-change: transform;
+  /* 添加过渡效果，使暂停更平滑 */
+  transition: animation-play-state 0.2s ease;
 }
 
 /* 当播放状态激活时旋转专辑封面 */

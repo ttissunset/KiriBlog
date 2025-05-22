@@ -1,5 +1,4 @@
 <script setup>
-import Header from "./components/Header.vue";
 import Sidebar from "./components/Sidebar.vue";
 import { convertAniBinaryToCSS } from "ani-cursor";
 import { onMounted, ref, onUnmounted } from "vue";
@@ -8,13 +7,15 @@ import { createVNode, render } from 'vue';
 import Firework from './components/Firework.vue';
 
 async function applyCursor(selector, aniUrl) {
-  const response = await fetch(aniUrl);
-  const data = new Uint8Array(await response.arrayBuffer());
-
-  const style = document.createElement("style");
-  style.innerText = convertAniBinaryToCSS(selector, data);
-
-  document.head.appendChild(style);
+  try {
+    const response = await fetch(aniUrl);
+    const data = new Uint8Array(await response.arrayBuffer());
+    const style = document.createElement("style");
+    style.innerText = convertAniBinaryToCSS(selector, data);
+    document.head.appendChild(style);
+  } catch (error) {
+    console.error(`Failed to apply cursor for ${selector}:`, error);
+  }
 }
 
 // 创建烟花组件
@@ -34,50 +35,50 @@ const handleClick = (e) => {
 };
 
 onMounted(async () => {
-  // 基础指针
-  await applyCursor("body", "/src/assets/cursor/Normal.ani");
-  await applyCursor("a", "/src/assets/cursor/Link.ani");
-  await applyCursor("input, textarea", "/src/assets/cursor/Text.ani");
-  await applyCursor("button", "/src/assets/cursor/Link.ani");
-  await applyCursor(".draggable", "/src/assets/cursor/Move.ani");
-  await applyCursor(".pointer", "/src/assets/cursor/Link.ani");
+  try {
+    // 基础指针
+    await applyCursor("body", "/src/assets/cursor/Normal.ani");
+    await applyCursor("a", "/src/assets/cursor/Link.ani");
+    await applyCursor("input, textarea", "/src/assets/cursor/Text.ani");
+    await applyCursor("button", "/src/assets/cursor/Link.ani");
+    await applyCursor("#draggable", "/src/assets/cursor/Move.ani");
+    await applyCursor("#pointer", "/src/assets/cursor/Link.ani");
 
-  // 状态指针
-  await applyCursor(".loading, .busy", "/src/assets/cursor/Busy.ani");
-  await applyCursor(".working", "/src/assets/cursor/Working.ani");
-  await applyCursor(
-    ".disabled, [disabled]",
-    "/src/assets/cursor/Unavailable.ani"
-  );
-  await applyCursor(".precision", "/src/assets/cursor/Precision.ani");
+    // 状态指针
+    await applyCursor("#loading, .busy", "/src/assets/cursor/Busy.ani");
+    await applyCursor("#working", "/src/assets/cursor/Working.ani");
+    await applyCursor("#disabled, [disabled]", "/src/assets/cursor/Unavailable.ani");
+    await applyCursor("#precision", "/src/assets/cursor/Precision.ani");
 
-  // 交互指针
-  await applyCursor(".resize-horizontal", "/src/assets/cursor/Horizontal.ani");
-  await applyCursor(".resize-vertical", "/src/assets/cursor/Vertical.ani");
-  await applyCursor(".resize-diagonal1", "/src/assets/cursor/Diagonal1.ani");
-  await applyCursor(".resize-diagonal2", "/src/assets/cursor/Diagonal2.ani");
-  await applyCursor(".alternate", "/src/assets/cursor/Alternate.ani");
+    // 交互指针
+    await applyCursor("#resize-horizontal", "/src/assets/cursor/Horizontal.ani");
+    await applyCursor("#resize-vertical", "/src/assets/cursor/Vertical.ani");
+    await applyCursor("#resize-diagonal1", "/src/assets/cursor/Diagonal1.ani");
+    await applyCursor("#resize-diagonal2", "/src/assets/cursor/Diagonal2.ani");
+    await applyCursor("#alternate", "/src/assets/cursor/Alternate.ani");
 
-  // 特殊指针
-  await applyCursor(".handwriting", "/src/assets/cursor/Handwriting.ani");
-  await applyCursor(".person", "/src/assets/cursor/Person.ani");
-  await applyCursor(".pin", "/src/assets/cursor/Pin.ani");
+    // 特殊指针
+    await applyCursor("#handwriting", "/src/assets/cursor/Handwriting.ani");
+    await applyCursor("#person", "/src/assets/cursor/Person.ani");
+    await applyCursor("#pin", "/src/assets/cursor/Pin.ani");
+  } catch (error) {
+    console.error("Failed to apply cursors:", error);
+  }
 
   // 添加点击事件监听
   document.addEventListener('click', handleClick);
 
-  // 启动
+  // 启动 Sakana
   const sakana = Sakana.init({
-    // 选项: 默认值
-    el: ".sakana-box", // 启动元素 node 或 选择器
-    character: "takina", // 启动角色 'chisato','takina'
-    inertia: 0.01, // 惯性
-    decay: 0.99, // 衰减
-    r: 60, // 启动角度
-    y: 10, // 启动高度
-    scale: .4, // 缩放倍数
-    translateY: 0, // 位移高度
-    canSwitchCharacter: true, // 允许换角色
+    el: ".sakana-box",
+    character: "takina",
+    inertia: 0.01,
+    decay: 0.99,
+    r: 60,
+    y: 10,
+    scale: .4,
+    translateY: 0,
+    canSwitchCharacter: true,
   });
 
   // 设定静音
@@ -120,7 +121,7 @@ onUnmounted(() => {
     <div class="main-content">
       <router-view></router-view>
     </div>
-    <div class="sakana-box"></div>
+    <div class="sakana-box" id="pointer"></div>
   </div>
 </template>
 
@@ -137,6 +138,7 @@ onUnmounted(() => {
   position: fixed;
   right: 0;
   bottom: 0;
+  cursor: none;
   transform-origin: 100% 100%; /* 从右下开始变换 */
 }
 
@@ -185,6 +187,13 @@ input[type='checkbox'] {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+}
+
+/* 全局 pointer 样式 */
+[style*='cursor: pointer'],
+[class*='cursor-pointer'],
+.cursor-pointer {
+  cursor: url('/src/assets/cursor/Link.ani'), pointer !important;
 }
 
 /* 允许输入框和文本域选中 */

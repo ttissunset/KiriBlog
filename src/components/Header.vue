@@ -72,7 +72,7 @@ onBeforeUnmount(() => {
       </div>
     </header>
     <!-- 灯泡拉绳 -->
-    <div v-if="isRopeVisible" class="header-rope" :class="{ 'pulling': isRopePulling, 'rope-appear': isRopeAppear }" @click="pullRope">
+    <div v-if="isRopeVisible" class="header-rope" id="pointer" :class="{ 'pulling': isRopePulling, 'rope-appear': isRopeAppear }" @click="pullRope">
       <div class="rope-line"></div>
       <div class="bulb-wrap">
         <div class="bulb">
@@ -92,13 +92,12 @@ onBeforeUnmount(() => {
 <style scoped>
 .side-header {
   position: fixed;
-  top: 0;
+  top: 20px;
   left: 50px;
   width: 20vw;
-  height: 100px;
   background: rgba(255, 255, 255, 0.85);
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
-  border-radius: 0 0 24px 0;
+  border-radius: 12px;
   z-index: 200;
   transform: translateY(-100%);
   transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), background 0.4s;
@@ -118,7 +117,7 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: space-between;
   height: 100px;
   gap: 32px;
 }
@@ -162,24 +161,79 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  cursor: pointer;
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+.header-rope.rope-appear {
+  animation: ropeSwing 3s ease-in-out infinite;
+  transform-origin: top center;
+}
+
+.header-rope.pulling {
+  animation: none;
+  transform: translateY(-100%);
+}
+
+@keyframes ropeSwing {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(1deg);
+  }
+  75% {
+    transform: rotate(-1deg);
+  }
+}
+
 .header-rope .rope-line {
-  width: 3px;
-  background: linear-gradient(to bottom, #bdbdbd 80%, #e0e0e0 100%);
-  border-radius: 2px;
+  width: 4px;
+  background: linear-gradient(
+    to bottom,
+    #8b7355 0%,
+    #a1886f 20%,
+    #b69b7d 40%,
+    #c4a98a 60%,
+    #d4b99a 80%,
+    #e0c5a8 100%
+  );
+  border-radius: 4px;
   margin: 0 auto;
   height: 0;
   transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  box-shadow: inset -1px 0 2px rgba(0, 0, 0, 0.1),
+    inset 1px 0 2px rgba(0, 0, 0, 0.1);
 }
+
+.header-rope .rope-line::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.1) 2px,
+    rgba(0, 0, 0, 0.1) 4px
+  );
+  border-radius: 4px;
+  opacity: 0.3;
+}
+
 .header-rope.rope-appear .rope-line {
   height: 60px;
 }
+
 .header-rope.pulling .rope-line {
   height: 120px;
   transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
 .header-rope .bulb-wrap {
   display: flex;
   flex-direction: column;
@@ -188,21 +242,25 @@ onBeforeUnmount(() => {
   transform: translateY(-16px);
   transition: opacity 0.3s, transform 0.3s;
 }
+
 .header-rope.rope-appear .bulb-wrap {
   opacity: 1;
   transform: translateY(0);
   transition: opacity 0.3s 0.3s, transform 0.3s 0.3s;
 }
+
 .header-rope.pulling .bulb-wrap {
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   transform: translateY(-100%);
 }
+
 .header-rope .bulb {
   width: 32px;
   height: 32px;
   background: radial-gradient(circle at 60% 40%, #fffbe6 70%, #ffe066 100%);
   border-radius: 50%;
-  box-shadow: 0 2px 12px 0 rgba(255, 230, 102, 0.25);
+  box-shadow: 0 2px 12px 0 rgba(255, 230, 102, 0.25),
+    0 0 0 1px rgba(255, 230, 102, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -210,16 +268,18 @@ onBeforeUnmount(() => {
   transition: box-shadow 0.3s, background 0.3s;
 }
 .header-rope .bulb:hover {
-  box-shadow: 0 0 24px 8px #ffe066, 0 2px 12px 0 rgba(255, 230, 102, 0.35);
+  box-shadow: 0 0 24px 8px rgba(255, 230, 102, 0.5),
+    0 2px 12px 0 rgba(255, 230, 102, 0.35), 0 0 0 1px rgba(255, 230, 102, 0.2);
   background: radial-gradient(circle at 60% 40%, #fffbe6 60%, #ffe066 100%);
 }
 .header-rope .bulb-base {
   width: 16px;
   height: 8px;
-  background: #bdbdbd;
+  background: linear-gradient(to bottom, #8b7355 0%, #a1886f 50%, #8b7355 100%);
   border-radius: 0 0 6px 6px;
   margin-top: -2px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08),
+    inset 0 1px 1px rgba(255, 255, 255, 0.2);
 }
 .header-rope .bulb-filament {
   position: absolute;
@@ -254,10 +314,6 @@ onBeforeUnmount(() => {
   left: 12px;
   top: 8px;
   opacity: 0.5;
-}
-
-.header-rope.pulling {
-  transform: translateY(-100%);
 }
 
 @media (max-width: 900px) {

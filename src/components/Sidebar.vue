@@ -22,7 +22,7 @@ const handleScroll = () => {
       </div>
 
       <!-- 向下滚动提示 -->
-      <div class="scroll-hint" @click="handleScroll">
+      <div class="scroll-hint" id="pointer" @click="handleScroll">
         <span>向下滚动查看更多</span>
         <div class="scroll-arrow">
           <span class="material-icons-sharp">expand_more</span>
@@ -43,7 +43,6 @@ const handleScroll = () => {
   position: fixed;
   left: 0;
   top: 60px; /* Header 的高度 */
-  border-right: 1px solid var(--lavender-web);
 }
 
 .sidebar-content {
@@ -108,7 +107,6 @@ const handleScroll = () => {
   align-items: center;
   color: #57606a;
   font-size: var(--fs-14);
-  cursor: pointer;
   transition: transform 0.3s ease;
 }
 

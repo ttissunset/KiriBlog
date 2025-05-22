@@ -40,7 +40,14 @@ const backgroundImages = [
   "https://kirii.online/20250522-102514.webp",
   "https://kirii.online/20250522-102505.webp",
   "https://kirii.online/20250521-225616.webp",
-  "https://kirii.online/20250521-211610.webp"
+  "https://kirii.online/20250521-211610.webp",
+  "https://kirii.online/20250522-105253.webp",
+  "https://kirii.online/20250522-105237.webp",
+  "https://kirii.online/20250522-105233.webp",
+  "https://kirii.online/20250522-105228.webp",
+  "https://kirii.online/20250522-105222.webp",
+  "https://kirii.online/20250522-105733.webp",
+  "https://kirii.online/20250522-105758.webp"
 ];
 
 const currentBgIndex = ref(0);

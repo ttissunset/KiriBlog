@@ -1,12 +1,6 @@
 <script setup>
-import { useBlogStore } from "../stores/blogStore";
 import { ref, onMounted, onUnmounted } from "vue";
-import { useRouter, useRoute } from "vue-router";
 import { debounce } from "../utils";
-
-const blogStore = useBlogStore();
-const router = useRouter();
-const route = useRoute();
 
 // 背景图数组
 const backgroundImages = [
@@ -38,7 +32,15 @@ const backgroundImages = [
   "https://kirii.online/20250521-211541.webp",
   "https://kirii.online/20250521-211536.webp",
   "https://kirii.online/20250521-211528.webp",
-  "https://kirii.online/20250521-211358.webp"
+  "https://kirii.online/20250521-211358.webp",
+  "https://kirii.online/20250522-102546.webp",
+  "https://kirii.online/20250522-102533.webp",
+  "https://kirii.online/20250522-102527.webp",
+  "https://kirii.online/20250522-102522.webp",
+  "https://kirii.online/20250522-102514.webp",
+  "https://kirii.online/20250522-102505.webp",
+  "https://kirii.online/20250521-225616.webp",
+  "https://kirii.online/20250521-211610.webp"
 ];
 
 const currentBgIndex = ref(0);
@@ -90,17 +92,10 @@ const changeBackground = debounce(() => {
 
       // 移除旧动画类并添加新动画类
       backgroundImageContainer.value.classList.remove('changing');
-      backgroundImageContainer.value.classList.add('changed');
-
-      // 动画完成后移除类
-      setTimeout(() => {
-        backgroundImageContainer.value.classList.remove('changed');
-      }, 400);
-
       currentBgIndex.value = newIndex;
     }, 400);
   }
-}, 300); // 300ms 的防抖延迟
+}, 300);
 
 onMounted(() => {
   // 预加载所有图片
@@ -110,35 +105,13 @@ onMounted(() => {
 
 <template>
   <div class="home-view">
-    <!-- 第一页：个人信息 + 背景图 -->
+    <!-- 第一页：背景图 -->
     <section class="page page-one">
-      <div class="page-content">
-        <!-- 左侧1/4：个人信息 -->
-        <div class="profile-info">
-          <!-- 头像及基本个人信息区域 -->
-          <div class="avatar-section">
-            <img src="../assets/avatar.jpg" alt="头像" class="avatar-img" />
-            <h1 class="profile-name">Kiri</h1>
-            <p class="username">苯氨基丙酸</p>
-            <div class="bio">“自由独立试新茶，沉醉半生”</div>
-          </div>
-
-          <!-- 向下滚动提示 -->
-          <div class="scroll-hint">
-            <span>向下滚动查看更多</span>
-            <div class="scroll-arrow">
-              <span class="material-icons-sharp">expand_more</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- 右侧3/4：背景图 -->
-        <div class="background-image-container" ref="backgroundImageContainer">
-          <div class="refresh-button-container">
-            <button class="refresh-button" @click="changeBackground">
-              <span class="material-icons-sharp">refresh</span>
-            </button>
-          </div>
+      <div class="background-image-container" ref="backgroundImageContainer">
+        <div class="refresh-button-container">
+          <button class="refresh-button" @click="changeBackground">
+            <span class="material-icons-sharp">refresh</span>
+          </button>
         </div>
       </div>
     </section>
@@ -318,30 +291,9 @@ onMounted(() => {
   background-color: var(--light-white);
 }
 
-.page-content {
-  display: flex;
-  height: 100%;
-  overflow: hidden;
-}
-
-/* 左侧信息区域 - 占1/4宽度 */
-.profile-info {
-  width: 25%;
-  height: 100%;
-  padding: 40px 20px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  box-sizing: border-box;
-  background-color: var(--light-white);
-  z-index: 10;
-  position: relative;
-  border-right: none;
-}
-
-/* 右侧背景图 - 占3/4宽度 */
+/* 背景图容器 */
 .background-image-container {
-  width: 75%;
+  width: 100%;
   height: 100%;
   background-image: linear-gradient(
       to right,
@@ -353,7 +305,6 @@ onMounted(() => {
   background-size: cover;
   background-position: center;
   position: relative;
-  margin-left: -1px;
   transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   transform-origin: center;
   animation: initialZoom 1.5s ease-out;
@@ -418,90 +369,6 @@ onMounted(() => {
   animation: slideOut 0.4s ease-out forwards;
 }
 
-.background-image-container.changed {
-  animation: slideIn 0.4s ease-out forwards;
-}
-
-/* 头像部分样式 */
-.avatar-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
-.avatar-img {
-  width: 150px;
-  height: 150px;
-  border-radius: var(--radius-circle);
-  border: 1px solid #d0d7de;
-  margin-bottom: 16px;
-  object-fit: cover;
-}
-
-.profile-name {
-  font-size: var(--fs-24);
-  line-height: 1.25;
-  font-weight: var(--fw-600);
-  color: #24292f;
-  margin: 0 0 4px;
-}
-
-.username {
-  font-size: var(--fs-20);
-  font-weight: 300;
-  line-height: 24px;
-  color: #57606a;
-  margin: 0 0 16px;
-}
-
-.bio {
-  margin-bottom: 16px;
-  color: #24292f;
-  font-size: var(--fs-16);
-  line-height: 1.5;
-  font-style: italic;
-  border-left: 3px solid #e0e0e0;
-  padding-left: 16px;
-}
-
-/* 滚动提示 */
-.scroll-hint {
-  position: absolute;
-  bottom: 30px;
-  left: 0;
-  right: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  color: #57606a;
-  font-size: var(--fs-14);
-}
-
-.scroll-arrow {
-  margin-top: 10px;
-  animation: fadeDown 1.8s infinite;
-}
-
-@keyframes fadeDown {
-  0% {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  20% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  80% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-}
-
 /* 第二页样式 */
 .page-two {
   background-color: var(--cultured);
@@ -524,36 +391,67 @@ onMounted(() => {
   max-height: 100%;
 }
 
-/* 基础样式调整 */
-.contact-badges {
+/* 刷新按钮样式 */
+.refresh-button-container {
+  position: absolute;
+  bottom: 20px;
+  right: 50%;
+  transform: translateX(50%);
+}
+
+.refresh-button {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: var(--light-white);
+  border: none;
+  font-weight: 600;
   display: flex;
-  gap: 10px;
-  justify-content: center;
-  margin-top: 20px;
-}
-
-.badge {
-  display: inline-flex;
   align-items: center;
-  padding: 5px 10px;
-  background-color: #f6f8fa;
-  border-radius: 20px;
-  font-size: var(--fs-14);
-  transition: 0.2s;
-  text-decoration: none;
-  color: #24292f;
+  justify-content: center;
+  box-shadow: 0px 0px 0px 4px rgba(180, 160, 255, 0.253);
+  transition-duration: 0.3s;
+  overflow: hidden;
+  position: relative;
 }
 
-.badge:hover {
-  background-color: #eaeef2;
+.refresh-button .material-icons-sharp {
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--blue-crayola);
+  transition-duration: 0.3s;
 }
 
-.badge-icon {
-  margin-right: 5px;
-  font-size: var(--fs-16);
+.refresh-button:hover {
+  width: 120px;
+  border-radius: 50px;
+  transition-duration: 0.3s;
+  align-items: center;
+  background-color: var(--youth-blue-2);
 }
 
-/* README标题 */
+.refresh-button:hover .material-icons-sharp {
+  transition-duration: 0.3s;
+  transform: translateY(-200%);
+}
+
+.refresh-button::before {
+  position: absolute;
+  bottom: -20px;
+  font-family: var(--ff-llt);
+  content: '"换个口味吧~"';
+  color: var(--blue-crayola);
+  font-size: 0px;
+}
+
+.refresh-button:hover::before {
+  font-size: 13px;
+  opacity: 1;
+  bottom: unset;
+  transition-duration: 0.3s;
+}
+
+/* 其他样式保持不变 */
 .readme-title {
   font-size: var(--fs-24);
   color: #24292f;
@@ -596,14 +494,12 @@ onMounted(() => {
   }
 }
 
-/* 简介文本 */
 .intro-text {
   margin-bottom: 20px;
   font-size: var(--fs-16);
   color: #24292f;
 }
 
-/* 信息列表 */
 .info-list {
   list-style: none;
   padding: 0;
@@ -627,7 +523,6 @@ onMounted(() => {
   margin-left: 4px;
 }
 
-/* README分段样式 */
 .readme-section {
   margin-bottom: 24px;
 }
@@ -640,7 +535,6 @@ onMounted(() => {
   padding-bottom: 8px;
 }
 
-/* 关于列表样式 */
 .about-list {
   list-style: none;
   padding: 0;
@@ -662,7 +556,6 @@ onMounted(() => {
   text-decoration: underline;
 }
 
-/* 语言统计样式 */
 .language-section {
   margin-bottom: 32px;
 }
@@ -729,7 +622,6 @@ onMounted(() => {
   background-color: #e34c26;
 }
 
-/* GitHub统计样式 */
 .github-stats {
   margin-bottom: 24px;
 }
@@ -795,7 +687,6 @@ onMounted(() => {
   font-weight: var(--fw-700);
 }
 
-/* 动漫图片容器 */
 .anime-container {
   width: 100%;
   display: flex;
@@ -810,7 +701,6 @@ onMounted(() => {
   object-fit: contain;
 }
 
-/* 友好信息样式 */
 .friendly-message {
   border-left: 4px solid #d0d7de;
   padding-left: 16px;
@@ -835,7 +725,6 @@ onMounted(() => {
   text-decoration: underline;
 }
 
-/* 技术栈样式调整 */
 .tech-stack {
   margin-bottom: 24px;
 }
@@ -871,7 +760,6 @@ onMounted(() => {
   font-size: 10px;
 }
 
-/* 技术栈图标样式 */
 .js-icon {
   background-color: #f7df1e;
   color: #000;
@@ -893,7 +781,6 @@ onMounted(() => {
   border-radius: 4px;
 }
 
-/* 响应式样式 */
 @media (max-width: 1100px) {
   .horizontal-content {
     flex-direction: column;
@@ -919,84 +806,9 @@ onMounted(() => {
     flex-direction: column;
   }
 
-  .profile-info {
-    width: 100%;
-    height: auto;
-    min-height: 50vh;
-  }
-
   .background-image-container {
     width: 100%;
     height: 50vh;
   }
-}
-
-/* 刷新按钮样式 */
-.refresh-button-container {
-  position: absolute;
-  bottom: 20px;
-  right: 50%;
-  transform: translateX(50%);
-}
-
-.refresh-button {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  background-color: var(--light-white);
-  border: none;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0px 0px 0px 4px rgba(180, 160, 255, 0.253);
-  transition-duration: 0.3s;
-  overflow: hidden;
-  position: relative;
-}
-
-.refresh-button .material-icons-sharp {
-  font-size: 24px;
-  cursor: pointer;
-  color: var(--blue-crayola);
-  transition-duration: 0.3s;
-}
-
-.refresh-text {
-  position: absolute;
-  bottom: -20px;
-  color: var(--blue-crayola);
-  font-size: 13px;
-  opacity: 0;
-  transition-duration: 0.3s;
-}
-
-.refresh-button:hover {
-  width: 120px;
-  border-radius: 50px;
-  transition-duration: 0.3s;
-  align-items: center;
-  background-color: var(--youth-blue-2);
-}
-
-.refresh-button:hover .material-icons-sharp {
-  transition-duration: 0.3s;
-  transform: translateY(-200%);
-}
-
-.refresh-button::before {
-  position: absolute;
-  bottom: -20px;
-  content: '“换个口味”';
-  color: var(--blue-crayola);
-  /* transition-duration: .3s; */
-  font-size: 0px;
-}
-
-.refresh-button:hover::before {
-  font-size: 13px;
-  opacity: 1;
-  bottom: unset;
-  transition-duration: 0.3s;
 }
 </style>

@@ -1,5 +1,6 @@
 <script setup>
 import Header from "./components/Header.vue";
+import Sidebar from "./components/Sidebar.vue";
 import { convertAniBinaryToCSS } from "ani-cursor";
 import { onMounted, ref, onUnmounted } from "vue";
 import Sakana from "sakana";
@@ -74,7 +75,7 @@ onMounted(async () => {
     decay: 0.99, // 衰减
     r: 60, // 启动角度
     y: 10, // 启动高度
-    scale: .4 , // 缩放倍数
+    scale: .4, // 缩放倍数
     translateY: 0, // 位移高度
     canSwitchCharacter: true, // 允许换角色
   });
@@ -115,7 +116,7 @@ onUnmounted(() => {
 
 <template>
   <div class="app">
-    <Header />
+    <Sidebar />
     <div class="main-content">
       <router-view></router-view>
     </div>
@@ -173,10 +174,28 @@ input {
   padding: 0;
 }
 
-input[type="checkbox"] {
+input[type='checkbox'] {
   width: 16px;
   height: 16px;
 }
+
+/* 禁止双击选中 */
+* {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* 允许输入框和文本域选中 */
+input,
+textarea {
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
+}
+
 :root {
   /* font-size */
   --fs-12: 12px;
@@ -194,7 +213,7 @@ input[type="checkbox"] {
   --fw-500: 500;
 
   /* font-family */
-  --ff-llt: "llt", llt;
+  --ff-llt: 'llt', llt;
 
   /* color */
   --info-dark: #7d8da1;
@@ -265,15 +284,15 @@ input[type="checkbox"] {
 }
 
 @font-face {
-  font-family: "llt";
-  src: url("./assets/fonts/萝莉体 第二版.ttc");
+  font-family: 'llt';
+  src: url('./assets/fonts/萝莉体 第二版.ttc');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
 .material-icons-sharp {
-  font-family: "Material Icons Sharp";
+  font-family: 'Material Icons Sharp';
   font-weight: normal;
   font-style: normal;
   font-size: 24px;
@@ -289,21 +308,22 @@ input[type="checkbox"] {
 
 .app {
   font-family: var(--ff-llt);
+  display: flex;
+  min-height: 100vh;
 }
 
-/* 禁止双击选中 */
-* {
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
+.main-content {
+  flex: 1;
+  margin-left: 25%;
+  width: 75%;
+  min-height: 100vh;
+  position: relative;
 }
 
-/* 允许输入框和文本域选中 */
-input, textarea {
-  -webkit-user-select: text;
-  -moz-user-select: text;
-  -ms-user-select: text;
-  user-select: text;
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 0;
+    width: 100%;
+  }
 }
 </style>

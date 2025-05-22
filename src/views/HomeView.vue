@@ -424,7 +424,6 @@ onMounted(() => {
 
 .refresh-button .material-icons-sharp {
   font-size: 24px;
-  cursor: pointer;
   color: var(--blue-crayola);
   transition-duration: 0.3s;
 }

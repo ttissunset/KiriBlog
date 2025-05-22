@@ -1,8 +1,30 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import Header from './Header.vue';
+import MusicPlayer from './MusicPlayer.vue';
 
 const emit = defineEmits(['scrollToContent']);
+const displayBio = ref('');
+const fullBio = '"自由独立试新茶，沉醉半生"';
+
+const typeWriter = () => {
+  let i = 0;
+  const speed = 100; // 打字速度（毫秒）
+
+  const type = () => {
+    if (i < fullBio.length) {
+      displayBio.value += fullBio.charAt(i);
+      i++;
+      setTimeout(type, speed);
+    }
+  };
+
+  type();
+};
+
+onMounted(() => {
+  typeWriter();
+});
 
 const handleScroll = () => {
   emit('scrollToContent');
@@ -18,8 +40,11 @@ const handleScroll = () => {
         <img src="../assets/avatar.jpg" alt="头像" class="avatar-img" />
         <h1 class="profile-name">Kiri</h1>
         <p class="username">苯氨基丙酸</p>
-        <div class="bio">"自由独立试新茶，沉醉半生"</div>
+        <div class="bio">{{ displayBio }}</div>
       </div>
+
+      <!-- 音乐播放器组件 -->
+      <MusicPlayer />
 
       <!-- 向下滚动提示 -->
       <div class="scroll-hint" id="pointer" @click="handleScroll">

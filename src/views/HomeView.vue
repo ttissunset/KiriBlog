@@ -126,7 +126,7 @@ onMounted(() => {
     </section>
 
     <!-- 第二页：README内容横向排布 -->
-    <section class="page page-two">
+    <section class="page page-two" id="page-two">
       <div class="horizontal-content">
         <!-- 左侧：个人介绍和技术栈 -->
         <div class="left-content">

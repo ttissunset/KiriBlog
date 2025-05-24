@@ -1,21 +1,30 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue';
+import { ref, onMounted, onBeforeUnmount, nextTick } from "vue";
 
 const isMenuActive = ref(false);
 const isHeaderVisible = ref(false); // header是否可见
-const isRopeVisible = ref(false);   // 抽绳是否可见
-const isRopePulling = ref(false);   // 抽绳拉动动画
-const isRopeAppear = ref(false);    // 抽绳出现动画
+const isRopeVisible = ref(false); // 抽绳是否可见
+const isRopePulling = ref(false); // 抽绳拉动动画
+const isRopeAppear = ref(false); // 抽绳出现动画
 
 const showHeader = () => {
-  isHeaderVisible.value = true;
-  isRopeVisible.value = false;
+  // 开始隐藏抽绳动画 (opacity to 0)
   isRopeAppear.value = false;
+  // 等待动画完成后再隐藏元素并显示Header
+  setTimeout(() => {
+    isRopeVisible.value = false;
+    isHeaderVisible.value = true;
+  }, 50); // 与opacity过渡时间一致
 };
+
 const hideHeader = () => {
-  isHeaderVisible.value = false;
+  // 显示抽绳元素 (initially opacity is 0)
   isRopeVisible.value = true;
-  isRopeAppear.value = true;
+  isHeaderVisible.value = false;
+  // 短暂延迟后开始抽绳出现动画 (opacity to 1)
+  setTimeout(() => {
+    isRopeAppear.value = true;
+  }, 10); // 短暂延迟确保isRopeVisible已生效
 };
 
 const pullRope = async () => {
@@ -41,10 +50,6 @@ onMounted(() => {
     showHeader();
   }, 200);
   window.addEventListener("scroll", handleScroll);
-  // 抽绳动画初始
-  setTimeout(() => {
-    isRopeAppear.value = true;
-  }, 10);
 });
 
 onBeforeUnmount(() => {
@@ -55,7 +60,10 @@ onBeforeUnmount(() => {
 <template>
   <div>
     <!-- Header主栏 -->
-    <header class="side-header" :class="{ 'visible': isHeaderVisible, 'hidden': !isHeaderVisible }">
+    <header
+      class="side-header"
+      :class="{ visible: isHeaderVisible, hidden: !isHeaderVisible }"
+    >
       <div class="header-content">
         <div class="logo">
           <router-link to="/">山茶</router-link>
@@ -72,14 +80,25 @@ onBeforeUnmount(() => {
       </div>
     </header>
     <!-- 灯泡拉绳 -->
-    <div v-if="isRopeVisible" class="header-rope" id="pointer" :class="{ 'pulling': isRopePulling, 'rope-appear': isRopeAppear }" @click="pullRope">
+    <div
+      v-if="isRopeVisible"
+      class="header-rope"
+      id="pointer"
+      :class="{ pulling: isRopePulling, 'rope-appear': isRopeAppear }"
+      @click="pullRope"
+    >
       <div class="rope-line"></div>
       <div class="bulb-wrap">
         <div class="bulb">
           <div class="bulb-ball"></div>
           <div class="bulb-filament">
             <svg viewBox="0 0 16 10">
-              <path d="M2 8 Q8 2 14 8" stroke="#e6b800" stroke-width="2" fill="none" />
+              <path
+                d="M2 8 Q8 2 14 8"
+                stroke="#e6b800"
+                stroke-width="2"
+                fill="none"
+              />
             </svg>
           </div>
         </div>
@@ -208,7 +227,7 @@ onBeforeUnmount(() => {
 }
 
 .header-rope .rope-line::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -304,7 +323,7 @@ onBeforeUnmount(() => {
 }
 
 .header-rope .bulb-ball:after {
-  content: '';
+  content: "";
   display: block;
   width: 8px;
   height: 8px;
@@ -324,4 +343,4 @@ onBeforeUnmount(() => {
     padding: 0 10vw;
   }
 }
-</style> 
+</style>

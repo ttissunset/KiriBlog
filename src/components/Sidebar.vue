@@ -64,8 +64,6 @@ const handleScroll = () => {
       <!-- 头像及基本个人信息区域 -->
       <div class="avatar-section">
         <img src="../assets/avatar.jpg" alt="头像" class="avatar-img" />
-        <h1 class="profile-name">Kiri</h1>
-        <p class="username">苯氨基丙酸</p>
         <div class="bio">{{ displayBio }}</div>
       </div>
 
@@ -119,22 +117,6 @@ const handleScroll = () => {
   border: 1px solid #d0d7de;
   margin-bottom: 16px;
   object-fit: cover;
-}
-
-.profile-name {
-  font-size: var(--fs-24);
-  line-height: 1.25;
-  font-weight: var(--fw-600);
-  color: #24292f;
-  margin: 0 0 4px;
-}
-
-.username {
-  font-size: var(--fs-20);
-  font-weight: 300;
-  line-height: 24px;
-  color: #57606a;
-  margin: 0 0 16px;
 }
 
 .bio {

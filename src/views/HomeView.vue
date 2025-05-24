@@ -2,6 +2,10 @@
 import { ref, onMounted, onUnmounted } from "vue";
 import { debounce } from "../utils";
 
+const visitor = "https://api.likepoems.com/counter/get/@kiriBlog";
+const visitorImg = new Image();
+visitorImg.src = visitor;
+
 // 背景图数组
 const backgroundImages = [
   "https://kirii.online/20250514-003324.jpeg",
@@ -49,6 +53,7 @@ const backgroundImages = [
   "https://kirii.online/20250522-105733.webp",
   "https://kirii.online/20250522-105758.webp",
   "https://kirii.online/bLDm3.webp",
+  "https://kirii.online/65f927e1b1b63.jpg",
 ];
 
 const currentBgIndex = ref(0);
@@ -113,9 +118,8 @@ onMounted(() => {
 
 <template>
   <div class="home-view">
-    <!-- 第一页：背景图 -->
+    <!-- 第一页 -->
     <section class="page page-one">
-      <!-- 渐变覆盖层 -->
       <div class="gradient-overlay"></div>
       <div class="background-image-container" ref="backgroundImageContainer">
         <div class="refresh-button-container">
@@ -126,161 +130,92 @@ onMounted(() => {
       </div>
     </section>
 
-    <!-- 第二页：README内容横向排布 -->
+    <!-- 第二页 -->
     <section class="page page-two" id="page-two">
       <div class="horizontal-content">
-        <!-- 左侧：个人介绍和技术栈 -->
         <div class="left-content">
-          <h2 class="readme-title">
-            Hello
-            <span class="wave-emoji">
-              <span class="material-icons-sharp">waving_hand</span>
-            </span>
-          </h2>
+          <!-- 个人简介卡片 -->
+          <div class="profile-card">
+            <div class="profile-header">
+              <div class="profile-avatar">
+                <img src="../assets/avatar.jpg" alt="Kiri" />
+              </div>
+              <div class="profile-info">
+                <h2 class="profile-name">Kiri</h2>
+                <p class="profile-title">前端开发工程师</p>
+              </div>
+            </div>
+            <div class="profile-stats">
+              <div class="stat-item">
+                <span class="stat-value">3+</span>
+                <span class="stat-label">年工作经验</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-value">50+</span>
+                <span class="stat-label">项目经验</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-value">100+</span>
+                <span class="stat-label">技术文章</span>
+              </div>
+            </div>
+          </div>
 
-          <p class="intro-text">我是 Kiri</p>
+          <!-- 访问量 -->
+          <div class="visitor-counter">
+            <img :src="visitorImg.src" alt="name" />
+          </div>
 
-          <!-- 个人信息列表 -->
-          <ul class="info-list">
-            <li class="info-item">
-              <span class="bullet">•</span>
-              <span>一位前端开发者</span>
-            </li>
-            <li class="info-item">
-              <span class="bullet">•</span>
-              <span>
-                <span class="material-icons-sharp">grass</span> 目前居住在广州
-              </span>
-            </li>
-            <li class="info-item">
-              <span class="bullet">•</span>
-              <span>
+          <!-- 社交媒体 -->
+          <div class="social-section">
+            <h3 class="section-heading">社交媒体</h3>
+            <div class="social-grid">
+              <a href="#" class="social-item">
+                <span class="material-icons-sharp">code</span>
+                <span>GitHub</span>
+              </a>
+              <a href="#" class="social-item">
                 <span class="material-icons-sharp">chat</span>
-                如果你有疑问，可以联系我
-              </span>
-              <span class="email-link">273390867@qq.com</span>
-            </li>
-          </ul>
-
-          <!-- 技术栈部分 -->
-          <div class="tech-stack">
-            <h3>技术栈</h3>
-            <div class="tech-tags">
-              <div class="tech-row">
-                <div class="tech-tag">
-                  <span class="badge-icon-small js-icon">JS</span>
-                  <span>JavaScript</span>
-                </div>
-                <div class="tech-tag">
-                  <span class="badge-icon-small vue-icon">Vue</span>
-                  <span>Vue</span>
-                </div>
-                <div class="tech-tag">
-                  <span class="badge-icon-small node-icon">Node</span>
-                  <span>Node.js</span>
-                </div>
-              </div>
+                <span>微信</span>
+              </a>
             </div>
           </div>
 
-          <!-- 关于我部分 -->
-          <div class="readme-section">
-            <h3 class="section-heading">关于我</h3>
-            <ul class="about-list">
-              <li class="about-item">
-                <span class="bullet">•</span>
-                <a href="https://github.com/ttissunset" class="about-link"
-                  >我的github</a
-                >
-              </li>
-              <li class="about-item">
-                <span class="bullet">•</span>
-                <a href="#" class="about-link">简历</a>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        <!-- 中间：技术统计和GitHub统计 -->
-        <div class="middle-content">
-          <!-- 语言统计部分 -->
-          <div class="readme-section language-section">
-            <h3 class="section-heading">Most Used Languages</h3>
-            <div class="language-stats">
-              <div class="language-bar">
-                <div class="bar-segment javascript" style="width: 64.8%"></div>
-                <div class="bar-segment css" style="width: 13.99%"></div>
-                <div class="bar-segment html" style="width: 21.21%"></div>
-              </div>
-              <div class="language-labels">
-                <div class="language-label javascript">
-                  <span class="label-dot"></span>
-                  <span>JavaScript 64.80%</span>
+          <!-- 技术栈展示 -->
+          <div class="readme-section tech-showcase">
+            <h3 class="section-heading">技术栈</h3>
+            <div class="tech-grid">
+              <div class="tech-item">
+                <div class="tech-icon">
+                  <img
+                    src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vuejs/vuejs-original.svg"
+                    alt="Vue.js"
+                  />
                 </div>
-                <div class="language-label css">
-                  <span class="label-dot"></span>
-                  <span>CSS 13.99%</span>
-                </div>
-                <div class="language-label html">
-                  <span class="label-dot"></span>
-                  <span>HTML 21.21%</span>
+                <div class="tech-info">
+                  <h4>Vue.js</h4>
+                  <p>前端框架</p>
                 </div>
               </div>
-            </div>
-          </div>
-
-          <!-- GitHub统计部分 -->
-          <div class="github-stats">
-            <h3>GitHub 统计</h3>
-            <div class="stats-container">
-              <div class="stats-data">
-                <div class="stat-item">
-                  <span class="material-icons-sharp">star</span>
-                  <div class="stat-details">
-                    <div class="stat-value">1024</div>
-                    <div class="stat-label">Total Stars</div>
-                  </div>
+              <div class="tech-item">
+                <div class="tech-icon">
+                  <img
+                    src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg"
+                    alt="Node.js"
+                  />
                 </div>
-                <div class="stat-item">
-                  <span class="material-icons-sharp">fork_right</span>
-                  <div class="stat-details">
-                    <div class="stat-value">512</div>
-                    <div class="stat-label">Commits (2023)</div>
-                  </div>
+                <div class="tech-info">
+                  <h4>Node.js</h4>
+                  <p>后端开发</p>
                 </div>
-              </div>
-              <div class="github-grade">
-                <div class="grade-circle">C</div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- 右侧：动漫图片和友好信息 -->
+        <div class="middle-content"></div>
+
         <div class="right-content">
-          <!-- 动漫图片容器 -->
-          <div class="anime-container">
-            <img
-              src="../assets/l2d.webp"
-              alt="Anime character"
-              class="anime-image"
-            />
-          </div>
-
-          <!-- 友好信息 -->
-          <div class="friendly-message">
-            <p>
-              I love to make friends, so if you want to say hi, I'll be happy to
-              meet you more! 😊
-            </p>
-            <p class="from-text">
-              <span class="wave-emoji">
-                <span class="material-icons-sharp">waving_hand</span>
-              </span>
-              From
-              <a href="#" class="author-link">Kiri</a>
-            </p>
-          </div>
         </div>
       </div>
     </section>
@@ -305,7 +240,7 @@ onMounted(() => {
 /* 第一页样式 */
 .page-one {
   background-color: var(--light-white);
-  position: relative; /* Ensure positioning context for overlay */
+  position: relative;
 }
 
 /* 渐变覆盖层 */
@@ -313,7 +248,7 @@ onMounted(() => {
   position: absolute;
   top: 0;
   left: 0;
-  width: 40%; /* Might need to adjust width to accommodate longer fade */
+  width: 40%;
   height: 100%;
   background-image: linear-gradient(
     to right,
@@ -327,24 +262,23 @@ onMounted(() => {
     rgba(255, 255, 255, 0.4) 35%,
     rgba(255, 255, 255, 0.2) 45%,
     rgba(255, 255, 255, 0) 55%
-      /* Extend the fade out range for a more thorough dissolve */
   );
-  z-index: 2; /* Ensure it's above the background image */
-  pointer-events: none; /* Allow clicks to pass through */
+  z-index: 2;
+  pointer-events: none;
 }
 
 /* 背景图容器 */
 .background-image-container {
   width: 100%;
   height: 100%;
-  background-image: url("https://kirii.online/20250514-003324.jpeg"); /* Initial image without gradient */
+  background-image: url("https://kirii.online/20250514-003324.jpeg");
   background-size: cover;
   background-position: center;
   position: relative;
   transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   transform-origin: center;
   animation: initialZoom 1.5s ease-out;
-  z-index: 1; /* Ensure it's below the overlay */
+  z-index: 1;
 }
 
 @keyframes initialZoom {
@@ -382,28 +316,28 @@ onMounted(() => {
 /* 添加图片切换动画 */
 @keyframes slideIn {
   0% {
-    transform: translateX(100%) scale(1.2); /* Keep animation */
+    transform: translateX(100%) scale(1.2);
     opacity: 0;
   }
   100% {
-    transform: translateX(0) scale(1); /* Keep animation */
+    transform: translateX(0) scale(1);
     opacity: 1;
   }
 }
 
 @keyframes slideOut {
   0% {
-    transform: translateX(0) scale(1); /* Keep animation */
+    transform: translateX(0) scale(1);
     opacity: 1;
   }
   100% {
-    transform: translateX(-100%) scale(0.8); /* Keep animation */
+    transform: translateX(-100%) scale(0.8);
     opacity: 0;
   }
 }
 
 .background-image-container.changing {
-  animation: slideOut 0.4s ease-out forwards; /* Apply animation only to image */
+  animation: slideOut 0.4s ease-out forwards;
 }
 
 /* 第二页样式 */
@@ -463,7 +397,6 @@ onMounted(() => {
   border-radius: 50px;
   transition-duration: 0.3s;
   align-items: center;
-  background-color: var(--youth-blue-2);
 }
 
 .refresh-button:hover .material-icons-sharp {
@@ -815,5 +748,406 @@ onMounted(() => {
   color: #fff;
   padding: 2px 4px;
   border-radius: 4px;
+}
+
+/* 技能进度条样式 */
+.skills-section {
+  margin-bottom: 32px;
+}
+
+.skills-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.skill-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.skill-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.skill-name {
+  font-size: var(--fs-14);
+  color: var(--dark);
+}
+
+.skill-percentage {
+  font-size: var(--fs-12);
+  color: var(--blue-crayola);
+}
+
+.skill-bar {
+  height: 6px;
+  background-color: var(--cultured);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.skill-progress {
+  height: 100%;
+  background-color: var(--blue-crayola);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+/* 项目展示样式 */
+.projects-section {
+  margin-bottom: 32px;
+}
+
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.project-card {
+  background-color: var(--light-white);
+  border-radius: var(--radius-8);
+  padding: 16px;
+  box-shadow: var(--shadow-1);
+  transition: transform 0.3s ease;
+}
+
+.project-card:hover {
+  transform: translateY(-4px);
+}
+
+.project-icon {
+  width: 40px;
+  height: 40px;
+  background-color: var(--youth-blue-3);
+  border-radius: var(--radius-circle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.project-icon .material-icons-sharp {
+  color: var(--blue-crayola);
+  font-size: 20px;
+}
+
+.project-title {
+  font-size: var(--fs-16);
+  font-weight: var(--fw-600);
+  color: var(--dark);
+  margin-bottom: 8px;
+}
+
+.project-desc {
+  font-size: var(--fs-12);
+  color: var(--dark);
+  opacity: 0.7;
+  margin-bottom: 12px;
+}
+
+.project-tags {
+  display: flex;
+  gap: 8px;
+}
+
+.project-tag {
+  font-size: var(--fs-10);
+  color: var(--blue-crayola);
+  background-color: var(--youth-blue-3);
+  padding: 2px 8px;
+  border-radius: var(--radius-4);
+}
+
+/* 社交媒体样式 */
+.social-section {
+  margin-bottom: 32px;
+}
+
+.social-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.social-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background-color: var(--light-white);
+  border-radius: var(--radius-8);
+  text-decoration: none;
+  color: var(--dark);
+  transition: all 0.3s ease;
+}
+
+.social-item:hover {
+  background-color: var(--youth-blue-3);
+  color: var(--blue-crayola);
+  transform: translateY(-2px);
+}
+
+.social-item .material-icons-sharp {
+  font-size: 20px;
+}
+
+/* 时间线样式 */
+.timeline-section {
+  margin-bottom: 32px;
+}
+
+.timeline {
+  position: relative;
+  padding-left: 24px;
+}
+
+.timeline::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background-color: var(--youth-blue-3);
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 32px;
+}
+
+.timeline-dot {
+  position: absolute;
+  left: -29px;
+  top: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: var(--blue-crayola);
+  border: 2px solid var(--light-white);
+}
+
+.timeline-content {
+  background-color: var(--light-white);
+  padding: 16px;
+  border-radius: var(--radius-8);
+  box-shadow: var(--shadow-1);
+}
+
+.timeline-date {
+  font-size: var(--fs-12);
+  color: var(--blue-crayola);
+  margin-bottom: 8px;
+}
+
+.timeline-title {
+  font-size: var(--fs-16);
+  font-weight: var(--fw-600);
+  color: var(--dark);
+  margin-bottom: 4px;
+}
+
+.timeline-company {
+  font-size: var(--fs-14);
+  color: var(--dark);
+  opacity: 0.7;
+  margin-bottom: 8px;
+}
+
+.timeline-desc {
+  font-size: var(--fs-12);
+  color: var(--dark);
+  opacity: 0.8;
+  line-height: 1.5;
+}
+
+/* 技术栈展示样式 */
+.tech-showcase {
+  margin-bottom: 32px;
+}
+
+.tech-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.tech-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background-color: var(--light-white);
+  border-radius: var(--radius-8);
+  transition: transform 0.3s ease;
+}
+
+.tech-item:hover {
+  transform: translateY(-4px);
+}
+
+.tech-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tech-icon img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.tech-info h4 {
+  font-size: var(--fs-14);
+  font-weight: var(--fw-600);
+  color: var(--dark);
+  margin-bottom: 4px;
+}
+
+.tech-info p {
+  font-size: var(--fs-12);
+  color: var(--dark);
+  opacity: 0.7;
+}
+
+/* 成就展示样式 */
+.achievements {
+  margin-bottom: 32px;
+}
+
+.achievements-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.achievement-card {
+  display: flex;
+  align-items: flex-start;
+  padding: 16px;
+  background-color: var(--light-white);
+  border-radius: var(--radius-8);
+  transition: transform 0.3s ease;
+}
+
+.achievement-card:hover {
+  transform: translateY(-4px);
+}
+
+.achievement-icon {
+  width: 40px;
+  height: 40px;
+  background-color: var(--youth-blue-3);
+  border-radius: var(--radius-circle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.achievement-icon .material-icons-sharp {
+  color: var(--blue-crayola);
+  font-size: 20px;
+}
+
+.achievement-content h4 {
+  font-size: var(--fs-14);
+  font-weight: var(--fw-600);
+  color: var(--dark);
+  margin-bottom: 4px;
+}
+
+.achievement-content p {
+  font-size: var(--fs-12);
+  color: var(--dark);
+  opacity: 0.7;
+  line-height: 1.5;
+}
+
+/* 个人简介卡片样式 */
+.profile-card {
+  background-color: var(--light-white);
+  border-radius: var(--radius-12);
+  padding: 24px;
+  margin-bottom: 32px;
+  box-shadow: var(--shadow-1);
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.profile-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-circle);
+  overflow: hidden;
+  border: 3px solid var(--blue-crayola);
+}
+
+.profile-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-info {
+  flex: 1;
+}
+
+.profile-name {
+  font-size: var(--fs-24);
+  font-weight: var(--fw-600);
+  color: var(--dark);
+  margin-bottom: 4px;
+}
+
+.profile-title {
+  font-size: var(--fs-14);
+  color: var(--dark);
+  opacity: 0.7;
+}
+
+.profile-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--cultured);
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.stat-value {
+  font-size: var(--fs-20);
+  font-weight: var(--fw-600);
+  color: var(--blue-crayola);
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-size: var(--fs-12);
+  color: var(--dark);
+  opacity: 0.7;
+}
+
+.visitor-counter img {
+  width: 100%;
+  margin-bottom: 32px;
 }
 </style>

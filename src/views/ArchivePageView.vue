@@ -1,11 +1,5 @@
 <template>
   <div class="archive-page">
-    <!-- 页面头部 -->
-    <div class="archive-header">
-      <h1 class="archive-title">归档</h1>
-      <p class="archive-subtitle">按时间顺序浏览所有文章</p>
-    </div>
-
     <!-- 归档内容 -->
     <div class="archive-content">
       <!-- 年份区块 -->
@@ -19,8 +13,9 @@
             <div class="article-dot"></div>
             <div class="article-content">
               <div class="article-left">
-                <div class="article-icon note"></div>
-                <a href="#" class="article-title">记一次 Linux 服务器迁移与抢救历程</a>
+                <a href="#" class="article-title"
+                  >记一次 Linux 服务器迁移与抢救历程</a
+                >
               </div>
               <div class="article-right">
                 <div class="article-tag note">记录 / 生活记录</div>
@@ -33,8 +28,10 @@
             <div class="article-dot"></div>
             <div class="article-content">
               <div class="article-left">
-                <div class="article-icon doc"></div>
-                <a href="#" class="article-title">Redux 数据仓库的数据持久化和 Next.js 中使用流程 | JustPure 起始页的构建历程</a>
+                <a href="#" class="article-title"
+                  >Redux 数据仓库的数据持久化和 Next.js 中使用流程 | JustPure
+                  起始页的构建历程</a
+                >
               </div>
               <div class="article-right">
                 <div class="article-tag tech">文章 / 技术学习</div>
@@ -47,8 +44,10 @@
             <div class="article-dot"></div>
             <div class="article-content">
               <div class="article-left">
-                <div class="article-icon doc"></div>
-                <a href="#" class="article-title">零成本手把手带你建一个学习笔记网站（AriaDocs 项目的使用简记）</a>
+                <a href="#" class="article-title"
+                  >零成本手把手带你建一个学习笔记网站（AriaDocs
+                  项目的使用简记）</a
+                >
               </div>
               <div class="article-right">
                 <div class="article-tag tech">文章 / 折腾不止</div>
@@ -61,8 +60,10 @@
             <div class="article-dot"></div>
             <div class="article-content">
               <div class="article-left">
-                <div class="article-icon note"></div>
-                <a href="#" class="article-title">最近的坎坷故事_多项目并行、偶遇传染病、DeepSeek 本地化部署，及记一次开源 WAF 尝试</a>
+                <a href="#" class="article-title"
+                  >最近的坎坷故事_多项目并行、偶遇传染病、DeepSeek
+                  本地化部署，及记一次开源 WAF 尝试</a
+                >
               </div>
               <div class="article-right">
                 <div class="article-tag note">记录 / 生活感悟</div>
@@ -75,8 +76,9 @@
             <div class="article-dot"></div>
             <div class="article-content">
               <div class="article-left">
-                <div class="article-icon doc"></div>
-                <a href="#" class="article-title">动手部署 Grtblog 前后端，即刻拥有自己的博客网站</a>
+                <a href="#" class="article-title"
+                  >动手部署 Grtblog 前后端，即刻拥有自己的博客网站</a
+                >
               </div>
               <div class="article-right">
                 <div class="article-tag tech">文章 / 技术学习</div>
@@ -89,8 +91,9 @@
             <div class="article-dot"></div>
             <div class="article-content">
               <div class="article-left">
-                <div class="article-icon doc"></div>
-                <a href="#" class="article-title">刷机半生，归来仍是 MIUI | HyperOS2 初体验及亿些吐槽</a>
+                <a href="#" class="article-title"
+                  >刷机半生，归来仍是 MIUI | HyperOS2 初体验及亿些吐槽</a
+                >
               </div>
               <div class="article-right">
                 <div class="article-tag tech">文章 / 折腾不止</div>
@@ -103,8 +106,9 @@
             <div class="article-dot"></div>
             <div class="article-content">
               <div class="article-left">
-                <div class="article-icon note"></div>
-                <a href="#" class="article-title">扩展编辑器，整合搜索...问题解决清单控！</a>
+                <a href="#" class="article-title"
+                  >扩展编辑器，整合搜索...问题解决清单控！</a
+                >
               </div>
               <div class="article-right">
                 <div class="article-tag note">记录 / 简单记录</div>
@@ -118,33 +122,54 @@
 </template>
 
 <script setup>
+import { onMounted } from 'vue';
 
+onMounted(() => {
+  const archiveContent = document.querySelector('.archive-content');
+  if (!archiveContent) return;
+  // 只处理纯文本节点
+  function typeText(node) {
+    if (node.nodeType === 3) {
+      const text = node.nodeValue;
+      node.nodeValue = '';
+      let i = 0;
+      function typeChar() {
+        if (i <= text.length) {
+          node.nodeValue = text.slice(0, i);
+          i++;
+          setTimeout(typeChar, 18);
+        }
+      }
+      typeChar();
+    } else if (node.nodeType === 1) {
+      // 递归处理子节点
+      node.childNodes.forEach(typeText);
+    }
+  }
+  archiveContent.childNodes.forEach(typeText);
+});
 </script>
 
 <style scoped>
+:root {
+  --purplr-crayola: #b39ddb;
+}
+
 .archive-page {
   max-width: 1000px;
   margin: 0 auto;
   padding: 20px 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
-.archive-header {
-  text-align: center;
-  margin-bottom: 60px;
-}
-
-.archive-title {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: var(--text-color);
-  margin-bottom: 10px;
-}
-
-.archive-subtitle {
-  font-size: 1rem;
-  color: var(--text-color);
-  opacity: 0.7;
-  font-weight: 400;
+.archive-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .year-block {
@@ -154,7 +179,7 @@
 .year-title {
   font-size: 1.8rem;
   font-weight: 600;
-  color: var(--text-color);
+  color: var(--dark);
   margin-bottom: 30px;
 }
 
@@ -164,14 +189,15 @@
 }
 
 .article-timeline::before {
-  content: '';
+  content: "";
   position: absolute;
-  left: 80px;
+  left: 85px;
   top: 0;
   bottom: 0;
   width: 2px;
-  background-color: var(--border-color);
+  background: var(--purplr-crayola);
   opacity: 0.5;
+  z-index: 0;
 }
 
 .article-item {
@@ -184,7 +210,7 @@
 .article-date {
   width: 60px;
   font-size: 0.9rem;
-  color: var(--text-color);
+  color: var(--dark-variant);
   opacity: 0.7;
   padding-top: 5px;
   flex-shrink: 0;
@@ -193,12 +219,12 @@
 .article-dot {
   position: absolute;
   left: 80px;
-  top: 10px;
-  width: 10px;
-  height: 10px;
+  top: 14px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  background-color: #4f86f7;
-  transform: translateX(-4px);
+  background: var(--purplr-crayola);
+  box-shadow: 0 0 0 2px #ede7f6;
   z-index: 2;
 }
 
@@ -234,7 +260,7 @@
 }
 
 .article-icon.note::before {
-  content: '';
+  content: "";
   position: absolute;
   width: 100%;
   height: 100%;
@@ -244,7 +270,7 @@
 }
 
 .article-icon.doc::before {
-  content: '';
+  content: "";
   position: absolute;
   width: 100%;
   height: 100%;
@@ -255,7 +281,7 @@
 
 .article-title {
   font-size: 1rem;
-  color: var(--text-color);
+  color: var(--dark);
   text-decoration: none;
   display: inline-block;
   transition: all 0.2s;
@@ -267,7 +293,7 @@
 }
 
 .article-title:hover {
-  color: #4f86f7;
+  color: var(--blue-crayola);
   text-decoration: underline;
 }
 
@@ -324,5 +350,9 @@
   .article-left {
     margin-right: 0;
   }
+
+  .article-title {
+    font-size: 1rem;
+  }
 }
-</style> 
+</style>

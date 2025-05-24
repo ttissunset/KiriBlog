@@ -252,15 +252,13 @@ textarea {
   --bg-green: rgb(229, 243, 229);
   --blackish-green: rgb(40, 72, 64);
   --blue-purple: rgb(153, 180, 222);
-  --youth-blue: rgb(199, 206, 232);
+  --youth-blue: #e1d5f4;
   --youth-blue-dark: rgb(144, 162, 216);
   --youth-blue-purple: rgb(98, 125, 211);
   --red: rgb(255, 0, 0);
   --dark-pink: hsl(358, 91%, 70%);
   --light-gray: rgb(139, 128, 128);
   --dark-gray: rgb(146, 137, 137);
-  --youth-blue-2: rgb(215, 223, 250);
-  --youth-blue-3: rgb(244, 246, 252);
   --blue: rgb(83, 147, 194);
   --blue-crayola: hsla(219, 72%, 56%, 1);
   --purplr-crayola: #c471d6;

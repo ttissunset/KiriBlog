@@ -47,7 +47,8 @@ const backgroundImages = [
   "https://kirii.online/20250522-105228.webp",
   "https://kirii.online/20250522-105222.webp",
   "https://kirii.online/20250522-105733.webp",
-  "https://kirii.online/20250522-105758.webp"
+  "https://kirii.online/20250522-105758.webp",
+  "https://kirii.online/bLDm3.webp",
 ];
 
 const currentBgIndex = ref(0);
@@ -67,7 +68,7 @@ const preloadImage = (url) => {
 
 // 预加载所有图片
 const preloadAllImages = () => {
-  backgroundImages.forEach(url => preloadImage(url));
+  backgroundImages.forEach((url) => preloadImage(url));
 };
 
 // 随机切换背景图
@@ -85,7 +86,7 @@ const changeBackground = debounce(() => {
     }
 
     // 添加切换动画类
-    backgroundImageContainer.value.classList.add('changing');
+    backgroundImageContainer.value.classList.add("changing");
 
     // 等待动画完成后再切换图片
     setTimeout(() => {
@@ -98,7 +99,7 @@ const changeBackground = debounce(() => {
       url('${newImage}')`;
 
       // 移除旧动画类并添加新动画类
-      backgroundImageContainer.value.classList.remove('changing');
+      backgroundImageContainer.value.classList.remove("changing");
       currentBgIndex.value = newIndex;
     }, 400);
   }
@@ -188,7 +189,9 @@ onMounted(() => {
             <ul class="about-list">
               <li class="about-item">
                 <span class="bullet">•</span>
-                <a href="https://github.com/ttissunset" class="about-link">我的github</a>
+                <a href="https://github.com/ttissunset" class="about-link"
+                  >我的github</a
+                >
               </li>
               <li class="about-item">
                 <span class="bullet">•</span>
@@ -257,7 +260,11 @@ onMounted(() => {
         <div class="right-content">
           <!-- 动漫图片容器 -->
           <div class="anime-container">
-            <img src="../assets/l2d.webp" alt="Anime character" class="anime-image" />
+            <img
+              src="../assets/l2d.webp"
+              alt="Anime character"
+              class="anime-image"
+            />
           </div>
 
           <!-- 友好信息 -->
@@ -319,7 +326,8 @@ onMounted(() => {
     rgba(255, 255, 255, 0.6) 25%,
     rgba(255, 255, 255, 0.4) 35%,
     rgba(255, 255, 255, 0.2) 45%,
-    rgba(255, 255, 255, 0) 55% /* Extend the fade out range for a more thorough dissolve */
+    rgba(255, 255, 255, 0) 55%
+      /* Extend the fade out range for a more thorough dissolve */
   );
   z-index: 2; /* Ensure it's above the background image */
   pointer-events: none; /* Allow clicks to pass through */
@@ -329,7 +337,7 @@ onMounted(() => {
 .background-image-container {
   width: 100%;
   height: 100%;
-  background-image: url('https://kirii.online/20250514-003324.jpeg'); /* Initial image without gradient */
+  background-image: url("https://kirii.online/20250514-003324.jpeg"); /* Initial image without gradient */
   background-size: cover;
   background-position: center;
   position: relative;
@@ -351,7 +359,7 @@ onMounted(() => {
 }
 
 .background-image-container::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;

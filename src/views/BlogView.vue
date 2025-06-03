@@ -17,91 +17,37 @@
       <!-- 主要内容区 -->
       <div class="blog-container-wrapper">
         <!-- 时间线浏览模式 -->
-        <template v-if="filteredArticles.length > 0 && !activeCategory && !activeTag">
+        <template v-if="archivedArticles">
           <div class="timeline-view">
             <!-- 文章年份归档区域 -->
-            <template v-if="archivedArticles">
-              <div v-for="year in Object.keys(archivedArticles).sort((a, b) => b - a)" :key="year" class="blog-date-group">
-                <div class="date-label">
-                  <span>{{ year }}</span>
+            <div v-for="year in Object.keys(archivedArticles).sort((a, b) => b - a)" :key="year" class="blog-date-group">
+              <div class="date-label">
+                <span>{{ year }}</span>
+              </div>
+
+              <!-- 文章月份归档区域 -->
+              <div v-for="month in Object.keys(archivedArticles[year] || {}).sort((a, b) => b - a)" :key="`${year}-${month}`" class="month-block">
+                <div class="month-marker">
+                  {{ month }}月
                 </div>
 
-                <!-- 文章月份归档区域 -->
-                <div v-for="month in Object.keys(archivedArticles[year] || {}).sort((a, b) => b - a)" :key="`${year}-${month}`" class="month-block">
-                  <div class="month-marker">
-                    {{ month }}月
-                  </div>
-
-                  <div class="article-cards">
-                    <div v-for="article in archivedArticles[year][month]" :key="article.id" class="article-card">
-                      <div class="card-date">
-                        {{ formatDateTime(article.createdAt) }}
-                      </div>
-                      <router-link :to="{ name: 'article', params: { id: article.id } }" class="card-title">
-                        {{ article.title }}
-                      </router-link>
-                      <p class="card-summary">{{ article.summary }}</p>
-                      <div class="card-footer">
-                        <div class="card-tags">
-                          <router-link v-for="tag in article.tags" :key="tag" :to="{ name: 'blog', query: { tag } }" class="card-tag">
-                            #{{ tag }}
-                          </router-link>
-                        </div>
-                        <div class="card-stats">
-                          <span class="view-count">
-                            <MaterialIcon icon="visibility" />
-                            {{ article.views }}
-                          </span>
-                        </div>
+                <div class="article-cards">
+                  <div v-for="article in archivedArticles[year][month]" :key="article.id" class="article-card">
+                    <div class="card-date">
+                      {{ formatDateTime(article.createdAt) }}
+                    </div>
+                    <router-link :to="{ name: 'article', params: { id: article.id } }" class="card-title">
+                      {{ article.title }}
+                    </router-link>
+                    <p class="card-summary">{{ article.summary }}</p>
+                    <div class="card-footer">
+                      <div class="card-tags">
+                        <span class="material-icons-sharp tag-icon">style</span>
+                        <router-link v-for="tag in article.tags" :key="tag" :to="{ name: 'blog', query: { tag } }" class="card-tag" :style="{ color: getRandomColor() }">
+                          {{ tag }}
+                        </router-link>
                       </div>
                     </div>
-                  </div>
-                </div>
-              </div>
-            </template>
-          </div>
-        </template>
-
-        <!-- 筛选模式下的文章列表 -->
-        <template v-else-if="filteredArticles.length > 0">
-          <div class="filtered-view">
-            <div class="filter-header" v-if="activeCategory || activeTag">
-              <h2 class="filter-title">
-                <span v-if="activeCategory">
-                  <MaterialIcon icon="folder" />
-                  分类: {{ activeCategory }}
-                </span>
-                <span v-else-if="activeTag">
-                  <MaterialIcon icon="tag" />
-                  标签: {{ activeTag }}
-                </span>
-              </h2>
-              <button class="reset-filter" @click="clearFilters">
-                <MaterialIcon icon="close" />
-                重置筛选
-              </button>
-            </div>
-
-            <div class="article-grid">
-              <div v-for="article in filteredArticles" :key="article.id" class="article-card">
-                <div class="card-date">
-                  {{ formatDateTime(article.createdAt) }}
-                </div>
-                <router-link :to="{ name: 'article', params: { id: article.id } }" class="card-title">
-                  {{ article.title }}
-                </router-link>
-                <p class="card-summary">{{ article.summary }}</p>
-                <div class="card-footer">
-                  <div class="card-tags">
-                    <router-link v-for="tag in article.tags" :key="tag" :to="{ name: 'blog', query: { tag } }" class="card-tag">
-                      #{{ tag }}
-                    </router-link>
-                  </div>
-                  <div class="card-stats">
-                    <span class="view-count">
-                      <MaterialIcon icon="visibility" />
-                      {{ article.views }} 次浏览
-                    </span>
                   </div>
                 </div>
               </div>
@@ -113,13 +59,12 @@
         <div v-else class="no-articles">
           <div class="empty-state">
             <div class="empty-icon">
-              <MaterialIcon icon="article" style="font-size: 48px; color: currentColor;" />
+              <span class="material-icons-sharp" style="font-size: 48px; color: currentColor;">
+                article
+              </span>
             </div>
             <h3>暂无文章</h3>
-            <p>尝试不同的筛选条件</p>
-            <button @click="clearFilters()" class="clear-all-btn">
-              清除所有筛选
-            </button>
+            <p>暂无文章内容</p>
           </div>
         </div>
       </div>
@@ -137,146 +82,38 @@ const route = useRoute();
 const router = useRouter();
 const blogStore = useBlogStore();
 
+// 生成随机颜色
+const getRandomColor = () => {
+  const colors = [
+    '#FF6B6B',
+    '#4ECDC4',
+    '#45B7D1',
+    '#96CEB4',
+    '#FFEEAD',
+    '#D4A5A5',
+    '#9B59B6',
+    '#3498DB',
+    '#E67E22',
+    '#2ECC71'
+  ];
+  return colors[Math.floor(Math.random() * colors.length)];
+};
+
 // 获取所有博客数据
-const { articles, categories, tags, archivedArticles } = blogStore;
-
-// 筛选条件
-const activeCategory = ref("");
-const activeTag = ref("");
-const searchQuery = ref("");
-
-// 初始化筛选条件（从URL参数）
-onMounted(() => {
-  if (route.query.category) {
-    activeCategory.value = route.query.category;
-  }
-
-  if (route.query.tag) {
-    activeTag.value = route.query.tag;
-  }
-
-  if (route.query.q) {
-    searchQuery.value = route.query.q;
-  }
-});
-
-// 筛选文章
-const filteredArticles = computed(() => {
-  // 始终按最新时间排序，确保最新的文章在最前面
-  return blogStore
-    .getFilteredArticles(
-      activeCategory.value,
-      activeTag.value,
-      searchQuery.value
-    )
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-});
-
-// 热门文章
-const popularArticles = computed(() => {
-  return blogStore.getPopularArticles().slice(0, 5);
-});
-
-// 执行搜索
-const performSearch = () => {
-  if (searchQuery.value.trim()) {
-    // 清空其他筛选条件
-    activeCategory.value = "";
-    activeTag.value = "";
-    // 更新URL查询参数
-    updateRouteQuery();
-    // 强制重新计算过滤后的文章
-    return filteredArticles.value;
-  }
-};
-
-// 按分类筛选
-const filterByCategory = (category) => {
-  activeCategory.value = category;
-  activeTag.value = "";
-  searchQuery.value = "";
-  updateRouteQuery();
-};
-
-// 按标签筛选
-const filterByTag = (tag) => {
-  activeTag.value = tag;
-  activeCategory.value = "";
-  searchQuery.value = "";
-  updateRouteQuery();
-};
-
-// 清除筛选条件
-const clearFilters = (type) => {
-  if (!type || type === "category") {
-    activeCategory.value = "";
-  }
-
-  if (!type || type === "tag") {
-    activeTag.value = "";
-  }
-
-  if (!type) {
-    searchQuery.value = "";
-  }
-
-  updateRouteQuery();
-};
-
-// 更新路由查询参数
-const updateRouteQuery = () => {
-  const query = {};
-
-  if (activeCategory.value) {
-    query.category = activeCategory.value;
-  }
-
-  if (activeTag.value) {
-    query.tag = activeTag.value;
-  }
-
-  if (searchQuery.value.trim()) {
-    query.q = searchQuery.value.trim();
-  }
-
-  router.replace({ query });
-};
-
-// 格式化日期
-const formatDate = (dateString, formatString) => {
-  return format(new Date(dateString), formatString);
-};
+const { articles, archivedArticles } = blogStore;
 
 // 精确到秒的日期格式化函数
 const formatDateTime = (dateString) => {
   return format(new Date(dateString), "yyyy/MM/dd HH:mm:ss");
 };
 
-// 监听滚动效果
-const isScrolled = ref(false);
-
-const handleScroll = () => {
-  isScrolled.value = window.scrollY > 50;
-};
-
-onMounted(() => {
-  window.addEventListener("scroll", handleScroll);
-});
-
-onUnmounted(() => {
-  window.removeEventListener("scroll", handleScroll);
-});
-
 // 滚动进度百分比
 const scrollProgress = ref(0);
 
 // 更新滚动进度，计算页面滚动的百分比
 const updateScrollProgress = () => {
-  const scrollTop =
-    document.documentElement.scrollTop || document.body.scrollTop;
-  const scrollHeight =
-    document.documentElement.scrollHeight -
-    document.documentElement.clientHeight;
+  const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+  const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
   scrollProgress.value = (scrollTop / scrollHeight) * 100;
 };
 
@@ -371,22 +208,24 @@ onUnmounted(() => {
 }
 
 .blog-date-group {
-  margin-bottom: 40px;
+  margin-bottom: 60px;
 }
 
 .date-label {
   display: flex;
   align-items: center;
-  margin-bottom: 15px;
-  font-size: var(--fs-16);
+  margin-bottom: 30px;
+  font-size: var(--fs-20);
   color: var(--dark);
+  position: relative;
+  z-index: 2;
 }
 
 .month-block {
   margin-left: 15px;
   padding-left: 25px;
   position: relative;
-  margin-bottom: 30px;
+  margin-bottom: 60px;
 }
 
 .month-block::before {
@@ -400,16 +239,20 @@ onUnmounted(() => {
 }
 
 .month-marker {
-  font-size: var(--fs-16);
+  font-size: var(--fs-18);
   font-weight: var(--fw-600);
-  margin-bottom: 20px;
+  margin-bottom: 25px;
   color: var(--dark);
+  position: relative;
+  z-index: 2;
 }
 
 .article-cards {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 60px 25px;
+  position: relative;
+  z-index: 1;
 }
 
 .article-card {
@@ -422,6 +265,8 @@ onUnmounted(() => {
   position: relative;
   display: flex;
   flex-direction: column;
+  height: 100%;
+  margin-bottom: 0;
 }
 
 .article-card:hover {
@@ -464,39 +309,56 @@ onUnmounted(() => {
   justify-content: space-between;
   align-items: center;
   margin-top: auto;
-  padding-top: 15px;
   border-top: 1px solid var(--border-color);
 }
 
 .card-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 4px;
+  align-items: center;
+}
+
+.tag-icon {
+  font-size: 16px;
+  margin-right: 2px;
+  color: var(--text-color);
+  opacity: 0.7;
 }
 
 .card-tag {
   font-size: 0.8rem;
-  color: var(--link-color);
   text-decoration: none;
-  transition: color 0.2s;
+  transition: all 0.2s;
+  padding: 2px 6px;
+  border-radius: 4px;
 }
 
-.card-tag:hover {
-  color: var(--link-hover);
-  text-decoration: underline;
+.view-count .material-icon,
+.section-title .material-icon {
+  font-size: 1em;
+  vertical-align: middle;
 }
 
-.card-stats {
+.section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: var(--text-color);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.section-icon {
   display: flex;
   align-items: center;
 }
 
-.view-count {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.85rem;
-  color: var(--text-color-light);
+.section-icon .material-icon {
+  font-size: 1rem;
+  vertical-align: middle;
+  margin-right: 8px;
 }
 
 .filtered-view {
@@ -513,6 +375,12 @@ onUnmounted(() => {
   font-size: 1.5rem;
   font-weight: 600;
   color: var(--text-color);
+}
+
+.filter-title span .material-icon {
+  font-size: 1em;
+  vertical-align: middle;
+  margin-right: 8px;
 }
 
 .article-grid {
@@ -580,20 +448,6 @@ onUnmounted(() => {
   box-shadow: 0 3px 15px rgba(0, 0, 0, 0.05);
   padding: 20px;
   overflow: hidden;
-}
-
-.section-title {
-  font-size: 1rem;
-  font-weight: 600;
-  margin-bottom: 10px;
-  color: var(--text-color);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.section-icon {
-  font-size: 1rem;
 }
 
 .categories-list {
@@ -675,5 +529,19 @@ onUnmounted(() => {
   font-size: 0.8rem;
   color: var(--text-color);
   opacity: 0.7;
+}
+
+@media (max-width: 1200px) {
+  .article-cards {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 60px 25px;
+  }
+}
+
+@media (max-width: 768px) {
+  .article-cards {
+    grid-template-columns: 1fr;
+    gap: 50px 0;
+  }
 }
 </style>

@@ -1,6 +1,9 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
 import { debounce } from "../utils";
+import Loading from "../components/Loading.vue";
+
+const isBgLoading = ref(true);
 
 const visitor = "https://api.likepoems.com/counter/get/@kiriBlog";
 const visitorImg = new Image();
@@ -61,13 +64,16 @@ const backgroundImageContainer = ref(null);
 const preloadedImages = ref(new Set());
 
 // 预加载图片
-const preloadImage = (url) => {
-  if (preloadedImages.value.has(url)) return;
-
+const preloadImage = (url, cb) => {
+  if (preloadedImages.value.has(url)) {
+    if (cb) cb();
+    return;
+  }
   const img = new Image();
   img.src = url;
   img.onload = () => {
     preloadedImages.value.add(url);
+    if (cb) cb();
   };
 };
 
@@ -75,6 +81,14 @@ const preloadImage = (url) => {
 const preloadAllImages = () => {
   backgroundImages.forEach((url) => preloadImage(url));
 };
+
+// 首次加载背景图片
+onMounted(() => {
+  preloadImage(backgroundImages[0], () => {
+    isBgLoading.value = false;
+  });
+  preloadAllImages();
+});
 
 // 随机切换背景图
 const changeBackground = debounce(() => {
@@ -109,11 +123,6 @@ const changeBackground = debounce(() => {
     }, 400);
   }
 }, 300);
-
-onMounted(() => {
-  // 预加载所有图片
-  preloadAllImages();
-});
 </script>
 
 <template>
@@ -121,13 +130,14 @@ onMounted(() => {
     <!-- 第一页 -->
     <section class="page page-one">
       <div class="gradient-overlay"></div>
-      <div class="background-image-container" ref="backgroundImageContainer">
+      <div class="background-image-container" ref="backgroundImageContainer" v-if="!isBgLoading">
         <div class="refresh-button-container">
           <button class="refresh-button" @click="changeBackground">
             <span class="material-icons-sharp">refresh</span>
           </button>
         </div>
       </div>
+      <Loading v-else full />
     </section>
 
     <!-- 第二页 -->
@@ -186,16 +196,14 @@ onMounted(() => {
             <h3 class="section-heading">技术栈</h3>
             <div class="tech-grid">
               <div class="tech-item">
-                <div class="tech-icon">
-                </div>
+                <div class="tech-icon"></div>
                 <div class="tech-info">
                   <h4>Vue.js</h4>
                   <p>前端框架</p>
                 </div>
               </div>
               <div class="tech-item">
-                <div class="tech-icon">
-                </div>
+                <div class="tech-icon"></div>
                 <div class="tech-info">
                   <h4>Node.js</h4>
                   <p>后端开发</p>
@@ -204,11 +212,11 @@ onMounted(() => {
             </div>
           </div>
         </div>
+      </div>
 
-        <div class="middle-content"></div>
+      <div class="middle-content"></div>
 
-        <div class="right-content">
-        </div>
+      <div class="right-content">
       </div>
     </section>
   </div>

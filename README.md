@@ -116,15 +116,3 @@ src/
 ├── locales/      # 多语言文件
 └── utils/        # 工具函数
 ```
-
-
-  'https://pub-160bab62b55e48a296c77cba82c9a1a0.r2.dev/10001.mp3',
-  'https://pub-160bab62b55e48a296c77cba82c9a1a0.r2.dev/10002.mp3',
-  'https://pub-160bab62b55e48a296c77cba82c9a1a0.r2.dev/10003.mp3',
-  'https://pub-160bab62b55e48a296c77cba82c9a1a0.r2.dev/10004.mp3',
-  'https://pub-160bab62b55e48a296c77cba82c9a1a0.r2.dev/10005.mp3',
-  'https://pub-160bab62b55e48a296c77cba82c9a1a0.r2.dev/10006.mp3',
-  'https://pub-160bab62b55e48a296c77cba82c9a1a0.r2.dev/10007.mp3',
-  'https://pub-160bab62b55e48a296c77cba82c9a1a0.r2.dev/10008.mp3',
-  'https://pub-160bab62b55e48a296c77cba82c9a1a0.r2.dev/10009.mp3',
-  'https://pub-160bab62b55e48a296c77cba82c9a1a0.r2.dev/10010.mp3'

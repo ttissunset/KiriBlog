@@ -15,10 +15,7 @@
       </div>
 
       <!-- 加载状态指示器 -->
-      <div v-if="isLoading && !hasItems" class="loading-container">
-        <div class="loading-spinner"></div>
-        <p>正在加载图片...</p>
-      </div>
+      <Loading v-if="isLoading && !hasItems" full />
 
       <!-- 相册内容，不使用虚拟滚动 -->
       <div class="gallery-container-wrapper">
@@ -51,7 +48,7 @@
 
       <!-- 无限滚动加载触发器 -->
       <div v-if="hasMoreImages && hasItems" class="load-more" ref="loadMoreTrigger">
-        <div class="loading-spinner"></div>
+        <Loading :width="40" :height="40" />
         <p>加载更多</p>
       </div>
     </div>
@@ -64,6 +61,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, nextTick, watch } from "vue";
 import ImageViewer from "../components/ImageViewer.vue";
+import Loading from "../components/Loading.vue";
 
 // 导入图片资源
 import img1 from "../assets/1.jpg";

@@ -23,24 +23,17 @@
           <div class="date-label">
             <span>{{ group.date }}</span>
           </div>
-          <div class="gallery-waterfall" id="pointer">
+          <div class="gallery-waterfall" :style="{
+              width: `${group.images.reduce((total, image) => total + image.url.length, 0) * 280 + (group.images.reduce((total, image) => total + image.url.length, 0) - 1) * 20}px`,
+              margin: '0'
+            }">
             <template v-for="(image, imageIndex) in group.images" :key="imageIndex">
-              <template v-if="Array.isArray(image.url)">
-                <div v-for="(imgSrc, idx) in image.url" :key="imageIndex + '-' + idx" class="gallery-item">
-                  <div class="gallery-image-wrapper" @click="viewImage(image)">
-                    <div v-if="!image.loaded" class="image-placeholder"></div>
-                    <img :src="imgSrc" :alt="image.description" class="gallery-image" loading="lazy" @load="imageLoaded(image)" :class="{ 'is-loaded': image.loaded }" />
-                  </div>
+              <div v-for="(imgSrc, idx) in image.url" :key="imageIndex + '-' + idx" class="gallery-item">
+                <div class="gallery-image-wrapper" @click="viewImage(image, idx)" id="pointer">
+                  <div v-if="!image.loaded" class="image-placeholder"></div>
+                  <img :src="imgSrc" :alt="image.description" class="gallery-image" loading="lazy" @load="imageLoaded(image)" :class="{ 'is-loaded': image.loaded }" />
                 </div>
-              </template>
-              <template v-else>
-                <div class="gallery-item">
-                  <div class="gallery-image-wrapper" @click="viewImage(image)">
-                    <div v-if="!image.loaded" class="image-placeholder"></div>
-                    <img :src="image.url" :alt="image.description" class="gallery-image" loading="lazy" @load="imageLoaded(image)" :class="{ 'is-loaded': image.loaded }" />
-                  </div>
-                </div>
-              </template>
+              </div>
             </template>
           </div>
         </div>
@@ -81,18 +74,54 @@ import img12 from "../assets/00_06.png";
 const allImages = [
   {
     id: 1,
-    url: [img1, img2, img3],
+    url: [img1, img2, img3, img1, img2, img3, img1],
     date: "2024-03-15",
   },
-  { id: 2, url: img4, date: "2024-02-20" },
-  { id: 3, url: img5, date: "2024-02-15" },
-  { id: 4, url: img6, date: "2024-02-10" },
-  { id: 5, url: img7, date: "2024-01-25" },
-  { id: 6, url: img8, date: "2024-01-20" },
-  { id: 7, url: img9, date: "2024-01-15" },
-  { id: 8, url: img10, date: "2024-01-10" },
-  { id: 9, url: img11, date: "2023-12-30" },
-  { id: 10, url: img12, date: "2023-12-25" },
+  {
+    id: 2,
+    url: [img4],
+    date: "2024-02-20"
+  },
+  {
+    id: 3,
+    url: [img5],
+    date: "2024-02-15"
+  },
+  {
+    id: 4,
+    url: [img6],
+    date: "2024-02-10"
+  },
+  {
+    id: 5,
+    url: [img7],
+    date: "2024-01-25"
+  },
+  {
+    id: 6,
+    url: [img8],
+    date: "2024-01-20"
+  },
+  {
+    id: 7,
+    url: [img9],
+    date: "2024-01-15"
+  },
+  {
+    id: 8,
+    url: [img10],
+    date: "2024-01-10"
+  },
+  {
+    id: 9,
+    url: [img11],
+    date: "2023-12-30"
+  },
+  {
+    id: 10,
+    url: [img12],
+    date: "2023-12-25"
+  },
 ];
 
 // 加载状态
@@ -199,8 +228,14 @@ const updateScrollProgress = () => {
 };
 
 // 查看大图，显示图片查看器
-const viewImage = (image) => {
-  activeImage.value = image;
+const viewImage = (image, currentIndex) => {
+  // 使用当前点击的图片索引
+  const previewImage = {
+    ...image,
+    url: Array.isArray(image.url) ? image.url[currentIndex] : image.url,
+    description: image.description || "这是一张精美的照片，捕捉了瞬间的美好。"
+  };
+  activeImage.value = previewImage;
   document.body.style.overflow = "hidden"; // 防止背景滚动
 };
 
@@ -335,51 +370,49 @@ onUnmounted(() => {
 }
 
 .gallery-waterfall {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(6, 280px);
+  gap: 20px;
+  width: fit-content;
 }
 
 .gallery-item {
-  width: calc((100% - 24px) / 3); /* 三列，间隔2*12px */
-  margin-bottom: 12px;
-  box-sizing: border-box;
+  width: 280px;
+  height: 210px;
+  max-width: 280px;
+  max-height: 210px;
 }
 
 .gallery-image-wrapper {
   position: relative;
   overflow: hidden;
-  border-radius: var(--radius-8);
-  box-shadow: var(--shadow-1);
-  transform: translateZ(0);
-  transition: all var(--transition-1);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   background-color: var(--cultured);
   width: 100%;
-  height: 0;
-  padding-bottom: 75%;
+  height: 100%;
+  transition: box-shadow 0.2s, transform 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .gallery-image-wrapper:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-2);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.2);
+  transform: translateY(-3px) scale(1.02);
 }
 
 .gallery-image {
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: all var(--transition-2);
   opacity: 0;
-  transform: scale(1.05);
+  transition: opacity 0.3s;
+  display: block;
 }
 
 .gallery-image.is-loaded {
   opacity: 1;
-  transform: scale(1);
 }
 
 /* 图片占位符 */
@@ -397,6 +430,7 @@ onUnmounted(() => {
   );
   background-size: 200% 100%;
   animation: 1.5s shine linear infinite;
+  border-radius: 10px;
 }
 
 @keyframes shine {

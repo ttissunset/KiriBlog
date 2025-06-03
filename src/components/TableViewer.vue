@@ -38,21 +38,21 @@ const parseMarkdownTable = (markdown) => {
     headers.value = [];
     alignments.value = [];
     rows.value = [];
-    
+
     if (!markdown || !markdown.includes('|')) return;
-    
+
     // 分割表格行，移除空行和只有空格的行
     const tableRows = markdown.split(/[\r\n]+/).filter(row => row.trim() !== '' && row.includes('|'));
-    
+
     if (tableRows.length < 3) return; // 需要至少有表头、分隔符和一行数据
-    
+
     // 处理表头行
     const headerRow = tableRows[0];
     headers.value = headerRow
       .split('|')
       .filter((cell, index, array) => index > 0 && index < array.length - 1) // 去除首尾空单元格
       .map(cell => cell.trim());
-    
+
     // 处理分隔行，确定列对齐方式
     const alignmentRow = tableRows[1];
     alignments.value = alignmentRow
@@ -61,12 +61,12 @@ const parseMarkdownTable = (markdown) => {
       .map(cell => {
         const trimmed = cell.trim();
         if (!trimmed || trimmed.length === 0) return 'left';
-        
+
         if (trimmed.startsWith(':') && trimmed.endsWith(':')) return 'center';
         if (trimmed.endsWith(':')) return 'right';
         return 'left';
       });
-    
+
     // 处理数据行
     const dataRows = tableRows.slice(2);
     rows.value = dataRows.map(row => {
@@ -75,14 +75,14 @@ const parseMarkdownTable = (markdown) => {
         .filter((cell, index, array) => index > 0 && index < array.length - 1)
         .map(cell => cell.trim());
     });
-    
+
     // 确保数据行单元格数量与表头匹配
     rows.value.forEach(row => {
       while (row.length < headers.value.length) {
         row.push(''); // 不足的单元格用空字符串填充
       }
     });
-    
+
     // 打印调试信息
     console.log('解析的表格数据:', { headers: headers.value, rows: rows.value, alignments: alignments.value });
   } catch (error) {
@@ -93,26 +93,26 @@ const parseMarkdownTable = (markdown) => {
 // 格式化单元格中的内容，支持简单的markdown格式
 const formatCell = (text) => {
   if (!text) return '';
-  
+
   // 处理代码标记
   let formatted = text.replace(/`([^`]+)`/g, '<code>$1</code>');
-  
+
   // 处理粗体
   formatted = formatted.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-  
+
   // 处理斜体
   formatted = formatted.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-  
+
   // 处理HTML标签（如TDZ<uninitialized>）
   formatted = formatted.replace(/&lt;([^&]+)&gt;/g, '<span class="tag">&lt;$1&gt;</span>');
-  
+
   // 处理常见关键字
   const keywords = ['var', 'let', 'const', 'function', 'if', 'for', 'undefined', 'TDZ'];
   keywords.forEach(keyword => {
     const regex = new RegExp(`\\b${keyword}\\b`, 'g');
     formatted = formatted.replace(regex, `<code>${keyword}</code>`);
   });
-  
+
   return formatted;
 };
 
@@ -177,7 +177,7 @@ onMounted(() => {
   background-color: #f5f5f5;
   padding: 2px 4px;
   border-radius: 3px;
-  font-family: Consolas, Monaco, "Andale Mono", monospace;
+  font-family: Consolas, Monaco, 'Andale Mono', monospace;
   font-size: 0.9em;
   color: #d14;
 }
@@ -185,37 +185,5 @@ onMounted(() => {
 .markdown-table .tag {
   color: #2973b7;
   font-family: monospace;
-}
-
-/* 暗黑模式适配 */
-@media (prefers-color-scheme: dark) {
-  .markdown-table {
-    border-color: #444;
-    background-color: #1e1e1e;
-  }
-  
-  .markdown-table th,
-  .markdown-table td {
-    border-color: #444;
-    color: #e0e0e0;
-  }
-  
-  .markdown-table th {
-    background-color: #333;
-    color: #fff;
-  }
-  
-  .markdown-table tr:nth-child(even) {
-    background-color: #2a2a2a;
-  }
-  
-  .markdown-table tr:hover {
-    background-color: #383838;
-  }
-  
-  .markdown-table code {
-    background-color: #333;
-    color: #ff9292;
-  }
 }
 </style>

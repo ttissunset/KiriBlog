@@ -1104,16 +1104,6 @@ const renderFallbackTable = (markdown) => {
   border-radius: 0 var(--radius-6) var(--radius-6) 0;
   font-style: italic;
 }
-
-/* 暗色模式适配 */
-@media (prefers-color-scheme: dark) {
-  .markdown-body blockquote.highlighted-quote,
-  .markdown-body .highlighted-quote {
-    color: var(--light-white);
-    background-color: var(--dark);
-    border-left-color: var(--blue-crayola);
-  }
-}
 </style>
 
 <style scoped>
@@ -1187,15 +1177,6 @@ const renderFallbackTable = (markdown) => {
   line-height: 1.6;
   color: #333;
   font-style: italic;
-}
-
-/* 暗色模式下的简介样式 */
-@media (prefers-color-scheme: dark) {
-  .article-summary {
-    color: #e0e0e0;
-    background-color: #1a2939;
-    border-left-color: #3498db;
-  }
 }
 
 .ai-summary {
@@ -1643,31 +1624,6 @@ const renderFallbackTable = (markdown) => {
   margin-bottom: 15px;
 }
 
-@media (max-width: 768px) {
-  .article-content {
-    padding: 20px;
-  }
-
-  .article-title {
-    font-size: 1.8rem;
-  }
-
-  .article-meta {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-    justify-content: flex-start;
-  }
-
-  .meta-item::after {
-    display: none;
-  }
-
-  .article-sidebar {
-    display: none;
-  }
-}
-
 /* 代码高亮样式 */
 :deep(.hljs-keyword),
 :deep(.hljs-reserved),
@@ -1764,30 +1720,6 @@ const renderFallbackTable = (markdown) => {
 
 .export-button svg {
   margin-right: 6px;
-}
-
-@media (max-width: 768px) {
-  .back-to-blog {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 15px;
-  }
-
-  .export-buttons {
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .back-button {
-    padding: 6px 0;
-    font-size: 0.9rem;
-  }
-
-  .back-button svg {
-    width: 18px;
-    height: 18px;
-    margin-right: 6px;
-  }
 }
 
 /* 文章标题下方作者和阅读时长样式 */
@@ -1892,23 +1824,6 @@ const renderFallbackTable = (markdown) => {
   color: #495057;
   font-size: 16px;
   line-height: 1.6;
-}
-
-/* 确保在移动设备上正确换行 */
-@media (max-width: 640px) {
-  .article-meta {
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .article-content {
-    padding: 20px;
-  }
-
-  .article-title {
-    font-size: 1.7rem;
-  }
 }
 
 /* 图片容器与保存按钮 */
@@ -2076,37 +1991,6 @@ const renderFallbackTable = (markdown) => {
 
 .toc-level-4 {
   padding-left: 30px;
-}
-
-/* 响应式设计 */
-@media (max-width: 1420px) {
-  .article-toc.desktop-toc {
-    right: 20px;
-  }
-}
-
-@media (max-width: 1200px) {
-  .article-toc.desktop-toc {
-    right: 15px;
-  }
-}
-
-@media (max-width: 991px) {
-  .desktop-toc {
-    display: none;
-  }
-
-  .article-content {
-    margin-right: 0;
-  }
-}
-
-/* 在大屏幕上隐藏移动端目录按钮及相关元素 */
-@media (min-width: 992px) {
-  .mobile-toc-button,
-  .mobile-toc-container {
-    display: none;
-  }
 }
 
 /* 移动端悬浮目录按钮 */

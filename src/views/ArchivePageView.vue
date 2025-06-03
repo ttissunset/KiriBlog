@@ -13,9 +13,7 @@
             <div class="article-dot"></div>
             <div class="article-content">
               <div class="article-left">
-                <a href="#" class="article-title"
-                  >记一次 Linux 服务器迁移与抢救历程</a
-                >
+                <a href="#" class="article-title">记一次 Linux 服务器迁移与抢救历程</a>
               </div>
               <div class="article-right">
                 <div class="article-tag note">记录 / 生活记录</div>
@@ -28,10 +26,8 @@
             <div class="article-dot"></div>
             <div class="article-content">
               <div class="article-left">
-                <a href="#" class="article-title"
-                  >Redux 数据仓库的数据持久化和 Next.js 中使用流程 | JustPure
-                  起始页的构建历程</a
-                >
+                <a href="#" class="article-title">Redux 数据仓库的数据持久化和 Next.js 中使用流程 | JustPure
+                  起始页的构建历程</a>
               </div>
               <div class="article-right">
                 <div class="article-tag tech">文章 / 技术学习</div>
@@ -44,10 +40,8 @@
             <div class="article-dot"></div>
             <div class="article-content">
               <div class="article-left">
-                <a href="#" class="article-title"
-                  >零成本手把手带你建一个学习笔记网站（AriaDocs
-                  项目的使用简记）</a
-                >
+                <a href="#" class="article-title">零成本手把手带你建一个学习笔记网站（AriaDocs
+                  项目的使用简记）</a>
               </div>
               <div class="article-right">
                 <div class="article-tag tech">文章 / 折腾不止</div>
@@ -60,10 +54,8 @@
             <div class="article-dot"></div>
             <div class="article-content">
               <div class="article-left">
-                <a href="#" class="article-title"
-                  >最近的坎坷故事_多项目并行、偶遇传染病、DeepSeek
-                  本地化部署，及记一次开源 WAF 尝试</a
-                >
+                <a href="#" class="article-title">最近的坎坷故事_多项目并行、偶遇传染病、DeepSeek
+                  本地化部署，及记一次开源 WAF 尝试</a>
               </div>
               <div class="article-right">
                 <div class="article-tag note">记录 / 生活感悟</div>
@@ -76,9 +68,7 @@
             <div class="article-dot"></div>
             <div class="article-content">
               <div class="article-left">
-                <a href="#" class="article-title"
-                  >动手部署 Grtblog 前后端，即刻拥有自己的博客网站</a
-                >
+                <a href="#" class="article-title">动手部署 Grtblog 前后端，即刻拥有自己的博客网站</a>
               </div>
               <div class="article-right">
                 <div class="article-tag tech">文章 / 技术学习</div>
@@ -91,9 +81,7 @@
             <div class="article-dot"></div>
             <div class="article-content">
               <div class="article-left">
-                <a href="#" class="article-title"
-                  >刷机半生，归来仍是 MIUI | HyperOS2 初体验及亿些吐槽</a
-                >
+                <a href="#" class="article-title">刷机半生，归来仍是 MIUI | HyperOS2 初体验及亿些吐槽</a>
               </div>
               <div class="article-right">
                 <div class="article-tag tech">文章 / 折腾不止</div>
@@ -106,9 +94,7 @@
             <div class="article-dot"></div>
             <div class="article-content">
               <div class="article-left">
-                <a href="#" class="article-title"
-                  >扩展编辑器，整合搜索...问题解决清单控！</a
-                >
+                <a href="#" class="article-title">扩展编辑器，整合搜索...问题解决清单控！</a>
               </div>
               <div class="article-right">
                 <div class="article-tag note">记录 / 简单记录</div>
@@ -189,7 +175,7 @@ onMounted(() => {
 }
 
 .article-timeline::before {
-  content: "";
+  content: '';
   position: absolute;
   left: 85px;
   top: 0;
@@ -260,7 +246,7 @@ onMounted(() => {
 }
 
 .article-icon.note::before {
-  content: "";
+  content: '';
   position: absolute;
   width: 100%;
   height: 100%;
@@ -270,7 +256,7 @@ onMounted(() => {
 }
 
 .article-icon.doc::before {
-  content: "";
+  content: '';
   position: absolute;
   width: 100%;
   height: 100%;
@@ -313,46 +299,5 @@ onMounted(() => {
 .article-tag.tech {
   background-color: rgba(79, 134, 247, 0.1);
   color: #4f86f7;
-}
-
-@media (max-width: 768px) {
-  .archive-page {
-    padding: 20px;
-  }
-
-  .archive-title {
-    font-size: 2rem;
-  }
-
-  .article-timeline::before {
-    left: 35px;
-  }
-
-  .article-dot {
-    left: 35px;
-  }
-
-  .article-date {
-    width: 30px;
-    font-size: 0.8rem;
-  }
-
-  .article-content {
-    padding-left: 25px;
-    flex-direction: column;
-  }
-
-  .article-right {
-    margin-top: 8px;
-    align-self: flex-start;
-  }
-
-  .article-left {
-    margin-right: 0;
-  }
-
-  .article-title {
-    font-size: 1rem;
-  }
 }
 </style>

@@ -182,7 +182,7 @@ input {
   padding: 0;
 }
 
-input[type="checkbox"] {
+input[type='checkbox'] {
   width: 16px;
   height: 16px;
 }
@@ -196,10 +196,10 @@ input[type="checkbox"] {
 }
 
 /* 全局 pointer 样式 */
-[style*="cursor: pointer"],
-[class*="cursor-pointer"],
+[style*='cursor: pointer'],
+[class*='cursor-pointer'],
 .cursor-pointer {
-  cursor: url("/src/assets/cursor/Link.ani"), pointer !important;
+  cursor: url('/src/assets/cursor/Link.ani'), pointer !important;
 }
 
 /* 允许输入框和文本域选中 */
@@ -228,7 +228,7 @@ textarea {
   --fw-500: 500;
 
   /* font-family */
-  --ff-llt: "llt", llt;
+  --ff-llt: 'llt', llt;
 
   /* color */
   --info-dark: #7d8da1;
@@ -297,15 +297,15 @@ textarea {
 }
 
 @font-face {
-  font-family: "llt";
-  src: url("./assets/fonts/萝莉体 第二版.ttc");
+  font-family: 'llt';
+  src: url('./assets/fonts/萝莉体 第二版.ttc');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
 }
 
 .material-icons-sharp {
-  font-family: "Material Icons Sharp";
+  font-family: 'Material Icons Sharp';
   font-weight: normal;
   font-style: normal;
   font-size: 24px;

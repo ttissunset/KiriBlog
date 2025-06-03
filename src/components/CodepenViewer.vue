@@ -106,7 +106,7 @@ const totalLines = computed(() => {
 // 复制代码
 const copyCode = (e) => {
   const button = e.currentTarget; // 使用事件对象获取当前按钮
-  
+
   navigator.clipboard
     .writeText(props.code)
     .then(() => {
@@ -172,37 +172,37 @@ const showSimpleToast = (message, type = 'info') => {
     const instance = getCurrentInstance();
     if (instance && instance.appContext && instance.appContext.config.globalProperties.$toast) {
       instance.appContext.config.globalProperties.$toast[type](message, {
-        title: type === 'success' ? '成功' : 
-               type === 'error' ? '错误' : 
-               type === 'warning' ? '警告' : '提示'
+        title: type === 'success' ? '成功' :
+          type === 'error' ? '错误' :
+            type === 'warning' ? '警告' : '提示'
       });
       return;
     }
   } catch (err) {
     console.error("无法使用全局toast服务，降级使用内联toast:", err);
   }
-  
+
   // 备用方案 - 创建一个简单的提示元素
   const toast = document.createElement('div');
   toast.style.position = 'fixed';
   toast.style.top = '20px';
   toast.style.right = '20px';
   toast.style.padding = '12px 16px';
-  toast.style.background = type === 'success' ? '#f0f9eb' : 
-                         type === 'error' ? '#fef0f0' : 
-                         type === 'warning' ? '#fdf6ec' : '#f4f4f5';
+  toast.style.background = type === 'success' ? '#f0f9eb' :
+    type === 'error' ? '#fef0f0' :
+      type === 'warning' ? '#fdf6ec' : '#f4f4f5';
   toast.style.color = '#606266';
-  toast.style.borderLeft = type === 'success' ? '4px solid #67c23a' : 
-                         type === 'error' ? '4px solid #f56c6c' : 
-                         type === 'warning' ? '4px solid #e6a23c' : '4px solid #909399';
+  toast.style.borderLeft = type === 'success' ? '4px solid #67c23a' :
+    type === 'error' ? '4px solid #f56c6c' :
+      type === 'warning' ? '4px solid #e6a23c' : '4px solid #909399';
   toast.style.borderRadius = '8px';
   toast.style.boxShadow = '0 2px 12px rgba(0,0,0,0.1)';
   toast.style.zIndex = '9999';
   toast.style.transition = 'all 0.3s';
   toast.innerText = message;
-  
+
   document.body.appendChild(toast);
-  
+
   // 3秒后移除
   setTimeout(() => {
     toast.style.opacity = '0';
@@ -410,59 +410,6 @@ onMounted(() => {
   white-space: pre;
   font-size: 13px;
   line-height: 1.5;
-}
-
-/* 暗色模式适配 */
-@media (prefers-color-scheme: dark) {
-  .code-block-wrapper {
-    background-color: #1e1e1e;
-    border-color: #333;
-  }
-
-  .code-block-header,
-  .line-numbers-area,
-  .code-footer {
-    background-color: #252525;
-    border-color: #333;
-  }
-
-  .code-type-label {
-    background-color: #333;
-    color: #ccc;
-    border-color: #444;
-  }
-
-  .code-type-arrow,
-  .line-numbers-indicator,
-  .line-number {
-    color: #999;
-  }
-
-  .line-number,
-  .line-numbers-area {
-    background-color: #252525;
-    border-color: #333;
-  }
-
-  .copy-button {
-    border-color: #444;
-  }
-
-  .copy-button:hover {
-    background-color: #333;
-  }
-
-  .show-all-code {
-    color: #999;
-  }
-
-  .show-all-code:hover {
-    color: #ccc;
-  }
-
-  .line-numbers-indicator {
-    background-color: rgba(30, 30, 30, 0.8);
-  }
 }
 
 /* 确保hljs正确展示 */

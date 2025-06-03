@@ -15,7 +15,7 @@
       </div>
 
       <!-- 加载状态指示器 -->
-      <Loading v-if="isLoading && !hasItems" full />
+      <Loading v-if="isInitialLoading && !hasItems" full />
 
       <!-- 相册内容，不使用虚拟滚动 -->
       <div class="gallery-container-wrapper">
@@ -23,10 +23,7 @@
           <div class="date-label">
             <span>{{ group.date }}</span>
           </div>
-          <div class="gallery-waterfall" :style="{
-              width: `${group.images.reduce((total, image) => total + image.url.length, 0) * 280 + (group.images.reduce((total, image) => total + image.url.length, 0) - 1) * 20}px`,
-              margin: '0'
-            }">
+          <div class="gallery-waterfall">
             <template v-for="(image, imageIndex) in group.images" :key="imageIndex">
               <div v-for="(imgSrc, idx) in image.url" :key="imageIndex + '-' + idx" class="gallery-item">
                 <div class="gallery-image-wrapper" @click="viewImage(image, idx)" id="pointer">
@@ -40,9 +37,8 @@
       </div>
 
       <!-- 无限滚动加载触发器 -->
-      <div v-if="hasMoreImages && hasItems" class="load-more" ref="loadMoreTrigger">
-        <Loading :width="40" :height="40" />
-        <p>加载更多</p>
+      <div v-if="hasMoreImages && hasItems && !isInitialLoading" class="load-more" ref="loadMoreTrigger">
+        <Loading v-if="isLoadingMore" :width="40" :height="40" />
       </div>
     </div>
 
@@ -125,7 +121,8 @@ const allImages = [
 ];
 
 // 加载状态
-const isLoading = ref(true);
+const isInitialLoading = ref(true); // 初始加载状态
+const isLoadingMore = ref(false); // 加载更多状态
 const imagesPerPage = 3; // 每次加载的图片数量
 const currentPage = ref(1);
 const hasMoreImages = computed(() => {
@@ -170,6 +167,10 @@ const loadMoreImages = () => {
   const endIndex = Math.min(startIndex + imagesPerPage, allImages.length);
 
   if (startIndex < allImages.length) {
+    if (!isInitialLoading.value) {
+      isLoadingMore.value = true;
+    }
+
     // 模拟网络请求延迟
     setTimeout(() => {
       for (let i = startIndex; i < endIndex; i++) {
@@ -178,7 +179,12 @@ const loadMoreImages = () => {
       }
 
       currentPage.value++;
-      isLoading.value = false;
+
+      if (isInitialLoading.value) {
+        isInitialLoading.value = false;
+      } else {
+        isLoadingMore.value = false;
+      }
 
       // 设置无限滚动观察器
       if (galleryImages.value.length < allImages.length) {
@@ -205,8 +211,7 @@ const setupIntersectionObserver = () => {
     observer = new IntersectionObserver(
       (entries) => {
         const entry = entries[0];
-        if (entry.isIntersecting && !isLoading.value && hasMoreImages.value) {
-          isLoading.value = true;
+        if (entry.isIntersecting && !isLoadingMore.value && !isInitialLoading.value && hasMoreImages.value) {
           loadMoreImages();
         }
       },
@@ -268,6 +273,7 @@ onUnmounted(() => {
 .gallery-container {
   position: relative;
   display: flex;
+  min-height: 100vh;
 }
 
 .gallery-progress {
@@ -281,6 +287,7 @@ onUnmounted(() => {
   flex-direction: column;
   align-items: center;
   z-index: 10;
+  flex-shrink: 0;
 }
 
 .progress-bar {
@@ -311,6 +318,7 @@ onUnmounted(() => {
   margin: 0 auto 0 0;
   padding: 20px 0;
   width: 100%;
+  position: relative;
 }
 
 .gallery-container-wrapper {
@@ -371,9 +379,10 @@ onUnmounted(() => {
 
 .gallery-waterfall {
   display: grid;
-  grid-template-columns: repeat(6, 280px);
+  grid-template-columns: repeat(auto-fill, 280px);
   gap: 20px;
-  width: fit-content;
+  width: 100%;
+  justify-content: start;
 }
 
 .gallery-item {
@@ -441,6 +450,10 @@ onUnmounted(() => {
 
 /* 加载状态 */
 .loading-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -448,6 +461,8 @@ onUnmounted(() => {
   padding: 30px 0;
   color: var(--dark);
   opacity: 0.7;
+  width: 100%;
+  z-index: 1;
 }
 
 .loading-spinner {
@@ -465,127 +480,11 @@ onUnmounted(() => {
   flex-direction: column;
   align-items: center;
   padding: 20px 0;
-  margin-bottom: 40px;
+  margin: 40px 0;
   color: var(--dark);
   opacity: 0.7;
-}
-
-/* 响应式布局调整 */
-@media (max-width: 768px) {
-  .gallery-container {
-    flex-direction: column;
-  }
-
-  .gallery-progress {
-    position: fixed;
-    top: auto;
-    bottom: 20px;
-    right: 20px;
-    left: auto;
-    height: auto;
-    width: auto;
-    margin-right: 0;
-    flex-direction: row;
-    background-color: var(--light-white);
-    padding: 5px 10px;
-    border-radius: var(--radius-20);
-    box-shadow: var(--shadow-3);
-    z-index: 50;
-  }
-
-  .progress-bar {
-    width: 50px;
-    height: 4px;
-    margin: 0 10px 0 0;
-  }
-
-  .progress-indicator {
-    height: 100%;
-    width: var(--progress-width);
-  }
-
-  .gallery-content {
-    max-width: 100%;
-    padding: 10px 10px 10px 10px;
-    margin: 0 0 0 0;
-  }
-
-  .gallery-waterfall {
-    column-count: 2;
-  }
-
-  .gallery-image-wrapper {
-    padding-bottom: 70%;
-  }
-
-  .gallery-header {
-    margin-bottom: 25px;
-    padding-left: 10px;
-  }
-
-  .gallery-title {
-    font-size: var(--fs-20);
-  }
-
-  .date-label {
-    padding-left: 10px;
-  }
-}
-
-/* 平板布局优化 */
-@media (min-width: 769px) and (max-width: 1024px) {
-  .gallery-content {
-    max-width: 90%;
-    padding: 15px 15px 15px 10px;
-    margin: 0;
-  }
-
-  .gallery-waterfall {
-    column-count: 2;
-    column-gap: 15px;
-  }
-
-  .gallery-item {
-    margin-bottom: 15px;
-  }
-
-  .gallery-image-wrapper {
-    padding-bottom: 80%;
-  }
-
-  .gallery-header {
-    padding-left: 10px;
-  }
-
-  .date-label {
-    padding-left: 10px;
-  }
-}
-
-/* 优化小屏幕样式 */
-@media (max-width: 480px) {
-  .gallery-content {
-    padding: 10px;
-  }
-
-  .gallery-title {
-    font-size: var(--fs-18);
-  }
-
-  .gallery-subtitle {
-    font-size: var(--fs-14);
-  }
-
-  .date-label {
-    font-size: var(--fs-14);
-  }
-
-  .gallery-date-group {
-    margin-bottom: 25px;
-  }
-
-  .gallery-image-wrapper {
-    padding-bottom: 65%;
-  }
+  width: 100%;
+  position: relative;
+  min-height: 80px;
 }
 </style>

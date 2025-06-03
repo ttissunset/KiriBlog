@@ -1,3 +1,132 @@
+<template>
+  <div class="blog-container">
+    <!-- 左侧进度滑轨 -->
+    <div class="blog-progress">
+      <div class="progress-bar">
+        <div class="progress-indicator" :style="{ height: scrollProgress + '%' }"></div>
+      </div>
+      <div class="progress-text">{{ Math.round(scrollProgress) }}%</div>
+    </div>
+
+    <div class="blog-content">
+      <div class="blog-header">
+        <h1 class="blog-title">我的博客</h1>
+        <p class="blog-subtitle">分享技术与生活的点点滴滴</p>
+      </div>
+
+      <!-- 主要内容区 -->
+      <div class="blog-container-wrapper">
+        <!-- 时间线浏览模式 -->
+        <template v-if="filteredArticles.length > 0 && !activeCategory && !activeTag">
+          <div class="timeline-view">
+            <!-- 文章年份归档区域 -->
+            <template v-if="archivedArticles">
+              <div v-for="year in Object.keys(archivedArticles).sort((a, b) => b - a)" :key="year" class="blog-date-group">
+                <div class="date-label">
+                  <span>{{ year }}</span>
+                </div>
+
+                <!-- 文章月份归档区域 -->
+                <div v-for="month in Object.keys(archivedArticles[year] || {}).sort((a, b) => b - a)" :key="`${year}-${month}`" class="month-block">
+                  <div class="month-marker">
+                    {{ month }}月
+                  </div>
+
+                  <div class="article-cards">
+                    <div v-for="article in archivedArticles[year][month]" :key="article.id" class="article-card">
+                      <div class="card-date">
+                        {{ formatDateTime(article.createdAt) }}
+                      </div>
+                      <router-link :to="{ name: 'article', params: { id: article.id } }" class="card-title">
+                        {{ article.title }}
+                      </router-link>
+                      <p class="card-summary">{{ article.summary }}</p>
+                      <div class="card-footer">
+                        <div class="card-tags">
+                          <router-link v-for="tag in article.tags" :key="tag" :to="{ name: 'blog', query: { tag } }" class="card-tag">
+                            #{{ tag }}
+                          </router-link>
+                        </div>
+                        <div class="card-stats">
+                          <span class="view-count">
+                            <MaterialIcon icon="visibility" />
+                            {{ article.views }}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </template>
+          </div>
+        </template>
+
+        <!-- 筛选模式下的文章列表 -->
+        <template v-else-if="filteredArticles.length > 0">
+          <div class="filtered-view">
+            <div class="filter-header" v-if="activeCategory || activeTag">
+              <h2 class="filter-title">
+                <span v-if="activeCategory">
+                  <MaterialIcon icon="folder" />
+                  分类: {{ activeCategory }}
+                </span>
+                <span v-else-if="activeTag">
+                  <MaterialIcon icon="tag" />
+                  标签: {{ activeTag }}
+                </span>
+              </h2>
+              <button class="reset-filter" @click="clearFilters">
+                <MaterialIcon icon="close" />
+                重置筛选
+              </button>
+            </div>
+
+            <div class="article-grid">
+              <div v-for="article in filteredArticles" :key="article.id" class="article-card">
+                <div class="card-date">
+                  {{ formatDateTime(article.createdAt) }}
+                </div>
+                <router-link :to="{ name: 'article', params: { id: article.id } }" class="card-title">
+                  {{ article.title }}
+                </router-link>
+                <p class="card-summary">{{ article.summary }}</p>
+                <div class="card-footer">
+                  <div class="card-tags">
+                    <router-link v-for="tag in article.tags" :key="tag" :to="{ name: 'blog', query: { tag } }" class="card-tag">
+                      #{{ tag }}
+                    </router-link>
+                  </div>
+                  <div class="card-stats">
+                    <span class="view-count">
+                      <MaterialIcon icon="visibility" />
+                      {{ article.views }} 次浏览
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
+
+        <!-- 无文章时显示 -->
+        <div v-else class="no-articles">
+          <div class="empty-state">
+            <div class="empty-icon">
+              <MaterialIcon icon="article" style="font-size: 48px; color: currentColor;" />
+            </div>
+            <h3>暂无文章</h3>
+            <p>尝试不同的筛选条件</p>
+            <button @click="clearFilters()" class="clear-all-btn">
+              清除所有筛选
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
@@ -137,276 +266,120 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener("scroll", handleScroll);
 });
+
+// 滚动进度百分比
+const scrollProgress = ref(0);
+
+// 更新滚动进度，计算页面滚动的百分比
+const updateScrollProgress = () => {
+  const scrollTop =
+    document.documentElement.scrollTop || document.body.scrollTop;
+  const scrollHeight =
+    document.documentElement.scrollHeight -
+    document.documentElement.clientHeight;
+  scrollProgress.value = (scrollTop / scrollHeight) * 100;
+};
+
+// 监听滚动事件，更新进度
+onMounted(() => {
+  window.addEventListener("scroll", updateScrollProgress);
+});
+
+// 移除滚动事件监听，防止内存泄漏
+onUnmounted(() => {
+  window.removeEventListener("scroll", updateScrollProgress);
+});
 </script>
 
-<template>
-  <div class="blog-page">
-    <!-- 主要内容区 -->
-    <div class="blog-container">
-      <!-- 左侧：文章列表 -->
-      <div class="articles-section">
-        <!-- 时间线浏览模式 -->
-        <template v-if="filteredArticles.length > 0 && !activeCategory && !activeTag">
-          <div class="timeline-view">
-            <!-- 文章年份归档区域 -->
-            <template v-if="archivedArticles">
-              <div v-for="year in Object.keys(archivedArticles).sort(
-                    (a, b) => b - a
-                  )" :key="year" class="year-block">
-                <div class="year-marker">
-                  <span class="year-number">{{ year }}</span>
-                </div>
-
-                <!-- 文章月份归档区域 -->
-                <div v-for="month in Object.keys(
-                      archivedArticles[year] || {}
-                    ).sort((a, b) => b - a)" :key="`${year}-${month}`" class="month-block">
-                  <div class="month-marker">
-                    {{ month }}月
-                  </div>
-
-                  <div class="article-cards">
-                    <div v-for="article in archivedArticles[year][month]" :key="article.id" class="article-card">
-                      <div class="card-date">
-                        {{ formatDateTime(article.createdAt) }}
-                      </div>
-                      <router-link :to="{ name: 'article', params: { id: article.id } }" class="card-title">
-                        {{ article.title }}
-                      </router-link>
-
-                      <p class="card-summary">{{ article.summary }}</p>
-
-                      <div class="card-footer">
-                        <div class="card-tags">
-                          <router-link v-for="tag in article.tags" :key="tag" :to="{ name: 'blog', query: { tag } }" class="card-tag">
-                            #{{ tag }}
-                          </router-link>
-                        </div>
-                        <div class="card-stats">
-                          <span class="view-count">
-                            <span class="view-icon">
-                              <MaterialIcon icon="visibility" />
-                            </span>
-                            {{ article.views }}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </template>
-          </div>
-        </template>
-
-        <!-- 筛选模式下的文章列表 -->
-        <template v-else-if="filteredArticles.length > 0">
-          <div class="filtered-view">
-            <div class="filter-header" v-if="activeCategory || activeTag">
-              <h2 class="filter-title">
-                <span v-if="activeCategory">
-                  <MaterialIcon icon="folder" />
-                  分类: {{ activeCategory }}
-                </span>
-                <span v-else-if="activeTag">
-                  <MaterialIcon icon="tag" />
-                  标签: {{ activeTag }}
-                </span>
-              </h2>
-              <button class="reset-filter" @click="resetFilter">
-                <MaterialIcon icon="close" />
-                重置筛选
-              </button>
-            </div>
-
-            <div class="article-grid">
-              <div v-for="article in filteredArticles" :key="article.id" class="article-card">
-                <div class="card-date">
-                  {{ formatDateTime(article.createdAt) }}
-                </div>
-                <router-link :to="{ name: 'article', params: { id: article.id } }" class="card-title">
-                  {{ article.title }}
-                </router-link>
-
-                <p class="card-summary">{{ article.summary }}</p>
-
-                <div class="card-footer">
-                  <div class="card-tags">
-                    <router-link v-for="tag in article.tags" :key="tag" :to="{ name: 'blog', query: { tag } }" class="card-tag">
-                      #{{ tag }}
-                    </router-link>
-                  </div>
-                  <div class="card-stats">
-                    <span class="view-count">
-                      <MaterialIcon icon="visibility" />
-                      {{ article.views }} 次浏览
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </template>
-
-        <!-- 无文章时显示 -->
-        <div v-else class="no-articles">
-          <div class="empty-state">
-            <div class="empty-icon">
-              <MaterialIcon icon="article" style="font-size: 48px; color: currentColor;" />
-            </div>
-            <h3>暂无文章</h3>
-            <p>尝试不同的筛选条件</p>
-            <button @click="clearFilters()" class="clear-all-btn">
-              清除所有筛选
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- 右侧：侧边栏 -->
-      <div class="blog-sidebar">
-        <!-- 分类部分 -->
-        <div class="sidebar-section">
-          <h3 class="section-title">
-            <span class="section-icon">
-              <MaterialIcon icon="folder" />
-            </span>
-            分类
-          </h3>
-          <div class="categories-list">
-            <div v-for="category in categories" :key="category.id" class="category-item" :class="{ active: activeCategory === category.name }" @click="filterByCategory(category.name)">
-              <div class="category-name">{{ category.name }}</div>
-              <div class="category-count">{{ category.count }}</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 热门文章部分 -->
-        <div class="sidebar-section">
-          <h3 class="section-title">
-            <span class="section-icon">
-              <MaterialIcon icon="local_fire_department" />
-            </span>
-            热门文章
-          </h3>
-          <div class="popular-posts">
-            <div v-for="article in popularArticles" :key="article.id" class="popular-post">
-              <router-link :to="{ name: 'article', params: { id: article.id } }" class="post-title">
-                {{ article.title }}
-              </router-link>
-              <div class="post-meta">
-                <span class="post-views">{{ article.views }} 次浏览</span>
-                <span class="post-date">{{
-                    formatDateTime(article.createdAt)
-                  }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
 
 <style scoped>
-/* 整体布局 */
-.blog-page {
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
-}
-
-/* 筛选器标签 */
-.active-filters {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 20px;
-}
-
-.filter-label {
-  font-weight: 500;
-  color: var(--text-color);
-  opacity: 0.7;
-  margin-right: 5px;
-}
-
-.active-filter {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  padding: 2px 8px;
-  background-color: var(--button-bg);
-  border-radius: 12px;
-  color: var(--link-color);
-  font-size: 0.75rem;
-  font-weight: 500;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-}
-
-.filter-icon {
-  font-size: 0.8rem;
-}
-
-.clear-filter {
-  background: none;
-  border: none;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 1rem;
-  margin-left: 2px;
-  color: var(--text-color);
-  opacity: 0.7;
-  transition: all 0.2s;
-}
-
-.clear-filter:hover {
-  background-color: rgba(0, 0, 0, 0.1);
-  opacity: 1;
-}
-
-/* 主要内容区布局 */
 .blog-container {
-  display: grid;
-  grid-template-columns: 1fr 300px;
-  gap: 30px;
+  position: relative;
+  display: flex;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
-/* 文章部分 */
-.articles-section {
-  flex: 1;
-}
-
-/* 时间线视图 */
-.timeline-view {
+.blog-progress {
+  position: sticky;
+  top: 90px;
+  left: 0;
+  height: calc(100vh - 180px);
+  width: 40px;
+  margin-right: 20px;
   display: flex;
   flex-direction: column;
-  gap: 40px;
-}
-
-.year-block {
-  position: relative;
-}
-
-.year-marker {
-  margin-bottom: 20px;
-  position: sticky;
-  top: 80px;
+  align-items: center;
   z-index: 10;
 }
 
-.year-number {
-  font-size: 1.8rem;
-  font-weight: 800;
-  color: var(--text-color);
-  opacity: 0.15;
-  letter-spacing: -0.05em;
+.progress-bar {
+  flex: 1;
+  width: 2px;
+  background-color: var(--raisin-black);
+  position: relative;
+  margin: 10px 0;
+}
+
+.progress-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: var(--youth-blue);
+  transition: height 0.1s ease;
+}
+
+.progress-text {
+  font-size: var(--fs-12);
+  color: var(--dark);
+  opacity: 0.7;
+}
+
+.blog-content {
+  flex: 1;
+  margin: 0;
+  padding: 20px 0;
+  width: 100%;
+  max-width: 100%;
+}
+
+.blog-container-wrapper {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.blog-header {
+  margin-bottom: 40px;
+}
+
+.blog-title {
+  font-size: var(--fs-24);
+  font-weight: var(--fw-600);
+  color: var(--dark);
+  margin-bottom: 8px;
+}
+
+.blog-subtitle {
+  font-size: var(--fs-16);
+  color: var(--dark);
+  opacity: 0.7;
+}
+
+.blog-date-group {
+  margin-bottom: 40px;
+}
+
+.date-label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  font-size: var(--fs-16);
+  color: var(--dark);
 }
 
 .month-block {
@@ -427,10 +400,10 @@ onUnmounted(() => {
 }
 
 .month-marker {
-  font-size: 1.2rem;
-  font-weight: 600;
+  font-size: var(--fs-16);
+  font-weight: var(--fw-600);
   margin-bottom: 20px;
-  color: var(--text-color);
+  color: var(--dark);
 }
 
 .article-cards {
@@ -439,30 +412,6 @@ onUnmounted(() => {
   gap: 20px;
 }
 
-/* 筛选视图 */
-.filtered-view {
-  display: flex;
-  flex-direction: column;
-  gap: 25px;
-}
-
-.filter-header {
-  margin-bottom: 10px;
-}
-
-.filter-header h2 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--text-color);
-}
-
-.article-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 25px;
-}
-
-/* 文章卡片 */
 .article-card {
   background-color: var(--card-bg);
   border-radius: 12px;
@@ -550,11 +499,28 @@ onUnmounted(() => {
   color: var(--text-color-light);
 }
 
-.view-icon {
-  font-size: 0.9rem;
+.filtered-view {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
 }
 
-/* 无文章状态 */
+.filter-header {
+  margin-bottom: 10px;
+}
+
+.filter-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.article-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 25px;
+}
+
 .no-articles {
   padding: 50px 0;
 }
@@ -601,53 +567,11 @@ onUnmounted(() => {
   color: white;
 }
 
-/* 侧边栏 */
 .blog-sidebar {
-  width: 100%;
+  width: 300px;
   display: flex;
   flex-direction: column;
   gap: 30px;
-}
-
-.sidebar-search {
-  display: flex;
-  margin-bottom: 20px;
-  position: relative;
-}
-
-.sidebar-search input {
-  flex: 1;
-  padding: 10px 15px;
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  font-size: 1rem;
-  transition: all 0.2s;
-}
-
-.sidebar-search input:focus {
-  outline: none;
-  border-color: var(--link-color);
-  box-shadow: 0 0 0 2px rgba(var(--link-color-rgb, 50, 115, 220), 0.1);
-}
-
-.search-btn {
-  position: absolute;
-  right: 0;
-  top: 0;
-  height: 100%;
-  width: 40px;
-  background: none;
-  border: none;
-  color: var(--text-color);
-  cursor: pointer;
-  opacity: 0.7;
-  transition: opacity 0.2s;
-}
-
-.search-btn:hover {
-  opacity: 1;
 }
 
 .sidebar-section {
@@ -751,80 +675,5 @@ onUnmounted(() => {
   font-size: 0.8rem;
   color: var(--text-color);
   opacity: 0.7;
-}
-
-/* 响应式调整 */
-@media (max-width: 1024px) {
-  .blog-container {
-    grid-template-columns: 1fr;
-  }
-
-  .blog-sidebar {
-    order: -1;
-  }
-
-  .sidebar-section {
-    padding: 15px;
-  }
-}
-
-@media (max-width: 768px) {
-  .header-content {
-    padding: 30px 20px;
-  }
-
-  .blog-title {
-    font-size: 2rem;
-  }
-
-  .article-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .month-block {
-    margin-left: 0;
-    padding-left: 15px;
-  }
-}
-
-/* 当页面滚动时的效果 */
-@media (min-width: 769px) {
-  .blog-header {
-    height: 180px;
-    transition: height 0.3s ease;
-  }
-
-  .blog-page.scrolled .blog-header {
-    height: 120px;
-  }
-
-  .blog-page.scrolled .blog-title {
-    font-size: 2rem;
-  }
-
-  .blog-page.scrolled .blog-description {
-    font-size: 0.9rem;
-  }
-}
-
-@media (max-width: 768px) {
-  .blog-title {
-    font-size: 2rem;
-  }
-
-  .blog-header-decoration {
-    width: 200px;
-    height: 200px;
-  }
-}
-
-/* 搜索结果样式 */
-.filtered-view .filter-header h2 {
-  margin-bottom: 20px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--border-color);
-  color: var(--text-color);
-  font-size: 1.3rem;
-  font-weight: 600;
 }
 </style>

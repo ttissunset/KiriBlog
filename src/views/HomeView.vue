@@ -1,3 +1,100 @@
+<template>
+  <div class="home-view">
+    <!-- 第一页 -->
+    <section class="page page-one">
+      <div class="gradient-overlay"></div>
+      <div class="background-image-container" ref="backgroundImageContainer" v-if="!isBgLoading">
+        <div class="refresh-button-container">
+          <button class="refresh-button" @click="changeBackground">
+            <span class="material-icons-sharp">refresh</span>
+          </button>
+        </div>
+      </div>
+      <Loading v-else full />
+    </section>
+
+    <!-- 第二页 -->
+    <section class="page page-two" id="page-two">
+      <div class="horizontal-content">
+        <div class="left-content">
+          <!-- 个人简介卡片 -->
+          <div class="profile-card">
+            <div class="profile-header">
+              <div class="profile-avatar">
+                <img src="../assets/avatar.jpg" alt="Kiri" />
+              </div>
+              <div class="profile-info">
+                <h2 class="profile-name">Kiri</h2>
+                <p class="profile-title">前端开发工程师</p>
+              </div>
+            </div>
+            <div class="profile-stats">
+              <div class="stat-item">
+                <span class="stat-value">3+</span>
+                <span class="stat-label">年工作经验</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-value">50+</span>
+                <span class="stat-label">项目经验</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-value">100+</span>
+                <span class="stat-label">技术文章</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 访问量 -->
+          <div class="visitor-counter">
+            <img :src="visitorImg.src" alt="name" />
+          </div>
+
+          <!-- 社交媒体 -->
+          <div class="social-section">
+            <h3 class="section-heading">社交媒体</h3>
+            <div class="social-grid">
+              <a href="#" class="social-item">
+                <span class="material-icons-sharp">code</span>
+                <span>GitHub</span>
+              </a>
+              <a href="#" class="social-item">
+                <span class="material-icons-sharp">chat</span>
+                <span>微信</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- 技术栈展示 -->
+          <div class="readme-section tech-showcase">
+            <h3 class="section-heading">技术栈</h3>
+            <div class="tech-grid">
+              <div class="tech-item">
+                <div class="tech-icon"></div>
+                <div class="tech-info">
+                  <h4>Vue.js</h4>
+                  <p>前端框架</p>
+                </div>
+              </div>
+              <div class="tech-item">
+                <div class="tech-icon"></div>
+                <div class="tech-info">
+                  <h4>Node.js</h4>
+                  <p>后端开发</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="middle-content"></div>
+
+      <div class="right-content">
+      </div>
+    </section>
+  </div>
+</template>
+
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
 import { debounce } from "../utils";
@@ -124,103 +221,6 @@ const changeBackground = debounce(() => {
   }
 }, 300);
 </script>
-
-<template>
-  <div class="home-view">
-    <!-- 第一页 -->
-    <section class="page page-one">
-      <div class="gradient-overlay"></div>
-      <div class="background-image-container" ref="backgroundImageContainer" v-if="!isBgLoading">
-        <div class="refresh-button-container">
-          <button class="refresh-button" @click="changeBackground">
-            <span class="material-icons-sharp">refresh</span>
-          </button>
-        </div>
-      </div>
-      <Loading v-else full />
-    </section>
-
-    <!-- 第二页 -->
-    <section class="page page-two" id="page-two">
-      <div class="horizontal-content">
-        <div class="left-content">
-          <!-- 个人简介卡片 -->
-          <div class="profile-card">
-            <div class="profile-header">
-              <div class="profile-avatar">
-                <img src="../assets/avatar.jpg" alt="Kiri" />
-              </div>
-              <div class="profile-info">
-                <h2 class="profile-name">Kiri</h2>
-                <p class="profile-title">前端开发工程师</p>
-              </div>
-            </div>
-            <div class="profile-stats">
-              <div class="stat-item">
-                <span class="stat-value">3+</span>
-                <span class="stat-label">年工作经验</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-value">50+</span>
-                <span class="stat-label">项目经验</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-value">100+</span>
-                <span class="stat-label">技术文章</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- 访问量 -->
-          <div class="visitor-counter">
-            <img :src="visitorImg.src" alt="name" />
-          </div>
-
-          <!-- 社交媒体 -->
-          <div class="social-section">
-            <h3 class="section-heading">社交媒体</h3>
-            <div class="social-grid">
-              <a href="#" class="social-item">
-                <span class="material-icons-sharp">code</span>
-                <span>GitHub</span>
-              </a>
-              <a href="#" class="social-item">
-                <span class="material-icons-sharp">chat</span>
-                <span>微信</span>
-              </a>
-            </div>
-          </div>
-
-          <!-- 技术栈展示 -->
-          <div class="readme-section tech-showcase">
-            <h3 class="section-heading">技术栈</h3>
-            <div class="tech-grid">
-              <div class="tech-item">
-                <div class="tech-icon"></div>
-                <div class="tech-info">
-                  <h4>Vue.js</h4>
-                  <p>前端框架</p>
-                </div>
-              </div>
-              <div class="tech-item">
-                <div class="tech-icon"></div>
-                <div class="tech-info">
-                  <h4>Node.js</h4>
-                  <p>后端开发</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="middle-content"></div>
-
-      <div class="right-content">
-      </div>
-    </section>
-  </div>
-</template>
 
 <style scoped>
 .home-view {

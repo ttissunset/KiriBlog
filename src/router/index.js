@@ -1,9 +1,8 @@
 import { createRouter, createWebHistory } from "vue-router";
 import HomeView from "../views/HomeView.vue";
 import NotFoundView from "../views/NotFoundView.vue";
-import ArticleView from "../views/ArticleView.vue";
+import ArticleView from "../components/ArticleViewer.vue";
 import BlogView from "../views/BlogView.vue";
-import CategoryView from "../views/CategoryView.vue";
 import ArchivePageView from "../views/ArchivePageView.vue";
 import GalleryView from "../views/GalleryView.vue";
 
@@ -74,7 +73,7 @@ router.beforeEach((to, from, next) => {
 
 // 路由加载完成后
 router.afterEach(() => {
-  setTimeout(() => {}, 200); // 短暂延迟以确保页面渲染完成
+  setTimeout(() => { }, 200); // 短暂延迟以确保页面渲染完成
 });
 
 // 处理路由错误

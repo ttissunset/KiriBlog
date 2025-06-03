@@ -123,17 +123,4 @@ onBeforeUnmount(() => {
 .main-nav a:hover {
   color: #6d41d1;
 }
-
-@media (max-width: 900px) {
-  .side-header {
-    width: 90vw;
-    min-width: 0;
-    max-width: 100vw;
-    padding: 0 10vw;
-  }
-  .header-trigger {
-    width: 90vw;
-    left: 5vw;
-  }
-}
 </style>

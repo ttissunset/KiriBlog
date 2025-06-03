@@ -308,39 +308,4 @@ const saveImage = () => {
 .save-button:hover svg {
   transform: translateY(2px);
 }
-
-@media (max-width: 768px) {
-  .viewer-container {
-    flex-direction: column;
-  }
-
-  .camera-info {
-    width: 100%;
-    height: auto;
-    max-height: 40vh;
-    padding: 15px;
-  }
-
-  .camera-info-header {
-    margin-bottom: 15px;
-    padding-bottom: 10px;
-  }
-
-  .camera-info-header h3 {
-    font-size: 1.2rem;
-  }
-
-  .viewer-main {
-    height: 60vh;
-  }
-
-  .viewer-image {
-    max-height: 55vh;
-  }
-
-  .save-button {
-    padding: 8px 12px;
-    font-size: 0.9rem;
-  }
-}
 </style>

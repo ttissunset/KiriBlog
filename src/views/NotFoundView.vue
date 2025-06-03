@@ -2,24 +2,24 @@
 </script>
 
 <template>
-    <div class="not-found">
-      <div class="not-found-content">
-        <div class="error-code">404</div>
+  <div class="not-found">
+    <div class="not-found-content">
+      <div class="error-code">404</div>
       <MaterialIcon icon="ghost" class="error-icon" />
-        <h2>页面未找到</h2>
-        <p>您访问的页面可能已被删除或移动到其他位置</p>
-        <div class="action-buttons">
-          <router-link to="/" class="btn-primary">
+      <h2>页面未找到</h2>
+      <p>您访问的页面可能已被删除或移动到其他位置</p>
+      <div class="action-buttons">
+        <router-link to="/" class="btn-primary">
           <MaterialIcon icon="home" class="btn-icon" />
-            <span>返回首页</span>
-          </router-link>
-          <router-link to="/archive" class="btn-secondary">
+          <span>返回首页</span>
+        </router-link>
+        <router-link to="/archive" class="btn-secondary">
           <MaterialIcon icon="description" class="btn-icon" />
-            <span>浏览所有文章</span>
-          </router-link>
-        </div>
+          <span>浏览所有文章</span>
+        </router-link>
       </div>
     </div>
+  </div>
 </template>
 
 <style scoped>

@@ -187,10 +187,6 @@ onMounted(() => {
             <div class="tech-grid">
               <div class="tech-item">
                 <div class="tech-icon">
-                  <img
-                    src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vuejs/vuejs-original.svg"
-                    alt="Vue.js"
-                  />
                 </div>
                 <div class="tech-info">
                   <h4>Vue.js</h4>
@@ -199,10 +195,6 @@ onMounted(() => {
               </div>
               <div class="tech-item">
                 <div class="tech-icon">
-                  <img
-                    src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg"
-                    alt="Node.js"
-                  />
                 </div>
                 <div class="tech-info">
                   <h4>Node.js</h4>
@@ -271,7 +263,7 @@ onMounted(() => {
 .background-image-container {
   width: 100%;
   height: 100%;
-  background-image: url("https://kirii.online/20250514-003324.jpeg");
+  background-image: url('https://kirii.online/20250514-003324.jpeg');
   background-size: cover;
   background-position: center;
   position: relative;
@@ -293,7 +285,7 @@ onMounted(() => {
 }
 
 .background-image-container::before {
-  content: "";
+  content: '';
   position: absolute;
   top: 0;
   left: 0;
@@ -907,7 +899,7 @@ onMounted(() => {
 }
 
 .timeline::before {
-  content: "";
+  content: '';
   position: absolute;
   left: 0;
   top: 0;

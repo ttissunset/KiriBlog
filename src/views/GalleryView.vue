@@ -3,10 +3,7 @@
     <!-- 左侧进度滑轨 -->
     <div class="gallery-progress">
       <div class="progress-bar">
-        <div
-          class="progress-indicator"
-          :style="{ height: scrollProgress + '%' }"
-        ></div>
+        <div class="progress-indicator" :style="{ height: scrollProgress + '%' }"></div>
       </div>
       <div class="progress-text">{{ Math.round(scrollProgress) }}%</div>
     </div>
@@ -25,35 +22,17 @@
 
       <!-- 相册内容，不使用虚拟滚动 -->
       <div class="gallery-container-wrapper">
-        <div
-          v-for="group in groupedImages"
-          :key="group.date"
-          class="gallery-date-group"
-        >
+        <div v-for="group in groupedImages" :key="group.date" class="gallery-date-group">
           <div class="date-label">
             <span>{{ group.date }}</span>
           </div>
           <div class="gallery-waterfall" id="pointer">
-            <template
-              v-for="(image, imageIndex) in group.images"
-              :key="imageIndex"
-            >
+            <template v-for="(image, imageIndex) in group.images" :key="imageIndex">
               <template v-if="Array.isArray(image.url)">
-                <div
-                  v-for="(imgSrc, idx) in image.url"
-                  :key="imageIndex + '-' + idx"
-                  class="gallery-item"
-                >
+                <div v-for="(imgSrc, idx) in image.url" :key="imageIndex + '-' + idx" class="gallery-item">
                   <div class="gallery-image-wrapper" @click="viewImage(image)">
                     <div v-if="!image.loaded" class="image-placeholder"></div>
-                    <img
-                      :src="imgSrc"
-                      :alt="image.description"
-                      class="gallery-image"
-                      loading="lazy"
-                      @load="imageLoaded(image)"
-                      :class="{ 'is-loaded': image.loaded }"
-                    />
+                    <img :src="imgSrc" :alt="image.description" class="gallery-image" loading="lazy" @load="imageLoaded(image)" :class="{ 'is-loaded': image.loaded }" />
                   </div>
                 </div>
               </template>
@@ -61,14 +40,7 @@
                 <div class="gallery-item">
                   <div class="gallery-image-wrapper" @click="viewImage(image)">
                     <div v-if="!image.loaded" class="image-placeholder"></div>
-                    <img
-                      :src="image.url"
-                      :alt="image.description"
-                      class="gallery-image"
-                      loading="lazy"
-                      @load="imageLoaded(image)"
-                      :class="{ 'is-loaded': image.loaded }"
-                    />
+                    <img :src="image.url" :alt="image.description" class="gallery-image" loading="lazy" @load="imageLoaded(image)" :class="{ 'is-loaded': image.loaded }" />
                   </div>
                 </div>
               </template>
@@ -78,28 +50,19 @@
       </div>
 
       <!-- 无限滚动加载触发器 -->
-      <div
-        v-if="hasMoreImages && hasItems"
-        class="load-more"
-        ref="loadMoreTrigger"
-      >
+      <div v-if="hasMoreImages && hasItems" class="load-more" ref="loadMoreTrigger">
         <div class="loading-spinner"></div>
         <p>加载更多</p>
       </div>
     </div>
 
     <!-- 使用图片查看器组件 -->
-    <image-viewer
-      v-if="activeImage"
-      :selected-image="activeImage"
-      @close="closeViewer"
-    />
+    <image-viewer v-if="activeImage" :selected-image="activeImage" @close="closeViewer" />
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted, nextTick, watch } from "vue";
-import { DotLottieVue } from "@lottiefiles/dotlottie-vue";
 import ImageViewer from "../components/ImageViewer.vue";
 
 // 导入图片资源
@@ -351,7 +314,7 @@ onUnmounted(() => {
 }
 
 .date-icon::before {
-  content: "";
+  content: '';
   position: absolute;
   top: -4px;
   left: 3px;
@@ -364,7 +327,7 @@ onUnmounted(() => {
 }
 
 .date-icon::after {
-  content: "";
+  content: '';
   position: absolute;
   top: 3px;
   left: 3px;
@@ -458,7 +421,7 @@ onUnmounted(() => {
 .loading-spinner {
   width: 150px;
   height: 150px;
-  background: url("@/assets/loading.gif") no-repeat center center;
+  background: url('@/assets/loading.gif') no-repeat center center;
   background-size: contain;
   margin-bottom: 10px;
   display: block;

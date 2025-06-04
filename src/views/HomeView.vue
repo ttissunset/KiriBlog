@@ -63,33 +63,84 @@
               </a>
             </div>
           </div>
+        </div>
 
-          <!-- 技术栈展示 -->
-          <div class="readme-section tech-showcase">
-            <h3 class="section-heading">技术栈</h3>
-            <div class="tech-grid">
-              <div class="tech-item">
-                <div class="tech-icon"></div>
-                <div class="tech-info">
-                  <h4>Vue.js</h4>
-                  <p>前端框架</p>
+        <div class="middle-content">
+          111
+        </div>
+
+        <div class="right-content">
+          <!-- 设备信息展示 -->
+          <div class="device-info-section" v-if="!showClawMachine">
+            <h3 class="section-heading">设备信息</h3>
+            <div class="device-info-card">
+              <div class="device-info-item">
+                <span class="material-icons-sharp">computer</span>
+                <div class="device-info-content">
+                  <span class="device-info-label">操作系统</span>
+                  <span class="device-info-value">{{ deviceInfo.os }}</span>
                 </div>
               </div>
-              <div class="tech-item">
-                <div class="tech-icon"></div>
-                <div class="tech-info">
-                  <h4>Node.js</h4>
-                  <p>后端开发</p>
+              <div class="device-info-item">
+                <span class="material-icons-sharp">web</span>
+                <div class="device-info-content">
+                  <span class="device-info-label">浏览器</span>
+                  <span class="device-info-value">{{ deviceInfo.browser }}</span>
+                </div>
+              </div>
+              <div class="device-info-item">
+                <span class="material-icons-sharp">router</span>
+                <div class="device-info-content">
+                  <span class="device-info-label">IP地址</span>
+                  <span class="device-info-value">{{ deviceInfo.ip }}</span>
+                </div>
+              </div>
+              <div class="device-info-item">
+                <span class="material-icons-sharp">memory</span>
+                <div class="device-info-content">
+                  <span class="device-info-label">CPU</span>
+                  <span class="device-info-value">{{ deviceInfo.cpu }}</span>
+                </div>
+              </div>
+              <div class="device-info-item">
+                <span class="material-icons-sharp">storage</span>
+                <div class="device-info-content">
+                  <span class="device-info-label">内存</span>
+                  <span class="device-info-value">{{ deviceInfo.memory }}</span>
+                </div>
+              </div>
+              <div class="device-info-item">
+                <span class="material-icons-sharp">speed</span>
+                <div class="device-info-content">
+                  <span class="device-info-label">网速</span>
+                  <span class="device-info-value">{{ deviceInfo.network }}</span>
                 </div>
               </div>
             </div>
           </div>
+
+          <!-- 游戏选择栏 -->
+          <div class="games-section" v-if="!showClawMachine">
+            <h3 class="section-heading">休闲游戏</h3>
+            <div class="games-grid" id="pointer">
+              <div class="game-card" v-for="(game, index) in games.slice(0, 3)" :key="game.id" @click="selectGame(game)" :class="{
+                    'slide-left': index % 2 === 0,
+                    'slide-right': index % 2 === 1
+                  }">
+                <div class="game-icon">
+                  <span class="material-icons-sharp">{{ game.icon }}</span>
+                </div>
+                <h4 class="game-title">{{ game.title }}</h4>
+                <p class="game-desc">{{ game.description }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- 娃娃机游戏 -->
+          <div class="claw-machine-container" v-if="showClawMachine">
+            <ClawMachine />
+          </div>
         </div>
-      </div>
-
-      <div class="middle-content"></div>
-
-      <div class="right-content">
       </div>
     </section>
   </div>
@@ -99,8 +150,10 @@
 import { ref, onMounted, onUnmounted } from "vue";
 import { debounce } from "../utils";
 import Loading from "../components/Loading.vue";
+import ClawMachine from "../components/Games/ClawMachine.vue";
 
 const isBgLoading = ref(true);
+const showClawMachine = ref(false);
 
 const visitor = "https://api.likepoems.com/counter/get/@kiriBlog";
 const visitorImg = new Image();
@@ -220,6 +273,232 @@ const changeBackground = debounce(() => {
     }, 400);
   }
 }, 300);
+
+// 设备信息
+const deviceInfo = ref({
+  os: '正在获取...',
+  browser: '正在获取...',
+  ip: '正在获取...',
+  cpu: '正在获取...',
+  memory: '正在获取...',
+  network: '正在获取...'
+});
+
+// 获取浏览器信息
+const getBrowserInfo = () => {
+  const userAgent = navigator.userAgent;
+  let browserName = '未知浏览器';
+
+  if (userAgent.indexOf('Chrome') > -1) {
+    browserName = 'Chrome';
+  } else if (userAgent.indexOf('Firefox') > -1) {
+    browserName = 'Firefox';
+  } else if (userAgent.indexOf('Safari') > -1) {
+    browserName = 'Safari';
+  } else if (userAgent.indexOf('Edge') > -1) {
+    browserName = 'Edge';
+  } else if (userAgent.indexOf('MSIE') > -1 || userAgent.indexOf('Trident') > -1) {
+    browserName = 'Internet Explorer';
+  }
+
+  return browserName;
+};
+
+// 获取操作系统信息
+const getOSInfo = () => {
+  const userAgent = navigator.userAgent;
+  let osName = '未知系统';
+
+  if (userAgent.indexOf('Win') > -1) {
+    osName = 'Windows';
+  } else if (userAgent.indexOf('Mac') > -1) {
+    osName = 'MacOS';
+  } else if (userAgent.indexOf('Linux') > -1) {
+    osName = 'Linux';
+  } else if (userAgent.indexOf('Android') > -1) {
+    osName = 'Android';
+  } else if (userAgent.indexOf('iOS') > -1) {
+    osName = 'iOS';
+  }
+
+  return osName;
+};
+
+// 获取CPU信息
+const getCPUInfo = () => {
+  try {
+    const cores = navigator.hardwareConcurrency || '未知';
+    const cpuName = getCPUName();
+    return `${cpuName} (${cores}核心)`;
+  } catch (error) {
+    console.error('获取CPU信息失败:', error);
+    return '未知';
+  }
+};
+
+// 获取CPU名称
+const getCPUName = () => {
+  const userAgent = navigator.userAgent;
+  if (userAgent.indexOf('Intel') > -1) {
+    return 'Intel';
+  } else if (userAgent.indexOf('AMD') > -1) {
+    return 'AMD';
+  } else if (userAgent.indexOf('Apple') > -1) {
+    return 'Apple Silicon';
+  }
+  return '未知处理器';
+};
+
+// 获取网速
+const getNetworkSpeed = async () => {
+  try {
+    const startTime = performance.now();
+    // 使用一个较小的图片来测试网速
+    const response = await fetch('https://www.baidu.com/favicon.ico', {
+      mode: 'no-cors',
+      cache: 'no-cache'
+    });
+    const endTime = performance.now();
+    const duration = endTime - startTime;
+
+    // 假设文件大小为 1KB
+    const fileSize = 1;
+    const speed = (fileSize / (duration / 1000)).toFixed(2);
+
+    if (speed > 1) {
+      return `${speed} MB/s`;
+    } else {
+      return `${(speed * 1024).toFixed(2)} KB/s`;
+    }
+  } catch (error) {
+    console.error('获取网速失败:', error);
+    return '未知';
+  }
+};
+
+// 获取内存信息
+const getMemoryInfo = () => {
+  if (navigator.deviceMemory) {
+    return `${navigator.deviceMemory}GB RAM`;
+  }
+  return '未知';
+};
+
+// 获取IP地址
+const getIPAddress = async () => {
+  try {
+    // 尝试多个IP获取服务
+    const ipApis = [
+      'https://api.ipify.org?format=json',
+      'https://api.ip.sb/ip',
+      'https://api.ipify.org?format=json'
+    ];
+
+    for (const api of ipApis) {
+      try {
+        const response = await fetch(api, {
+          mode: 'cors',
+          cache: 'no-cache',
+          timeout: 5000
+        });
+        if (response.ok) {
+          const data = await response.json();
+          return data.ip || '未知';
+        }
+      } catch (e) {
+        console.warn(`API ${api} 获取失败，尝试下一个`);
+        continue;
+      }
+    }
+    return '未知';
+  } catch (error) {
+    console.error('获取IP地址失败:', error);
+    return '未知';
+  }
+};
+
+// 初始化设备信息
+const initDeviceInfo = async () => {
+  try {
+    // 先设置基本信息
+    deviceInfo.value = {
+      os: getOSInfo(),
+      browser: getBrowserInfo(),
+      cpu: getCPUInfo(),
+      memory: getMemoryInfo(),
+      ip: '正在获取...',
+      network: '正在获取...'
+    };
+
+    // 异步获取IP和网速
+    const [ip, network] = await Promise.all([
+      getIPAddress(),
+      getNetworkSpeed()
+    ]);
+
+    // 更新异步获取的信息
+    deviceInfo.value = {
+      ...deviceInfo.value,
+      ip,
+      network
+    };
+  } catch (error) {
+    console.error('初始化设备信息失败:', error);
+  }
+};
+
+// 定期更新网速
+const updateNetworkSpeed = async () => {
+  try {
+    const speed = await getNetworkSpeed();
+    if (speed !== '未知') {
+      deviceInfo.value.network = speed;
+    }
+  } catch (error) {
+    console.error('更新网速失败:', error);
+  }
+};
+
+// 在组件挂载时获取设备信息
+onMounted(() => {
+  initDeviceInfo();
+  // 每30秒更新一次网速
+  const speedInterval = setInterval(updateNetworkSpeed, 30000);
+
+  // 组件卸载时清除定时器
+  onUnmounted(() => {
+    clearInterval(speedInterval);
+  });
+});
+
+// 游戏列表
+const games = ref([
+  {
+    id: 1,
+    title: '2048',
+    icon: 'grid_4x4',
+    description: '经典数字合并游戏，考验你的策略思维'
+  },
+  {
+    id: 2,
+    title: '贪吃蛇',
+    icon: 'extension',
+    description: '控制蛇吃食物，不断变长，注意不要撞墙'
+  },
+  {
+    id: 3,
+    title: '俄罗斯方块',
+    icon: 'view_quilt',
+    description: '经典的方块堆叠游戏，考验你的空间思维'
+  }
+]);
+
+// 选择游戏
+const selectGame = (game) => {
+  if (game.id === 1) {
+    showClawMachine.value = true;
+  }
+};
 </script>
 
 <style scoped>
@@ -351,6 +630,7 @@ const changeBackground = debounce(() => {
   height: 100%;
   padding: 40px;
   box-sizing: border-box;
+  gap: 24px;
 }
 
 .left-content,
@@ -360,6 +640,30 @@ const changeBackground = debounce(() => {
   padding: 20px;
   overflow-y: auto;
   max-height: 100%;
+  background-color: var(--light-white);
+  border-radius: var(--radius-12);
+  box-shadow: var(--shadow-1);
+}
+
+/* 优化滚动条样式 */
+.left-content::-webkit-scrollbar,
+.middle-content::-webkit-scrollbar,
+.right-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.left-content::-webkit-scrollbar-thumb,
+.middle-content::-webkit-scrollbar-thumb,
+.right-content::-webkit-scrollbar-thumb {
+  background-color: var(--youth-blue-3);
+  border-radius: 3px;
+}
+
+.left-content::-webkit-scrollbar-track,
+.middle-content::-webkit-scrollbar-track,
+.right-content::-webkit-scrollbar-track {
+  background-color: var(--cultured);
+  border-radius: 3px;
 }
 
 /* 刷新按钮样式 */
@@ -804,7 +1108,7 @@ const changeBackground = debounce(() => {
 
 .projects-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: 1fr;
   gap: 16px;
 }
 
@@ -903,7 +1207,7 @@ const changeBackground = debounce(() => {
 
 .timeline {
   position: relative;
-  padding-left: 24px;
+  padding-left: 20px;
 }
 
 .timeline::before {
@@ -923,7 +1227,7 @@ const changeBackground = debounce(() => {
 
 .timeline-dot {
   position: absolute;
-  left: -29px;
+  left: -25px;
   top: 0;
   width: 12px;
   height: 12px;
@@ -1149,5 +1453,245 @@ const changeBackground = debounce(() => {
 .visitor-counter img {
   width: 100%;
   margin-bottom: 32px;
+}
+
+/* 设备信息样式 */
+.device-info-section {
+  flex-shrink: 0;
+}
+
+.device-info-card {
+  background-color: var(--light-white);
+  border-radius: var(--radius-12);
+  padding: 16px;
+  box-shadow: var(--shadow-1);
+}
+
+.device-info-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border-bottom: 1px solid var(--cultured);
+  transition: all 0.3s ease;
+}
+
+.device-info-item:hover {
+  background-color: var(--youth-blue-3);
+  transform: translateX(4px);
+}
+
+.device-info-item:last-child {
+  border-bottom: none;
+}
+
+.device-info-item .material-icons-sharp {
+  font-size: 24px;
+  color: var(--blue-crayola);
+  transition: transform 0.3s ease;
+}
+
+.device-info-item:hover .material-icons-sharp {
+  transform: scale(1.1);
+}
+
+.device-info-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.device-info-label {
+  font-size: var(--fs-12);
+  color: var(--dark);
+  opacity: 0.7;
+}
+
+.device-info-value {
+  font-size: var(--fs-14);
+  font-weight: var(--fw-600);
+  color: var(--dark);
+  word-break: break-all;
+  line-height: 1.4;
+}
+
+/* 游戏选择样式 */
+.games-section {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  margin-top: 50px;
+}
+
+.games-section .section-heading {
+  flex-shrink: 0;
+}
+
+.games-grid {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 12px 0;
+  overflow-y: auto;
+}
+
+.games-grid::-webkit-scrollbar {
+  width: 4px;
+}
+
+.games-grid::-webkit-scrollbar-thumb {
+  background-color: var(--youth-blue-3);
+  border-radius: 2px;
+}
+
+.games-grid::-webkit-scrollbar-track {
+  background-color: var(--cultured);
+  border-radius: 2px;
+}
+
+.game-card {
+  background-color: var(--light-white);
+  border-radius: var(--radius-12);
+  padding: 16px;
+  box-shadow: var(--shadow-1);
+  transition: all 0.3s ease;
+  opacity: 0;
+  transform: translateX(-100px);
+  max-width: 100%;
+  height: 120px;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.game-card.slide-left {
+  animation: slideInLeft 0.6s ease forwards;
+}
+
+.game-card.slide-right {
+  animation: slideInRight 0.6s ease forwards;
+}
+
+@keyframes slideInLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-100px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  0% {
+    opacity: 0;
+    transform: translateX(100px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.game-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-2);
+}
+
+.game-icon {
+  width: 48px;
+  height: 48px;
+  background-color: var(--youth-blue-3);
+  border-radius: var(--radius-circle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
+}
+
+.game-card:hover .game-icon {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.game-icon .material-icons-sharp {
+  font-size: 24px;
+  color: var(--blue-crayola);
+}
+
+.game-title {
+  font-size: var(--fs-16);
+  font-weight: var(--fw-600);
+  color: var(--dark);
+  margin-bottom: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.game-desc {
+  font-size: var(--fs-12);
+  color: var(--dark);
+  opacity: 0.7;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+
+/* 响应式调整 */
+@media (max-width: 1200px) {
+  .games-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 娃娃机容器样式 */
+.claw-machine-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: slideInFromLeft 0.5s ease-out;
+}
+
+@keyframes slideInFromLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* 调整右侧内容区域样式 */
+.right-content {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  max-height: 100%;
+  background-color: var(--light-white);
+  border-radius: var(--radius-12);
+  box-shadow: var(--shadow-1);
+  display: flex;
+  flex-direction: column;
+}
+
+/* 确保娃娃机不会溢出容器 */
+.claw-machine-container :deep(.wrapper) {
+  max-height: 100%;
+  height: auto;
+  min-height: auto;
 }
 </style>

@@ -17,51 +17,9 @@
     <section class="page page-two" id="page-two">
       <div class="horizontal-content">
         <div class="left-content">
-          <!-- 个人简介卡片 -->
-          <div class="profile-card">
-            <div class="profile-header">
-              <div class="profile-avatar">
-                <img src="../assets/avatar.jpg" alt="Kiri" />
-              </div>
-              <div class="profile-info">
-                <h2 class="profile-name">Kiri</h2>
-                <p class="profile-title">前端开发工程师</p>
-              </div>
-            </div>
-            <div class="profile-stats">
-              <div class="stat-item">
-                <span class="stat-value">3+</span>
-                <span class="stat-label">年工作经验</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-value">50+</span>
-                <span class="stat-label">项目经验</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-value">100+</span>
-                <span class="stat-label">技术文章</span>
-              </div>
-            </div>
-          </div>
-
           <!-- 访问量 -->
           <div class="visitor-counter">
             <img :src="visitorImg.src" alt="name" />
-          </div>
-
-          <!-- 社交媒体 -->
-          <div class="social-section">
-            <h3 class="section-heading">社交媒体</h3>
-            <div class="social-grid">
-              <a href="#" class="social-item">
-                <span class="material-icons-sharp">code</span>
-                <span>GitHub</span>
-              </a>
-              <a href="#" class="social-item">
-                <span class="material-icons-sharp">chat</span>
-                <span>微信</span>
-              </a>
-            </div>
           </div>
         </div>
 
@@ -70,76 +28,7 @@
         </div>
 
         <div class="right-content">
-          <!-- 设备信息展示 -->
-          <div class="device-info-section" v-if="!showClawMachine">
-            <h3 class="section-heading">设备信息</h3>
-            <div class="device-info-card">
-              <div class="device-info-item">
-                <span class="material-icons-sharp">computer</span>
-                <div class="device-info-content">
-                  <span class="device-info-label">操作系统</span>
-                  <span class="device-info-value">{{ deviceInfo.os }}</span>
-                </div>
-              </div>
-              <div class="device-info-item">
-                <span class="material-icons-sharp">web</span>
-                <div class="device-info-content">
-                  <span class="device-info-label">浏览器</span>
-                  <span class="device-info-value">{{ deviceInfo.browser }}</span>
-                </div>
-              </div>
-              <div class="device-info-item">
-                <span class="material-icons-sharp">router</span>
-                <div class="device-info-content">
-                  <span class="device-info-label">IP地址</span>
-                  <span class="device-info-value">{{ deviceInfo.ip }}</span>
-                </div>
-              </div>
-              <div class="device-info-item">
-                <span class="material-icons-sharp">memory</span>
-                <div class="device-info-content">
-                  <span class="device-info-label">CPU</span>
-                  <span class="device-info-value">{{ deviceInfo.cpu }}</span>
-                </div>
-              </div>
-              <div class="device-info-item">
-                <span class="material-icons-sharp">storage</span>
-                <div class="device-info-content">
-                  <span class="device-info-label">内存</span>
-                  <span class="device-info-value">{{ deviceInfo.memory }}</span>
-                </div>
-              </div>
-              <div class="device-info-item">
-                <span class="material-icons-sharp">speed</span>
-                <div class="device-info-content">
-                  <span class="device-info-label">网速</span>
-                  <span class="device-info-value">{{ deviceInfo.network }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
 
-          <!-- 游戏选择栏 -->
-          <div class="games-section" v-if="!showClawMachine">
-            <h3 class="section-heading">休闲游戏</h3>
-            <div class="games-grid" id="pointer">
-              <div class="game-card" v-for="(game, index) in games.slice(0, 3)" :key="game.id" @click="selectGame(game)" :class="{
-                    'slide-left': index % 2 === 0,
-                    'slide-right': index % 2 === 1
-                  }">
-                <div class="game-icon">
-                  <span class="material-icons-sharp">{{ game.icon }}</span>
-                </div>
-                <h4 class="game-title">{{ game.title }}</h4>
-                <p class="game-desc">{{ game.description }}</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- 娃娃机游戏 -->
-          <div class="claw-machine-container" v-if="showClawMachine">
-            <ClawMachine />
-          </div>
         </div>
       </div>
     </section>
@@ -147,13 +36,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, onMounted } from "vue";
 import { debounce } from "../utils";
 import Loading from "../components/Loading.vue";
-import ClawMachine from "../components/Games/ClawMachine.vue";
 
 const isBgLoading = ref(true);
-const showClawMachine = ref(false);
 
 const visitor = "https://api.likepoems.com/counter/get/@kiriBlog";
 const visitorImg = new Image();
@@ -161,52 +48,11 @@ visitorImg.src = visitor;
 
 // 背景图数组
 const backgroundImages = [
-  "https://kirii.online/20250514-003324.jpeg",
-  "https://kirii.online/20250520-232650.webp",
-  "https://kirii.online/20250514-214947.webp",
-  "https://kirii.online/20250514-210152.jpg",
-  "https://kirii.online/20250514-205217.png",
-  "https://kirii.online/20250514-205211.png",
-  "https://kirii.online/20250514-205124.png",
-  "https://kirii.online/20250514-205120.png",
-  "https://kirii.online/20250514-205017.png",
-  "https://kirii.online/20250514-205111.png",
-  "https://kirii.online/20250514-003320.jpeg",
-  "https://kirii.online/20250514-003317.jpeg",
-  "https://kirii.online/20250514-003315.jpeg",
-  "https://kirii.online/20250514-003311.jpeg",
-  "https://kirii.online/20250514-001113.jpg",
-  "https://kirii.online/20250514-001112.jpg",
-  "https://kirii.online/20250521-210953.webp",
-  "https://kirii.online/20250521-211301.webp",
-  "https://kirii.online/20250521-211146.webp",
-  "https://kirii.online/20250521-211142.webp",
-  "https://kirii.online/20250521-211134.webp",
-  "https://kirii.online/20250521-211128.webp",
-  "https://kirii.online/20250521-211113.webp",
-  "https://kirii.online/20250521-211610.webp",
-  "https://kirii.online/20250521-211603.webp",
-  "https://kirii.online/20250521-211541.webp",
-  "https://kirii.online/20250521-211536.webp",
-  "https://kirii.online/20250521-211528.webp",
-  "https://kirii.online/20250521-211358.webp",
-  "https://kirii.online/20250522-102546.webp",
-  "https://kirii.online/20250522-102533.webp",
-  "https://kirii.online/20250522-102527.webp",
-  "https://kirii.online/20250522-102522.webp",
-  "https://kirii.online/20250522-102514.webp",
-  "https://kirii.online/20250522-102505.webp",
-  "https://kirii.online/20250521-225616.webp",
-  "https://kirii.online/20250521-211610.webp",
-  "https://kirii.online/20250522-105253.webp",
-  "https://kirii.online/20250522-105237.webp",
-  "https://kirii.online/20250522-105233.webp",
-  "https://kirii.online/20250522-105228.webp",
-  "https://kirii.online/20250522-105222.webp",
-  "https://kirii.online/20250522-105733.webp",
-  "https://kirii.online/20250522-105758.webp",
-  "https://kirii.online/bLDm3.webp",
-  "https://kirii.online/65f927e1b1b63.jpg",
+  "https://kirii.online/kiri/13.jpg",
+  "https://kirii.online/kiri/20250819-162636.webp",
+  "https://kirii.online/kiri/20250820-175522.webp",
+  "https://kirii.online/kiri/recommend_image_1756093969338.jpg",
+  "https://kirii.online/kiri/20250914-161629.webp"
 ];
 
 const currentBgIndex = ref(0);
@@ -273,232 +119,6 @@ const changeBackground = debounce(() => {
     }, 400);
   }
 }, 300);
-
-// 设备信息
-const deviceInfo = ref({
-  os: '正在获取...',
-  browser: '正在获取...',
-  ip: '正在获取...',
-  cpu: '正在获取...',
-  memory: '正在获取...',
-  network: '正在获取...'
-});
-
-// 获取浏览器信息
-const getBrowserInfo = () => {
-  const userAgent = navigator.userAgent;
-  let browserName = '未知浏览器';
-
-  if (userAgent.indexOf('Chrome') > -1) {
-    browserName = 'Chrome';
-  } else if (userAgent.indexOf('Firefox') > -1) {
-    browserName = 'Firefox';
-  } else if (userAgent.indexOf('Safari') > -1) {
-    browserName = 'Safari';
-  } else if (userAgent.indexOf('Edge') > -1) {
-    browserName = 'Edge';
-  } else if (userAgent.indexOf('MSIE') > -1 || userAgent.indexOf('Trident') > -1) {
-    browserName = 'Internet Explorer';
-  }
-
-  return browserName;
-};
-
-// 获取操作系统信息
-const getOSInfo = () => {
-  const userAgent = navigator.userAgent;
-  let osName = '未知系统';
-
-  if (userAgent.indexOf('Win') > -1) {
-    osName = 'Windows';
-  } else if (userAgent.indexOf('Mac') > -1) {
-    osName = 'MacOS';
-  } else if (userAgent.indexOf('Linux') > -1) {
-    osName = 'Linux';
-  } else if (userAgent.indexOf('Android') > -1) {
-    osName = 'Android';
-  } else if (userAgent.indexOf('iOS') > -1) {
-    osName = 'iOS';
-  }
-
-  return osName;
-};
-
-// 获取CPU信息
-const getCPUInfo = () => {
-  try {
-    const cores = navigator.hardwareConcurrency || '未知';
-    const cpuName = getCPUName();
-    return `${cpuName} (${cores}核心)`;
-  } catch (error) {
-    console.error('获取CPU信息失败:', error);
-    return '未知';
-  }
-};
-
-// 获取CPU名称
-const getCPUName = () => {
-  const userAgent = navigator.userAgent;
-  if (userAgent.indexOf('Intel') > -1) {
-    return 'Intel';
-  } else if (userAgent.indexOf('AMD') > -1) {
-    return 'AMD';
-  } else if (userAgent.indexOf('Apple') > -1) {
-    return 'Apple Silicon';
-  }
-  return '未知处理器';
-};
-
-// 获取网速
-const getNetworkSpeed = async () => {
-  try {
-    const startTime = performance.now();
-    // 使用一个较小的图片来测试网速
-    const response = await fetch('https://www.baidu.com/favicon.ico', {
-      mode: 'no-cors',
-      cache: 'no-cache'
-    });
-    const endTime = performance.now();
-    const duration = endTime - startTime;
-
-    // 假设文件大小为 1KB
-    const fileSize = 1;
-    const speed = (fileSize / (duration / 1000)).toFixed(2);
-
-    if (speed > 1) {
-      return `${speed} MB/s`;
-    } else {
-      return `${(speed * 1024).toFixed(2)} KB/s`;
-    }
-  } catch (error) {
-    console.error('获取网速失败:', error);
-    return '未知';
-  }
-};
-
-// 获取内存信息
-const getMemoryInfo = () => {
-  if (navigator.deviceMemory) {
-    return `${navigator.deviceMemory}GB RAM`;
-  }
-  return '未知';
-};
-
-// 获取IP地址
-const getIPAddress = async () => {
-  try {
-    // 尝试多个IP获取服务
-    const ipApis = [
-      'https://api.ipify.org?format=json',
-      'https://api.ip.sb/ip',
-      'https://api.ipify.org?format=json'
-    ];
-
-    for (const api of ipApis) {
-      try {
-        const response = await fetch(api, {
-          mode: 'cors',
-          cache: 'no-cache',
-          timeout: 5000
-        });
-        if (response.ok) {
-          const data = await response.json();
-          return data.ip || '未知';
-        }
-      } catch (e) {
-        console.warn(`API ${api} 获取失败，尝试下一个`);
-        continue;
-      }
-    }
-    return '未知';
-  } catch (error) {
-    console.error('获取IP地址失败:', error);
-    return '未知';
-  }
-};
-
-// 初始化设备信息
-const initDeviceInfo = async () => {
-  try {
-    // 先设置基本信息
-    deviceInfo.value = {
-      os: getOSInfo(),
-      browser: getBrowserInfo(),
-      cpu: getCPUInfo(),
-      memory: getMemoryInfo(),
-      ip: '正在获取...',
-      network: '正在获取...'
-    };
-
-    // 异步获取IP和网速
-    const [ip, network] = await Promise.all([
-      getIPAddress(),
-      getNetworkSpeed()
-    ]);
-
-    // 更新异步获取的信息
-    deviceInfo.value = {
-      ...deviceInfo.value,
-      ip,
-      network
-    };
-  } catch (error) {
-    console.error('初始化设备信息失败:', error);
-  }
-};
-
-// 定期更新网速
-const updateNetworkSpeed = async () => {
-  try {
-    const speed = await getNetworkSpeed();
-    if (speed !== '未知') {
-      deviceInfo.value.network = speed;
-    }
-  } catch (error) {
-    console.error('更新网速失败:', error);
-  }
-};
-
-// 在组件挂载时获取设备信息
-onMounted(() => {
-  initDeviceInfo();
-  // 每30秒更新一次网速
-  const speedInterval = setInterval(updateNetworkSpeed, 30000);
-
-  // 组件卸载时清除定时器
-  onUnmounted(() => {
-    clearInterval(speedInterval);
-  });
-});
-
-// 游戏列表
-const games = ref([
-  {
-    id: 1,
-    title: '2048',
-    icon: 'grid_4x4',
-    description: '经典数字合并游戏，考验你的策略思维'
-  },
-  {
-    id: 2,
-    title: '贪吃蛇',
-    icon: 'extension',
-    description: '控制蛇吃食物，不断变长，注意不要撞墙'
-  },
-  {
-    id: 3,
-    title: '俄罗斯方块',
-    icon: 'view_quilt',
-    description: '经典的方块堆叠游戏，考验你的空间思维'
-  }
-]);
-
-// 选择游戏
-const selectGame = (game) => {
-  if (game.id === 1) {
-    showClawMachine.value = true;
-  }
-};
 </script>
 
 <style scoped>
@@ -550,7 +170,7 @@ const selectGame = (game) => {
 .background-image-container {
   width: 100%;
   height: 100%;
-  background-image: url('https://kirii.online/20250514-003324.jpeg');
+  background-image: url('https://kirii.online/kiri/13.jpg');
   background-size: cover;
   background-position: center;
   position: relative;

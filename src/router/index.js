@@ -1,50 +1,13 @@
 import { createRouter, createWebHistory } from "vue-router";
-import HomeView from "../views/HomeView.vue";
-import NotFoundView from "../views/NotFoundView.vue";
-import ArticleView from "../components/ArticleViewer.vue";
-import BlogView from "../views/BlogView.vue";
-import ArchivePageView from "../views/ArchivePageView.vue";
-import GalleryView from "../views/GalleryView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: "/",
       name: "home",
-      component: HomeView,
+      component: () => import("../views/HomeView.vue"),
       meta: { title: "首页" },
-    },
-    {
-      path: "/blog",
-      name: "blog",
-      component: BlogView,
-      meta: { title: "博客" },
-    },
-    {
-      path: "/article/:id",
-      name: "article",
-      component: ArticleView,
-      meta: { title: "文章详情" },
-    },
-    {
-      path: "/gallery",
-      name: "gallery",
-      component: GalleryView,
-      meta: { title: "图库" },
-    },
-    {
-      path: "/archive",
-      name: "archive",
-      component: ArchivePageView,
-      meta: { title: "归档" },
-    },
-    {
-      path: "/:pathMatch(.*)*",
-      name: "not-found",
-      component: NotFoundView,
-      meta: { title: "页面未找到" },
-    },
+    }
   ],
   // 添加滚动行为，在路由切换时自动滚动到顶部
   scrollBehavior(to, from, savedPosition) {

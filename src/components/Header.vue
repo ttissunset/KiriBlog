@@ -43,10 +43,8 @@ onBeforeUnmount(() => {
         <nav class="main-nav">
           <ul>
             <li><router-link to="/" id="pointer">首页</router-link></li>
-            <li><router-link to="/gallery" id="pointer">相册</router-link></li>
             <li><router-link to="/blog" id="pointer">文章</router-link></li>
             <li><router-link to="/archive" id="pointer">归档</router-link></li>
-            <li><router-link to="/blog" id="pointer">随记</router-link></li>
           </ul>
         </nav>
       </div>

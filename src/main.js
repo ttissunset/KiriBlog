@@ -9,10 +9,10 @@ app.use(pinia)
 app.use(router)
 
 // 禁用右键点击
-document.addEventListener('contextmenu', (e) => {
-  e.preventDefault();
-  return false;
-});
+// document.addEventListener('contextmenu', (e) => {
+//   e.preventDefault();
+//   return false;
+// });
 
 // 挂载应用
 app.mount('#app')

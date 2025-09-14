@@ -7,6 +7,7 @@ const emit = defineEmits(['scrollToContent']);
 const displayBio = ref('');
 const fullBio = '"自由独立试新茶，沉醉半生"';
 
+// 文字打字机效果
 const typeWriter = () => {
   let i = 0;
   const speed = 100; // 打字速度（毫秒）
@@ -39,10 +40,10 @@ const handleScroll = () => {
       if (start === null) start = currentTime;
       const timeElapsed = currentTime - start;
       const progress = Math.min(timeElapsed / duration, 1);
-      
+
       // 使用easeInOutQuad缓动函数
-      const easeProgress = progress < 0.5 
-        ? 2 * progress * progress 
+      const easeProgress = progress < 0.5
+        ? 2 * progress * progress
         : 1 - Math.pow(-2 * progress + 2, 2) / 2;
 
       window.scrollTo(0, startPosition + distance * easeProgress);

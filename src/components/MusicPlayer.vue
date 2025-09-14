@@ -252,17 +252,17 @@ onUnmounted(cleanupAudio);
 .player-content {
   display: flex;
   align-items: center;
-  width: 100%; /* 让内容占据父容器（music-player）的全部宽度 */
+  width: 100%;
 }
 
 .album-cover {
-  width: 90px; /* 缩小专辑图片尺寸 */
-  height: 90px; /* 缩小专辑图片尺寸 */
+  max-width: 90px;
+  max-height: 90px;
   border-radius: 50%;
   overflow: hidden;
-  margin-right: 20px; /* 与右侧内容保持间距 */
+  margin-right: 20px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  flex-shrink: 0; /* 防止封面缩小 */
+  flex-shrink: 0;
   animation: element-appear 0.5s ease-out 0.2s both;
 }
 
@@ -271,17 +271,15 @@ onUnmounted(cleanupAudio);
   height: 100%;
   object-fit: cover;
   animation: cover-rotate 15s linear infinite;
-  animation-play-state: paused; /* 默认暂停 */
+  animation-play-state: paused;
   transform-origin: center center;
-  /* 添加 will-change 提高旋转性能 */
   will-change: transform;
-  /* 添加过渡效果，使暂停更平滑 */
   transition: animation-play-state 0.2s ease;
 }
 
 /* 当播放状态激活时旋转专辑封面 */
 .music-player.playing .cover-img {
-  animation-play-state: running; /* 播放时旋转 */
+  animation-play-state: running;
 }
 
 /* 专辑封面旋转动画 */
@@ -306,8 +304,7 @@ onUnmounted(cleanupAudio);
   background-color: #eef0f3;
   border-radius: var(--radius-small);
   padding: 5px 10px;
-  margin-bottom: 15px; /* 调整间距 */
-  /* 移除 width: fit-content; 让其宽度适应容器 */
+  margin-bottom: 15px;
 }
 
 .search-bar span {
@@ -317,7 +314,7 @@ onUnmounted(cleanupAudio);
 
 .song-info {
   text-align: left;
-  margin-bottom: 10px; /* 调整间距 */
+  margin-bottom: 10px;
 }
 
 .song-title {
@@ -351,7 +348,7 @@ onUnmounted(cleanupAudio);
 }
 
 .controls-and-volume {
-  display: none; /* 不再使用此类 */
+  display: none;
 }
 
 .controls {
@@ -361,7 +358,7 @@ onUnmounted(cleanupAudio);
 
 .control-btn {
   font-size: var(--fs-30);
-  margin: 0 8px; /* 调整按钮间距 */
+  margin: 0 8px;
   color: #57606a;
   transition: all 0.2s ease;
 }
@@ -377,8 +374,8 @@ onUnmounted(cleanupAudio);
 
 .play-pause {
   font-size: var(--fs-48);
-  color: #6f42c1; /* 紫色，参考图片 */
-  background-color: #e1d5f4; /* 淡紫色背景 */
+  color: #6f42c1;
+  background-color: #e1d5f4;
   border-radius: 50%;
   padding: 5px;
   display: flex;
@@ -403,7 +400,6 @@ onUnmounted(cleanupAudio);
   display: flex;
   align-items: center;
   width: 100%;
-  /* 作为最后一个元素，不需要 margin-bottom */
   animation: element-appear 0.5s ease-out 0.5s both;
 }
 
@@ -453,7 +449,6 @@ onUnmounted(cleanupAudio);
 .volume-control span {
   font-size: var(--fs-24);
   transition: all 0.2s ease;
-  /* 添加手型光标 已删除 */
 }
 
 .volume-control span:hover {
